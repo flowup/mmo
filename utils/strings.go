@@ -1,6 +1,10 @@
 package utils
 
-import "regexp"
+import (
+	"regexp"
+	"os"
+	"path/filepath"
+)
 
 func SepareteFileNameFromPath(path string) (string, error) {
 	golintRegex := regexp.MustCompile(`\/(.[^\/]+)$`)
@@ -10,4 +14,14 @@ func SepareteFileNameFromPath(path string) (string, error) {
 	}
 
 	return filename[1], nil
+}
+
+func ImportPath() (string, error) {
+	golintRegex := regexp.MustCompile(`(github.+)`)
+	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	if err != nil {
+		return "", err
+	}
+	filepath := golintRegex.FindStringSubmatch(dir)
+	return filepath[0], nil
 }

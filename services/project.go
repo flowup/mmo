@@ -5,7 +5,12 @@ import (
 )
 
 func Project(name string) error {
-	definition := utils.Definition{Name: name}
+	path, err := utils.ImportPath()
+	if err != nil {
+		return err
+	}
+
+	definition := utils.Definition{Name: name, Path: path + "/" + name}
 
 	if err := utils.CreateDir(name); err != nil {
 		return err
@@ -21,7 +26,11 @@ func Project(name string) error {
 		return err
 	}
 
-	//TODO glide
+	//Create glide.yaml
+	if err := utils.CreateFileFromTemplate(definition, "template/glide.yaml"); err != nil {
+		return err
+	}
+
 	//TODO infra folde
 	//TODO contributing
 	//TODO issue template
