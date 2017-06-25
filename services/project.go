@@ -31,19 +31,27 @@ func Project(name string) error {
 		return err
 	}
 
-	//TODO infra folde
+	//TODO infra folder
+
 	//TODO contributing
+	if err := utils.CreateFileFromTemplate(definition, "template/CONTRIBUTING.md"); err != nil {
+		return err
+	}
+
 	//TODO issue template
+	if err := utils.CreateFileFromTemplate(definition, "template/ISSUE_TEMPLATE.md"); err != nil {
+		return err
+	}
 
 	//TODO wercker.yml
-	/*if err := utils.CreateFileFromTemplate(definition, "template/wercker.yml"); err != nil {
+	if err := utils.CreateFileFromTemplate(definition, "template/wercker.yml"); err != nil {
 		return err
-	}*/
+	}
 
 	//TODO gitignore
-	/*if err := utils.CreateFileFromTemplate(definition, "template/gitignore"); err != nil {
+	if err := utils.CreateFileFromTemplate(definition, "template/gitignore"); err != nil {
 		return err
-	}*/
+	}
 
 	return nil
 }
