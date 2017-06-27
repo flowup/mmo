@@ -2,10 +2,10 @@ package main
 
 import (
 	"github.com/urfave/cli"
-	"fmt"
 	"github.com/flowup/mmo/utils"
 	"os"
-	"github.com/flowup/mmo/services"
+	"errors"
+	"github.com/flowup/mmo/commands/project"
 )
 
 func main() {
@@ -20,13 +20,13 @@ func main() {
 			Usage:   "creates new project with a given name",
 			Action: func(c *cli.Context) error {
 				if c.Args().First() == "" {
-					fmt.Println("Missing project name")
-					return utils.ErrNoArg
+					return errors.New("Missing project name argument")
 				}
 
-				if err := services.Project(c.Args().First()); err != nil {
-					return err
-				}
+				project.Create(project.ProjectOptions{
+					Name: c.Args().First(),
+					Language: "go",
+				})
 
 				return nil
 			},
@@ -79,14 +79,14 @@ func main() {
 			Usage: "adds selected resource to the given service",
 			Subcommands: []cli.Command{
 				{
-					Name: "model",
+					Name:  "model",
 					Usage: "adds model with a given name to the service",
 					Action: func(c *cli.Context) error {
 						return utils.ErrNotImplemented
 					},
 				},
 				{
-					Name: "plugin",
+					Name:  "plugin",
 					Usage: "adds plugin with the given name to the service",
 					Action: func(c *cli.Context) error {
 						return utils.ErrNotImplemented
