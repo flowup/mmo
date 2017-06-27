@@ -23,12 +23,11 @@ func main() {
 					return errors.New("Missing project name argument")
 				}
 
-				project.Create(project.ProjectOptions{
+				return project.Create(project.ProjectOptions{
 					Name: c.Args().First(),
 					Language: "go",
+					DependencyManager: "glide",
 				})
-
-				return nil
 			},
 		},
 		{
