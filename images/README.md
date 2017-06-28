@@ -16,4 +16,4 @@ Python
 - [ ] python protobuf gRPC image (flowup/mmo-py-grpc)
 
 Others
-- [ ] typescript WebRPC image (flowup/mmo-webrpc)
+- [X] typescript WebRPC image (flowup/mmo-webrpc)
