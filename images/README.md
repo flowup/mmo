@@ -13,7 +13,7 @@ Golang
 Python
 - [ ] python build image (flowup/mmo-py-build)
 - [ ] python testing image (flowup/mmo-py-test)
-- [ ] python protobuf gRPC image (flowup/mmo-py-grpc)
+- [X] python protobuf gRPC image (flowup/mmo-py-grpc)
 
 Others
 - [X] typescript WebRPC image (flowup/mmo-webrpc)
