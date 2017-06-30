@@ -6,14 +6,21 @@ import (
 	"text/template"
 	"errors"
 	"os/exec"
+	"github.com/docker/docker/client"
+	"context"
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/mount"
+	"github.com/flowup/mmo/config"
+	"github.com/docker/docker/api/types"
+	"io"
 )
 
 // ProjectOptions encapsulates options that can be passed to the
 // project creator
 type ProjectOptions struct {
-	Name string
-	Language string
-	Path string
+	Name              string
+	Language          string
+	Path              string
 	DependencyManager string
 }
 
@@ -60,7 +67,7 @@ func Create(opts ProjectOptions) error {
 		return err
 	}
 
-	err = InitializeDependnecyManager(opts.DependencyManager)
+	err = InitializeDependencyManager(opts.DependencyManager)
 	if err != nil {
 		return err
 	}
@@ -73,7 +80,7 @@ func Create(opts ProjectOptions) error {
 	return nil
 }
 
-func InitializeDependnecyManager(man string) error {
+func InitializeDependencyManager(man string) error {
 	switch man {
 	case "glide":
 		glideInstallCmd := exec.Command("go", "get", "github.com/Masterminds/glide")
@@ -88,6 +95,64 @@ func InitializeDependnecyManager(man string) error {
 
 	default:
 		return errors.New("Unrecognized dependency manager: " + man)
+	}
+
+	return nil
+}
+
+func RunTests() error {
+	ctx := context.Background()
+	cli, err := client.NewEnvClient()
+	if err != nil {
+		return err
+	}
+
+	pConfig := config.ReadConfig()
+
+	pwd, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	testContainer, err := cli.ContainerCreate(ctx, &container.Config{
+		Image: "flowup/mmo-webrpc",
+		Cmd:   []string{"bash", "-c", "go test $(glide novendor)"},
+		WorkingDir: "/go/src/" + pConfig.GetGoPrefix(),
+	}, &container.HostConfig{
+		AutoRemove: true,
+		Mounts: []mount.Mount{
+			{
+				Type:   mount.TypeBind,
+				Source: pwd,
+				Target: "/go/src/" + pConfig.GetGoPrefix(),
+			},
+		},
+	}, nil, pConfig.GetProjectName())
+
+	if err != nil {
+		return err
+	}
+
+	resp, err := cli.ContainerAttach(ctx, testContainer.ID, types.ContainerAttachOptions{
+		Stdout: true,
+		Stderr: true,
+		Stream: true,
+	})
+
+	if err != nil {
+		return err
+	}
+
+	go func() { io.Copy(os.Stdout, resp.Reader) }()
+
+	err = cli.ContainerStart(ctx, testContainer.ID, types.ContainerStartOptions{})
+	if err != nil {
+		return err
+	}
+
+	_, err = cli.ContainerWait(context.Background(), testContainer.ID)
+	if err != nil {
+		return err
 	}
 
 	return nil

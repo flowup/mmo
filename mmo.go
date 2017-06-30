@@ -74,6 +74,13 @@ func main() {
 			},
 		},
 		{
+			Name:  "test",
+			Usage: "runs tests for all services targeted by the context",
+			Action: func(c *cli.Context) error {
+				return project.RunTests()
+			},
+		},
+		{
 			Name:  "add",
 			Usage: "adds selected resource to the given service",
 			Subcommands: []cli.Command{
