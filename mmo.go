@@ -42,7 +42,12 @@ func main() {
 			Aliases: []string{"ctx"},
 			Usage:   "sets context to the service(s) given by the argument(s)",
 			Action: func(c *cli.Context) error {
-				return utils.ErrNotImplemented
+				services := make([]string, c.NArg())
+				for i := 0; i < c.NArg(); i++ {
+					services[i] = c.Args().Get(i)
+				}
+
+				return project.SetContext(services)
 			},
 		},
 		{

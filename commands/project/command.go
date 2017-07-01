@@ -4,7 +4,7 @@ import (
 	"os"
 	"strings"
 	"text/template"
-	"errors"
+	"github.com/pkg/errors"
 	"os/exec"
 	"github.com/docker/docker/client"
 	"context"
@@ -13,6 +13,8 @@ import (
 	"github.com/flowup/mmo/config"
 	"github.com/docker/docker/api/types"
 	"io"
+	"github.com/flowup/mmo/utils"
+	"fmt"
 )
 
 // ProjectOptions encapsulates options that can be passed to the
@@ -156,4 +158,20 @@ func RunTests() error {
 	}
 
 	return nil
+}
+
+func SetContext(services []string) error {
+	for _,service := range services {
+		if _, err := os.Stat(service); os.IsNotExist(err) {
+			return errors.Wrap(utils.ErrServiceNotExists, service)
+		}
+	}
+
+	serviceContext := config.Context{
+		Services: services,
+	}
+
+	err := config.SaveContext(serviceContext)
+
+	return err
 }
