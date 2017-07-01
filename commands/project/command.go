@@ -6,8 +6,10 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/client"
+	"github.com/flowup/mmo/commands"
 	"github.com/flowup/mmo/config"
 	"github.com/flowup/mmo/utils"
+	"github.com/flowup/mmo/utils/dockercmd"
 	"github.com/pkg/errors"
 	"os"
 	"os/exec"
@@ -170,4 +172,41 @@ func SetContext(services []string) error {
 	err := config.SaveContext(serviceContext)
 
 	return err
+}
+
+// ProtoGen is cli function to generate API clients and server stubs of specified service or services
+func ProtoGen() error {
+
+	mmoContext, err := config.LoadContext()
+
+	if err != nil {
+		return utils.ErrContextNotSet
+	}
+
+	pwd, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	for _, serviceName := range mmoContext.Services {
+		if _, err := os.Stat(serviceName + "/sdk"); os.IsNotExist(err) {
+			os.Mkdir(serviceName+"/sdk", os.ModePerm)
+		}
+
+		fmt.Println("Generating API clients and server stubs for service \"" + serviceName + "\":")
+
+		err := commands.GenerateProto(pwd+"/"+serviceName+"/protobuf", pwd+"/"+serviceName+"/sdk", dockercmd.TsGen)
+		if err != nil {
+			return err
+		}
+
+		err = commands.GenerateProto(pwd+"/"+serviceName+"/protobuf", pwd+"/"+serviceName, dockercmd.GoGen)
+		if err != nil {
+			return err
+		}
+
+		fmt.Println()
+	}
+
+	return nil
 }

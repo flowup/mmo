@@ -91,6 +91,13 @@ func main() {
 			},
 		},
 		{
+			Name:  "proto-gen",
+			Usage: "generates API clients and server stubs from proto definition for all services targeted by the context",
+			Action: func(c *cli.Context) error {
+				return project.ProtoGen()
+			},
+		},
+		{
 			Name:  "add",
 			Usage: "adds selected resource to the given service",
 			Subcommands: []cli.Command{
