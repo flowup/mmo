@@ -1,20 +1,18 @@
 package project
 
 import (
-	"os"
-	"strings"
-	"text/template"
-	"github.com/pkg/errors"
-	"os/exec"
-	"github.com/docker/docker/client"
 	"context"
+	"fmt"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
+	"github.com/docker/docker/client"
 	"github.com/flowup/mmo/config"
-	"github.com/docker/docker/api/types"
-	"io"
 	"github.com/flowup/mmo/utils"
-	"fmt"
+	"github.com/pkg/errors"
+	"os"
+	"os/exec"
+	"strings"
+	"text/template"
 )
 
 // ProjectOptions encapsulates options that can be passed to the
@@ -102,8 +100,15 @@ func InitializeDependencyManager(man string) error {
 	return nil
 }
 
+// RunTests is cli function to run tests of application in docker
 func RunTests() error {
-	ctx := context.Background()
+
+	mmoContext, err := config.LoadContext()
+
+	if err != nil {
+		return utils.ErrContextNotSet
+	}
+
 	cli, err := client.NewEnvClient()
 	if err != nil {
 		return err
@@ -116,52 +121,43 @@ func RunTests() error {
 		return err
 	}
 
-	testContainer, err := cli.ContainerCreate(ctx, &container.Config{
-		Image: "flowup/mmo-webrpc",
-		Cmd:   []string{"bash", "-c", "go test $(glide novendor)"},
-		WorkingDir: "/go/src/" + pConfig.GetGoPrefix(),
-	}, &container.HostConfig{
-		AutoRemove: true,
-		Mounts: []mount.Mount{
-			{
-				Type:   mount.TypeBind,
-				Source: pwd,
-				Target: "/go/src/" + pConfig.GetGoPrefix(),
+	for _, serviceName := range mmoContext.Services {
+
+		fmt.Println("Running tests for service \"" + serviceName + "\":")
+
+		testContainer, err := cli.ContainerCreate(context.Background(), &container.Config{
+			Image:      "flowup/mmo-webrpc",
+			Cmd:        []string{"bash", "-c", "go test $(glide novendor)"},
+			WorkingDir: "/go/src/" + pConfig.GetGoPrefix() + "/" + serviceName,
+		}, &container.HostConfig{
+			AutoRemove: true,
+			Mounts: []mount.Mount{
+				{
+					Type:   mount.TypeBind,
+					Source: pwd,
+					Target: "/go/src/" + pConfig.GetGoPrefix(),
+				},
 			},
-		},
-	}, nil, pConfig.GetProjectName())
+		}, nil, "")
 
-	if err != nil {
-		return err
-	}
+		if err != nil {
+			return err
+		}
 
-	resp, err := cli.ContainerAttach(ctx, testContainer.ID, types.ContainerAttachOptions{
-		Stdout: true,
-		Stderr: true,
-		Stream: true,
-	})
+		err = utils.ContainerRunStdout(cli, testContainer.ID)
+		if err != nil {
+			return err
+		}
 
-	if err != nil {
-		return err
-	}
-
-	go func() { io.Copy(os.Stdout, resp.Reader) }()
-
-	err = cli.ContainerStart(ctx, testContainer.ID, types.ContainerStartOptions{})
-	if err != nil {
-		return err
-	}
-
-	_, err = cli.ContainerWait(context.Background(), testContainer.ID)
-	if err != nil {
-		return err
+		fmt.Println()
 	}
 
 	return nil
 }
 
+// SetContext is cli function to set context of mmo to specified service or services
 func SetContext(services []string) error {
-	for _,service := range services {
+	for _, service := range services {
 		if _, err := os.Stat(service); os.IsNotExist(err) {
 			return errors.Wrap(utils.ErrServiceNotExists, service)
 		}

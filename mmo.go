@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/urfave/cli"
-	"github.com/flowup/mmo/utils"
-	"os"
 	"errors"
 	"github.com/flowup/mmo/commands/project"
+	"github.com/flowup/mmo/utils"
+	"github.com/urfave/cli"
+	"os"
 )
 
 func main() {
@@ -24,8 +24,8 @@ func main() {
 				}
 
 				return project.Create(project.ProjectOptions{
-					Name: c.Args().First(),
-					Language: "go",
+					Name:              c.Args().First(),
+					Language:          "go",
 					DependencyManager: "glide",
 				})
 			},
@@ -42,6 +42,11 @@ func main() {
 			Aliases: []string{"ctx"},
 			Usage:   "sets context to the service(s) given by the argument(s)",
 			Action: func(c *cli.Context) error {
+
+				if c.NArg() == 0 {
+					return utils.ErrSetContextNoArg
+				}
+
 				services := make([]string, c.NArg())
 				for i := 0; i < c.NArg(); i++ {
 					services[i] = c.Args().Get(i)
