@@ -193,12 +193,14 @@ func ProtoGen() error {
 			os.Mkdir(serviceName+"/sdk", os.ModePerm)
 		}
 
-		fmt.Println("Generating API clients and server stubs for service \"" + serviceName + "\":")
+		fmt.Println("Generating TypeScript API clients and server stubs for service \"" + serviceName + "\"...")
 
 		err := commands.GenerateProto(pwd+"/"+serviceName+"/protobuf", pwd+"/"+serviceName+"/sdk", dockercmd.TsGen)
 		if err != nil {
 			return err
 		}
+
+		fmt.Println("\nGenerating Go API clients and server stubs for service \"" + serviceName + "\"...")
 
 		err = commands.GenerateProto(pwd+"/"+serviceName+"/protobuf", pwd+"/"+serviceName, dockercmd.GoGen)
 		if err != nil {

@@ -16,8 +16,11 @@ RUN npm install -g ts-protoc-gen
 
 RUN curl https://glide.sh/get | sh
 
+ADD webrpc/removeGogoImports.sh /scripts/removeGogoImports
+
 ENV PROTO_PATH /go/proto/include
 ENV PATH $PATH:/go/proto/bin
+ENV PATH $PATH:/scripts
 
 WORKDIR /in
 
