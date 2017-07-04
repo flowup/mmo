@@ -5,6 +5,7 @@ import (
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/client"
 	"io"
+	"io/ioutil"
 	"os"
 )
 
@@ -29,5 +30,18 @@ func ContainerRunStdout(cli *client.Client, containerID string) error {
 	}
 
 	_, err = cli.ContainerWait(context.Background(), containerID)
+	return err
+}
+
+// PullImage is function to pull image
+func PullImage(cli *client.Client, image string) error {
+	out, err := cli.ImagePull(context.Background(), image, types.ImagePullOptions{})
+	if err != nil {
+		return err
+	}
+
+	defer out.Close()
+
+	_, err = io.Copy(ioutil.Discard, out)
 	return err
 }

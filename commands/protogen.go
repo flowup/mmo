@@ -47,6 +47,11 @@ func GenerateProto(lang string, serviceName string) error {
 		return err
 	}
 
+	err = utils.PullImage(cli, image)
+	if err != nil {
+		return err
+	}
+
 	cont, err := cli.ContainerCreate(context.Background(), &container.Config{
 		Image: image,
 		Cmd:   []string{"bash", "-c", cmd},
