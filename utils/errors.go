@@ -7,6 +7,8 @@ var (
 
 	ErrNoArg = errors.New("No arguments")
 
+	ErrNoProject = errors.New("No project initialized in current directory")
+
 	ErrParseFileName = errors.New("Can't parse file name from path")
 
 	ErrServiceNotExists = errors.New("Following service doesn't exist: ")

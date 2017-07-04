@@ -2,13 +2,45 @@ package commands
 
 import (
 	"context"
+	"fmt"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/client"
 	"github.com/flowup/mmo/utils"
+	"github.com/flowup/mmo/utils/dockercmd"
+	"os"
 )
 
-func GenerateProto(in string, out string, cmd string) error {
+func GenerateProto(lang string, serviceName string) error {
+
+	pwd, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("Generating " + lang + " API clients and server stubs for service \"" + serviceName + "\"...")
+
+	var inputMount string
+	var outputMount string
+	var cmd string
+	var image string
+
+	inputMount = pwd + "/" + serviceName + "/protobuf"
+
+	switch lang {
+	case "go":
+		outputMount = pwd + "/" + serviceName
+		cmd = dockercmd.GoGen
+		image = dockercmd.ImageGo
+	case "python":
+		outputMount = pwd + "/" + serviceName
+		cmd = dockercmd.PyGen
+		image = dockercmd.ImagePy
+	case "ts":
+		outputMount = pwd + "/" + serviceName + "/sdk"
+		cmd = dockercmd.TsGen
+		image = dockercmd.ImageTs
+	}
 
 	cli, err := client.NewEnvClient()
 	if err != nil {
@@ -16,18 +48,18 @@ func GenerateProto(in string, out string, cmd string) error {
 	}
 
 	cont, err := cli.ContainerCreate(context.Background(), &container.Config{
-		Image: "flowup/mmo-webrpc",
+		Image: image,
 		Cmd:   []string{"bash", "-c", cmd},
 	}, &container.HostConfig{
 		AutoRemove: true,
 		Mounts: []mount.Mount{
 			{
 				Type:   mount.TypeBind,
-				Source: in,
+				Source: inputMount,
 				Target: "/in",
 			}, {
 				Type:   mount.TypeBind,
-				Source: out,
+				Source: outputMount,
 				Target: "/out",
 			},
 		},

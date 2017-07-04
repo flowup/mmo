@@ -9,7 +9,6 @@ import (
 	"github.com/flowup/mmo/commands"
 	"github.com/flowup/mmo/config"
 	"github.com/flowup/mmo/utils"
-	"github.com/flowup/mmo/utils/dockercmd"
 	"github.com/pkg/errors"
 	"os"
 	"os/exec"
@@ -116,7 +115,10 @@ func RunTests() error {
 		return err
 	}
 
-	pConfig := config.ReadConfig()
+	pConfig, err := config.ReadConfig()
+	if err != nil {
+		return utils.ErrNoProject
+	}
 
 	pwd, err := os.Getwd()
 	if err != nil {
@@ -183,9 +185,9 @@ func ProtoGen() error {
 		return utils.ErrContextNotSet
 	}
 
-	pwd, err := os.Getwd()
+	pConfig, err := config.ReadConfig()
 	if err != nil {
-		return err
+		return utils.ErrNoProject
 	}
 
 	for _, serviceName := range mmoContext.Services {
@@ -193,18 +195,16 @@ func ProtoGen() error {
 			os.Mkdir(serviceName+"/sdk", os.ModePerm)
 		}
 
-		fmt.Println("Generating TypeScript API clients and server stubs for service \"" + serviceName + "\"...")
-
-		err := commands.GenerateProto(pwd+"/"+serviceName+"/protobuf", pwd+"/"+serviceName+"/sdk", dockercmd.TsGen)
+		err := commands.GenerateProto(pConfig.GetLang(), serviceName)
 		if err != nil {
 			return err
 		}
 
-		fmt.Println("\nGenerating Go API clients and server stubs for service \"" + serviceName + "\"...")
-
-		err = commands.GenerateProto(pwd+"/"+serviceName+"/protobuf", pwd+"/"+serviceName, dockercmd.GoGen)
-		if err != nil {
-			return err
+		if pConfig.HasWebRPC() {
+			err = commands.GenerateProto("ts", serviceName)
+			if err != nil {
+				return err
+			}
 		}
 
 		fmt.Println()
