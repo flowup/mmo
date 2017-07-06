@@ -1,5 +1,5 @@
-hash: 8a665ce1316b44028c9c702781113cac48471c53d010c7c2e7fc709fbdd268a0
-updated: 2017-07-04T13:19:14.721878884+02:00
+hash: 5e6f2c66435064ebf1de3b2cbdef6a291dfd48cb233c160c7adaec5ceed3f4bd
+updated: 2017-07-06T16:40:12.233308283+02:00
 imports:
 - name: github.com/docker/distribution
   version: f86db6b22663a27ba4d278220b7e34be528b1e79
@@ -80,6 +80,10 @@ imports:
   version: e57e3eeb33f795204c1ca35f56c44f83227c6e66
 - name: github.com/spf13/viper
   version: c1de95864d73a5465492829d7cb2dd422b19ac96
+- name: github.com/stretchr/testify
+  version: 69483b4bd14f5845b5a1e55bca19e954e827f1d0
+  subpackages:
+  - '...'
 - name: github.com/urfave/cli
   version: 0bdeddeeb0f650497d603c4ad7b20cfe685682f6
 - name: golang.org/x/net

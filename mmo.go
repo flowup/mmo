@@ -63,6 +63,13 @@ func main() {
 			},
 		},
 		{
+			Name: "run",
+			Usage: "runs services and their dependencies using docker on your machine",
+			Action: func(c *cli.Context) error {
+				return utils.ErrNotImplemented
+			},
+		},
+		{
 			Name:  "build",
 			Usage: "builds docker images for all services targeted by the context",
 			Action: func(c *cli.Context) error {
@@ -115,8 +122,8 @@ func main() {
 					},
 				},
 				{
-					Name:  "plugin",
-					Usage: "adds plugin with the given name to the service",
+					Name:  "dep",
+					Usage: "adds dependency with the given name to the service",
 					Action: func(c *cli.Context) error {
 						return utils.ErrNotImplemented
 					},
