@@ -11,9 +11,9 @@ import (
 // ProjectOptions encapsulates options that can be passed to the
 // project creator
 type ProjectOptions struct {
-	Name string
-	Language string
-	Path string
+	Name              string
+	Language          string
+	Path              string
 	DependencyManager string
 }
 
@@ -35,8 +35,7 @@ func Create(opts ProjectOptions) error {
 		}
 
 		// get correct path to the file
-		filePath := strings.Replace(asset.info.Name(), "template", "new", 1)
-
+		filePath := strings.Replace(asset.info.Name(), "template", opts.Name, 1)
 		// create template for the file
 		tmpl := template.Must(template.New(name).Parse(string(asset.bytes)))
 
