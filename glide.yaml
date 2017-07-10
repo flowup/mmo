@@ -1,16 +1,19 @@
 package: github.com/flowup/mmo
 import:
-- package: github.com/urfave/cli
-  version: ^1.19.1
 - package: github.com/docker/docker
   version: ^17.5.0-ce-rc3
   subpackages:
+  - api/types
+  - api/types/container
+  - api/types/mount
   - client
-  - api
+- package: github.com/pkg/errors
+  version: ^0.8.0
 - package: github.com/spf13/viper
-- package: github.com/fsnotify/fsnotify
-  version: ^1.4.2
+- package: github.com/urfave/cli
+  version: ^1.19.1
+testImport:
 - package: github.com/stretchr/testify
   version: ^1.1.4
   subpackages:
-  - '...'
+  - suite

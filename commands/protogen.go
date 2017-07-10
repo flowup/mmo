@@ -29,7 +29,7 @@ func GenerateProto(lang Language, serviceName string) error {
 		return err
 	}
 
-	fmt.Println("Generating " + lang + " API clients and server stubs for service \"" + serviceName + "\"...")
+	fmt.Println("Generating " + string(lang) + " API clients and server stubs for service \"" + serviceName + "\"...")
 
 	var inputMount string
 	var outputMount string

@@ -9,3 +9,6 @@ go:
 install:
   - go get github.com/Masterminds/glide
   - glide i
+
+script:
+  - go test $(go list ./... | grep -v /vendor/)
