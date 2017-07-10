@@ -6,7 +6,9 @@ import (
 
 // CreateFile create file in path
 func CreateFile(path string) error {
-	_, err := os.Create(path)
+	file , err := os.Create(path)
+	defer file.Close()
+
 	return err
 }
 
