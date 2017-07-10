@@ -6,8 +6,9 @@ go:
   - master
 
 install:
+  - go get github.com/mattn/goveralls
   - go get github.com/Masterminds/glide
   - glide i
 
 script:
-  - go test $(go list ./... | grep -v /vendor/)
+  - $HOME/gopath/bin/goveralls -service=travis-ci
