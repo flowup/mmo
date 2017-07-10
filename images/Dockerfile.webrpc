@@ -14,8 +14,13 @@ RUN git clone https://github.com/googleapis/googleapis.git /googleapis
 
 RUN npm install -g ts-protoc-gen
 
+RUN curl https://glide.sh/get | sh
+
+ADD webrpc/ /scripts/
+
 ENV PROTO_PATH /go/proto/include
 ENV PATH $PATH:/go/proto/bin
+ENV PATH $PATH:/scripts
 
 WORKDIR /in
 

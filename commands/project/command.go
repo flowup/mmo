@@ -1,11 +1,19 @@
 package project
 
 import (
+	"context"
+	"fmt"
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/mount"
+	"github.com/docker/docker/client"
+	"github.com/flowup/mmo/commands"
+	"github.com/flowup/mmo/config"
+	"github.com/flowup/mmo/utils"
+	"github.com/pkg/errors"
 	"os"
+	"os/exec"
 	"strings"
 	"text/template"
-	"errors"
-	"os/exec"
 )
 
 // ProjectOptions encapsulates options that can be passed to the
@@ -59,7 +67,7 @@ func Create(opts ProjectOptions) error {
 		return err
 	}
 
-	err = InitializeDependnecyManager(opts.DependencyManager)
+	err = InitializeDependencyManager(opts.DependencyManager)
 	if err != nil {
 		return err
 	}
@@ -72,7 +80,10 @@ func Create(opts ProjectOptions) error {
 	return nil
 }
 
-func InitializeDependnecyManager(man string) error {
+// InitializeDependencyManager initializes given dependency manager
+// within the current project.
+// It will also automatically update the dependency manager
+func InitializeDependencyManager(man string) error {
 	switch man {
 	case "glide":
 		glideInstallCmd := exec.Command("go", "get", "github.com/Masterminds/glide")
@@ -87,6 +98,118 @@ func InitializeDependnecyManager(man string) error {
 
 	default:
 		return errors.New("Unrecognized dependency manager: " + man)
+	}
+
+	return nil
+}
+
+// RunTests is cli function to run tests of application in docker
+func RunTests() error {
+
+	mmoContext, err := config.LoadContext()
+
+	if err != nil {
+		return utils.ErrContextNotSet
+	}
+
+	cli, err := client.NewEnvClient()
+	if err != nil {
+		return err
+	}
+
+	pConfig, err := config.ReadConfig()
+	if err != nil {
+		return utils.ErrNoProject
+	}
+
+	pwd, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	for _, serviceName := range mmoContext.Services {
+
+		fmt.Println("Running tests for service \"" + serviceName + "\":")
+
+		testContainer, err := cli.ContainerCreate(context.Background(), &container.Config{
+			Image:      "flowup/mmo-webrpc",
+			Cmd:        []string{"bash", "-c", "go test $(glide novendor)"},
+			WorkingDir: "/go/src/" + pConfig.GetGoPrefix() + "/" + serviceName,
+		}, &container.HostConfig{
+			AutoRemove: true,
+			Mounts: []mount.Mount{
+				{
+					Type:   mount.TypeBind,
+					Source: pwd,
+					Target: "/go/src/" + pConfig.GetGoPrefix(),
+				},
+			},
+		}, nil, "")
+
+		if err != nil {
+			return err
+		}
+
+		err = utils.ContainerRunStdout(cli, testContainer.ID)
+		if err != nil {
+			return err
+		}
+
+		fmt.Println()
+	}
+
+	return nil
+}
+
+// SetContext is cli function to set context of mmo to specified service or services
+func SetContext(services []string) error {
+	for _, service := range services {
+		if _, err := os.Stat(service); os.IsNotExist(err) {
+			return errors.Wrap(utils.ErrServiceNotExists, service)
+		}
+	}
+
+	serviceContext := config.Context{
+		Services: services,
+	}
+
+	err := config.SaveContext(serviceContext)
+
+	return err
+}
+
+// ProtoGen is cli function to generate API clients and server stubs of specified service or services
+func ProtoGen() error {
+
+	mmoContext, err := config.LoadContext()
+
+	if err != nil {
+		return utils.ErrContextNotSet
+	}
+
+	pConfig, err := config.ReadConfig()
+	if err != nil {
+		return utils.ErrNoProject
+	}
+
+	for _, serviceName := range mmoContext.Services {
+		if _, err := os.Stat(serviceName + "/sdk"); os.IsNotExist(err) {
+			os.Mkdir(serviceName+"/sdk", os.ModePerm)
+		}
+
+		err := commands.GenerateProto(pConfig.GetLang(), serviceName)
+		if err != nil {
+			return err
+		}
+
+		if pConfig.HasWebRPC() {
+			err = commands.GenerateProto(commands.TypeScript, serviceName)
+			if err != nil {
+				return err
+			}
+		}
+
+		fmt.Println()
 	}
 
 	return nil

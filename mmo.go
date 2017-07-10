@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/urfave/cli"
-	"github.com/flowup/mmo/utils"
-	"os"
 	"errors"
 	"github.com/flowup/mmo/commands/project"
+	"github.com/flowup/mmo/utils"
+	"github.com/urfave/cli"
+	"os"
 )
 
 func main() {
@@ -24,8 +24,8 @@ func main() {
 				}
 
 				return project.Create(project.ProjectOptions{
-					Name: c.Args().First(),
-					Language: "go",
+					Name:              c.Args().First(),
+					Language:          "go",
 					DependencyManager: "glide",
 				})
 			},
@@ -42,12 +42,29 @@ func main() {
 			Aliases: []string{"ctx"},
 			Usage:   "sets context to the service(s) given by the argument(s)",
 			Action: func(c *cli.Context) error {
-				return utils.ErrNotImplemented
+
+				if c.NArg() == 0 {
+					return utils.ErrSetContextNoArg
+				}
+
+				services := make([]string, c.NArg())
+				for i := 0; i < c.NArg(); i++ {
+					services[i] = c.Args().Get(i)
+				}
+
+				return project.SetContext(services)
 			},
 		},
 		{
 			Name:  "dev",
 			Usage: "starts up development environment for all services targeted by the context",
+			Action: func(c *cli.Context) error {
+				return utils.ErrNotImplemented
+			},
+		},
+		{
+			Name: "run",
+			Usage: "runs services and their dependencies using docker on your machine",
 			Action: func(c *cli.Context) error {
 				return utils.ErrNotImplemented
 			},
@@ -74,6 +91,26 @@ func main() {
 			},
 		},
 		{
+			Name:  "test",
+			Usage: "runs tests for all services targeted by the context",
+			Action: func(c *cli.Context) error {
+				return project.RunTests()
+			},
+		},
+		{
+			Name:  "gen",
+			Usage: "is used to generate various components across services",
+			Subcommands: []cli.Command{
+				{
+					Name: "proto",
+					Usage: "generates API clients and server stubs from proto definition for all services targeted by the context",
+					Action: func(c *cli.Context) error {
+						return project.ProtoGen()
+					},
+				},
+			},
+		},
+		{
 			Name:  "add",
 			Usage: "adds selected resource to the given service",
 			Subcommands: []cli.Command{
@@ -85,8 +122,8 @@ func main() {
 					},
 				},
 				{
-					Name:  "plugin",
-					Usage: "adds plugin with the given name to the service",
+					Name:  "dep",
+					Usage: "adds dependency with the given name to the service",
 					Action: func(c *cli.Context) error {
 						return utils.ErrNotImplemented
 					},
