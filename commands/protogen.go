@@ -11,7 +11,18 @@ import (
 	"os"
 )
 
-func GenerateProto(lang string, serviceName string) error {
+type Language string
+
+const (
+	Go Language = "go"
+	Python = "python"
+	TypeScript = "ts"
+)
+
+// GenerateProto generates proto files in a given language for
+// the given service.
+// Current Support: go, python, typescript(ts)
+func GenerateProto(lang Language, serviceName string) error {
 
 	pwd, err := os.Getwd()
 	if err != nil {
@@ -28,15 +39,15 @@ func GenerateProto(lang string, serviceName string) error {
 	inputMount = pwd + "/" + serviceName + "/protobuf"
 
 	switch lang {
-	case "go":
+	case Go:
 		outputMount = pwd + "/" + serviceName
 		cmd = dockercmd.GoGen
 		image = dockercmd.ImageGo
-	case "python":
+	case Python:
 		outputMount = pwd + "/" + serviceName
 		cmd = dockercmd.PyGen
 		image = dockercmd.ImagePy
-	case "ts":
+	case TypeScript:
 		outputMount = pwd + "/" + serviceName + "/sdk"
 		cmd = dockercmd.TsGen
 		image = dockercmd.ImageTs

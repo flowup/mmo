@@ -7,6 +7,8 @@ import (
 )
 
 var (
+	// ErrFilesNotEqual should be fired any time two compared files
+	// are not byte-equal
 	ErrFilesNotEqual = errors.New("Given files are not equal")
 )
 

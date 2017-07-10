@@ -10,10 +10,12 @@ const (
 	filenameContext = ".mmo.cache"
 )
 
+// Context represents a cached configuration for the project
 type Context struct {
 	Services []string
 }
 
+// LoadContext loads project context from the given directory
 func LoadContext() (Context, error) {
 	b, err := ioutil.ReadFile(filenameContext)
 	if err != nil {
@@ -26,6 +28,7 @@ func LoadContext() (Context, error) {
 	return context,err
 }
 
+// SaveContext saves given context to the current path
 func SaveContext(context Context) error {
 	b, err := json.Marshal(context)
 

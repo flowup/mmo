@@ -81,6 +81,9 @@ func Create(opts ProjectOptions) error {
 	return nil
 }
 
+// InitializeDependencyManager initializes given dependency manager
+// within the current project.
+// It will also automatically update the dependency manager
 func InitializeDependencyManager(man string) error {
 	switch man {
 	case "glide":
@@ -201,7 +204,7 @@ func ProtoGen() error {
 		}
 
 		if pConfig.HasWebRPC() {
-			err = commands.GenerateProto("ts", serviceName)
+			err = commands.GenerateProto(commands.TypeScript, serviceName)
 			if err != nil {
 				return err
 			}

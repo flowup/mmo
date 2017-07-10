@@ -1,6 +1,8 @@
 package dockercmd
 
-var (
+// These constants are commands that are used to generated code from the
+// proto files of services
+const (
 	ProtocBin    = "protoc "
 	ProtoInclude = "-I/usr/local/include -I. -I/googleapis -I${GOPATH}/src "
 	ProtoDefName = "proto.proto"
