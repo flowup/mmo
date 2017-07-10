@@ -2,8 +2,9 @@ package filecompare
 
 import (
 	"io/ioutil"
-	"bytes"
 	"github.com/pkg/errors"
+	"fmt"
+	"github.com/sergi/go-diff/diffmatchpatch"
 )
 
 var (
@@ -15,19 +16,22 @@ var (
 // CompareFiles compare two file paths
 func CompareFiles(source, expected string) error {
 	src, srcErr := ioutil.ReadFile(source)
-
 	if srcErr != nil {
 		return srcErr
 	}
 
 	exp, expErr := ioutil.ReadFile(expected)
-
 	if expErr != nil {
 		return expErr
 	}
 
-	if !bytes.Equal(src, exp) {
-		return errors.Wrap(ErrFilesNotEqual, "Files: " + source + " / " + expected)
+	dmp := diffmatchpatch.New()
+
+	diffs := dmp.DiffMain(string(src), string(exp), true)
+
+	if len(diffs) > 1 {
+		fmt.Println(dmp.DiffPrettyText(diffs))
+		return errors.Wrap(ErrFilesNotEqual, "Files: "+source+" / "+expected)
 	}
 
 	return nil
