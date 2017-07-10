@@ -1,5 +1,5 @@
 hash: a080d20682b7c1f7a73a7be06f6e44ceb2b4256a76cdeef5c5a94cb30a004d03
-updated: 2017-07-10T07:46:25.217304031+02:00
+updated: 2017-07-10T15:37:06.859330095+02:00
 imports:
 - name: github.com/docker/distribution
   version: f86db6b22663a27ba4d278220b7e34be528b1e79
@@ -66,6 +66,10 @@ imports:
   version: fe7536c3dee2596cdd23ee9976a17c22bdaae286
 - name: github.com/pkg/errors
   version: 645ef00459ed84a119197bfb8d8205042c6df63d
+- name: github.com/sergi/go-diff
+  version: 24e2351369ec4949b2ed0dc5c477afdd4c4034e8
+  subpackages:
+  - diffmatchpatch
 - name: github.com/Sirupsen/logrus
   version: 7dd06bf38e1e13df288d471a57d5adbac106be9e
 - name: github.com/spf13/afero
