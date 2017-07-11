@@ -43,7 +43,7 @@ func Init(opts ProjectOptions) error {
 		}
 
 		// get correct path to the file
-		filePath := strings.Replace(asset.info.Name(), "template", opts.Name, 1)
+		filePath := strings.Replace(asset.info.Name(), "commands/project/template", opts.Name, 1)
 		// create template for the file
 		tmpl := template.Must(template.New(name).Parse(string(asset.bytes)))
 
