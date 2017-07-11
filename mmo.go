@@ -3,10 +3,10 @@ package main
 import (
 	"errors"
 	"github.com/flowup/mmo/commands/project"
+	"github.com/flowup/mmo/commands/service"
 	"github.com/flowup/mmo/utils"
 	"github.com/urfave/cli"
 	"os"
-	"github.com/flowup/mmo/commands/service"
 )
 
 func main() {
@@ -40,7 +40,10 @@ func main() {
 				}
 
 				return service.Init(service.SetviceOptions{
-					Name: c.Args().First(),
+					Name:    c.Args().First(),
+					ProjectName: "test",
+					WebGrpc: true,
+					Dsn:     "",
 				})
 			},
 		},
