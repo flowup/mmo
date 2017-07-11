@@ -15,7 +15,7 @@ func main() {
 
 	app.Commands = []cli.Command{
 		{
-			Name:    "project",
+			Name:    "init",
 			Aliases: []string{},
 			Usage:   "creates new project with a given name",
 			Action: func(c *cli.Context) error {
@@ -23,7 +23,7 @@ func main() {
 					return errors.New("Missing project name argument")
 				}
 
-				if err := project.Create(project.ProjectOptions{
+				if err := project.Init(project.ProjectOptions{
 					Name:              c.Args().First(),
 					Language:          "go",
 					DependencyManager: "glide",
@@ -31,13 +31,6 @@ func main() {
 					utils.Log.Fatal(err)
 				}
 				return nil
-			},
-		},
-		{
-			Name:  "service",
-			Usage: "creates new service within the project",
-			Action: func(c *cli.Context) error {
-				return utils.ErrNotImplemented
 			},
 		},
 		{
@@ -83,15 +76,8 @@ func main() {
 			},
 		},
 		{
-			Name:  "e2e",
-			Usage: "spins up e2e tests for all services targeted by the context. Make sure you are targeting all dependencies",
-			Action: func(c *cli.Context) error {
-				return utils.ErrNotImplemented
-			},
-		},
-		{
-			Name:  "deploy",
-			Usage: "performs clean build and applies all configurations to the current kubectl context",
+			Name:  "integration",
+			Usage: "builds all the services, deploys them to the kubernetes development cluster and starts up the integration tests. ",
 			Action: func(c *cli.Context) error {
 				return utils.ErrNotImplemented
 			},
@@ -134,8 +120,14 @@ func main() {
 					},
 				},
 				{
-					Name:  "dep",
-					Usage: "adds dependency with the given name to the service",
+					Name:  "service",
+					Usage: "creates new service within the project",
+					Action: func(c *cli.Context) error {
+						return utils.ErrNotImplemented
+					},
+				}, {
+					Name:  "plugin",
+					Usage: "adds plugin to the current service",
 					Action: func(c *cli.Context) error {
 						return utils.ErrNotImplemented
 					},
