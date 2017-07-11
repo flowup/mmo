@@ -6,6 +6,7 @@ import (
 	"github.com/flowup/mmo/utils"
 	"github.com/urfave/cli"
 	"os"
+	"github.com/flowup/mmo/commands/service"
 )
 
 func main() {
@@ -34,7 +35,13 @@ func main() {
 			Name:  "service",
 			Usage: "creates new service within the project",
 			Action: func(c *cli.Context) error {
-				return utils.ErrNotImplemented
+				if c.Args().First() == "" {
+					return errors.New("Missing service name argument")
+				}
+
+				return service.Init(service.SetviceOptions{
+					Name: c.Args().First(),
+				})
 			},
 		},
 		{
@@ -63,7 +70,7 @@ func main() {
 			},
 		},
 		{
-			Name: "run",
+			Name:  "run",
 			Usage: "runs services and their dependencies using docker on your machine",
 			Action: func(c *cli.Context) error {
 				return utils.ErrNotImplemented
@@ -102,7 +109,7 @@ func main() {
 			Usage: "is used to generate various components across services",
 			Subcommands: []cli.Command{
 				{
-					Name: "proto",
+					Name:  "proto",
 					Usage: "generates API clients and server stubs from proto definition for all services targeted by the context",
 					Action: func(c *cli.Context) error {
 						return project.ProtoGen()
