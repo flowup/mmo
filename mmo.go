@@ -23,11 +23,14 @@ func main() {
 					return errors.New("Missing project name argument")
 				}
 
-				return project.Init(project.ProjectOptions{
+				if err := project.Init(project.ProjectOptions{
 					Name:              c.Args().First(),
 					Language:          "go",
 					DependencyManager: "glide",
-				})
+				}); err != nil {
+					utils.Log.Fatal(err)
+				}
+				return nil
 			},
 		},
 		{
@@ -45,7 +48,10 @@ func main() {
 					services[i] = c.Args().Get(i)
 				}
 
-				return project.SetContext(services)
+				if err := project.SetContext(services); err != nil {
+					utils.Log.Fatal(err)
+				}
+				return nil
 			},
 		},
 		{
@@ -80,18 +86,24 @@ func main() {
 			Name:  "test",
 			Usage: "runs tests for all services targeted by the context",
 			Action: func(c *cli.Context) error {
-				return project.RunTests()
+				if err := project.RunTests(); err != nil {
+					utils.Log.Fatal(err)
+				}
+				return nil
 			},
 		},
 		{
-			Name:  "proto",
-			Usage: "",
+			Name:  "gen",
+			Usage: "is used to generate various components across services",
 			Subcommands: []cli.Command{
 				{
-					Name:  "regen",
-					Usage: "regenerate proto files for the given services (in context)",
+					Name:  "proto",
+					Usage: "generates API clients and server stubs from proto definition for all services targeted by the context",
 					Action: func(c *cli.Context) error {
-						return project.ProtoGen()
+						if err := project.ProtoGen(); err != nil {
+							utils.Log.Fatal(err)
+						}
+						return nil
 					},
 				},
 			},

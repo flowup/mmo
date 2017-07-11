@@ -1,6 +1,8 @@
 hash: a080d20682b7c1f7a73a7be06f6e44ceb2b4256a76cdeef5c5a94cb30a004d03
-updated: 2017-07-10T15:37:06.859330095+02:00
+updated: 2017-07-11T12:43:28.732490763+02:00
 imports:
+- name: github.com/certifi/gocertifi
+  version: a9c833d2837d3b16888d55d5aafa9ffe9afb22b0
 - name: github.com/docker/distribution
   version: f86db6b22663a27ba4d278220b7e34be528b1e79
   subpackages:
@@ -39,8 +41,12 @@ imports:
   version: 0dadbb0345b35ec7ef35e228dabb8de89a65bf52
 - name: github.com/docker/libtrust
   version: aabc10ec26b754e797f9028f4589c5b7bd90dc20
+- name: github.com/evalphobia/logrus_sentry
+  version: 9f8f2d05a621e616d9341ac75374eb8402ae0630
 - name: github.com/fsnotify/fsnotify
   version: 629574ca2a5df945712d3079857300b5e4da0236
+- name: github.com/getsentry/raven-go
+  version: d175f85701dfbf44cb0510114c9943e665e60907
 - name: github.com/hashicorp/hcl
   version: 392dba7d905ed5d04a5794ba89f558b27e2ba1ca
   subpackages:
@@ -70,6 +76,8 @@ imports:
   version: 24e2351369ec4949b2ed0dc5c477afdd4c4034e8
   subpackages:
   - diffmatchpatch
+- name: github.com/sirupsen/logrus
+  version: 547e984ad93a90192134fc0fdb57a468edb514fe
 - name: github.com/Sirupsen/logrus
   version: 7dd06bf38e1e13df288d471a57d5adbac106be9e
 - name: github.com/spf13/afero
