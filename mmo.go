@@ -6,6 +6,7 @@ import (
 	"github.com/flowup/mmo/utils"
 	"github.com/urfave/cli"
 	"os"
+	"github.com/flowup/mmo/config"
 )
 
 func main() {
@@ -15,7 +16,7 @@ func main() {
 
 	app.Commands = []cli.Command{
 		{
-			Name:    "project",
+			Name:    "init",
 			Aliases: []string{},
 			Usage:   "creates new project with a given name",
 			Action: func(c *cli.Context) error {
@@ -23,11 +24,14 @@ func main() {
 					return errors.New("Missing project name argument")
 				}
 
-				return project.Create(project.ProjectOptions{
-					Name:              c.Args().First(),
-					Language:          "go",
-					DependencyManager: "glide",
-				})
+				mmo := project.Mmo{}
+				mmo.Config = &config.Config{}
+
+				mmo.Config.Name = c.Args().First()
+				mmo.Config.Lang = "go"
+				mmo.Config.DepManager = "glide"
+
+				return mmo.Create()
 			},
 		},
 		{
@@ -47,12 +51,17 @@ func main() {
 					return utils.ErrSetContextNoArg
 				}
 
+				mmo := project.GetMmo()
+				if mmo.Config == nil {
+					return utils.ErrNoProject
+				}
+
 				services := make([]string, c.NArg())
 				for i := 0; i < c.NArg(); i++ {
 					services[i] = c.Args().Get(i)
 				}
 
-				return project.SetContext(services)
+				return mmo.SetContext(services)
 			},
 		},
 		{
@@ -63,7 +72,7 @@ func main() {
 			},
 		},
 		{
-			Name: "run",
+			Name:  "run",
 			Usage: "runs services and their dependencies using docker on your machine",
 			Action: func(c *cli.Context) error {
 				return utils.ErrNotImplemented
@@ -94,7 +103,18 @@ func main() {
 			Name:  "test",
 			Usage: "runs tests for all services targeted by the context",
 			Action: func(c *cli.Context) error {
-				return project.RunTests()
+
+				mmo := project.GetMmo()
+
+				if mmo.Config == nil {
+					return utils.ErrNoProject
+				}
+
+				if mmo.Context == nil {
+					return utils.ErrContextNotSet
+				}
+
+				return mmo.RunTests()
 			},
 		},
 		{
@@ -102,10 +122,21 @@ func main() {
 			Usage: "is used to generate various components across services",
 			Subcommands: []cli.Command{
 				{
-					Name: "proto",
+					Name:  "proto",
 					Usage: "generates API clients and server stubs from proto definition for all services targeted by the context",
 					Action: func(c *cli.Context) error {
-						return project.ProtoGen()
+
+						mmo := project.GetMmo()
+
+						if mmo.Config == nil {
+							return utils.ErrNoProject
+						}
+
+						if mmo.Context == nil {
+							return utils.ErrContextNotSet
+						}
+
+						return mmo.ProtoGen()
 					},
 				},
 			},

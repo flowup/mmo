@@ -16,21 +16,37 @@ import (
 	"text/template"
 )
 
-// ProjectOptions encapsulates options that can be passed to the
-// project creator
-type ProjectOptions struct {
-	Name              string
-	Language          string
-	Path              string
-	DependencyManager string
+type Mmo struct {
+	Config  *config.Config
+	Context *config.Context
+}
+
+func GetMmo() *Mmo {
+
+	var mmo Mmo
+	mmoContext, err := config.LoadContext()
+	if err != nil {
+		mmo.Context = nil
+	} else {
+		mmo.Context = &mmoContext
+	}
+
+	mmoConfig, err := config.LoadConfig()
+	if err != nil {
+		mmo.Config = nil
+	} else {
+		mmo.Config = &mmoConfig
+	}
+
+	return &mmo
 }
 
 // Create extends all assets using project options passed by the caller
 // This automatically creates a project folder with all files
-func Create(opts ProjectOptions) error {
+func (mmo *Mmo) Create() error {
 
 	// create project folder
-	err := os.Mkdir(opts.Name, os.ModePerm)
+	err := os.Mkdir(mmo.Config.Name, os.ModePerm)
 	if err != nil {
 		return err
 	}
@@ -43,7 +59,7 @@ func Create(opts ProjectOptions) error {
 		}
 
 		// get correct path to the file
-		filePath := strings.Replace(asset.info.Name(), "template", opts.Name, 1)
+		filePath := strings.Replace(asset.info.Name(), "template", mmo.Config.Name, 1)
 		// create template for the file
 		tmpl := template.Must(template.New(name).Parse(string(asset.bytes)))
 
@@ -52,22 +68,23 @@ func Create(opts ProjectOptions) error {
 		if err != nil {
 			return err
 		}
-		defer file.Close()
 
 		// execute the template to the file
-		err = tmpl.Execute(file, opts)
+		err = tmpl.Execute(file, mmo.Config)
 		if err != nil {
 			return err
 		}
+
+		file.Close()
 	}
 
 	// change to the newly created project and init the dep manager
-	err = os.Chdir(opts.Name)
+	err = os.Chdir(mmo.Config.Name)
 	if err != nil {
 		return err
 	}
 
-	err = InitializeDependencyManager(opts.DependencyManager)
+	err = mmo.InitializeDependencyManager()
 	if err != nil {
 		return err
 	}
@@ -83,8 +100,8 @@ func Create(opts ProjectOptions) error {
 // InitializeDependencyManager initializes given dependency manager
 // within the current project.
 // It will also automatically update the dependency manager
-func InitializeDependencyManager(man string) error {
-	switch man {
+func (mmo *Mmo) InitializeDependencyManager() error {
+	switch mmo.Config.DepManager {
 	case "glide":
 		glideInstallCmd := exec.Command("go", "get", "github.com/Masterminds/glide")
 		if err := glideInstallCmd.Run(); err != nil {
@@ -97,29 +114,18 @@ func InitializeDependencyManager(man string) error {
 		}
 
 	default:
-		return errors.New("Unrecognized dependency manager: " + man)
+		return errors.New("Unrecognized dependency manager: " + mmo.Config.DepManager)
 	}
 
 	return nil
 }
 
 // RunTests is cli function to run tests of application in docker
-func RunTests() error {
-
-	mmoContext, err := config.LoadContext()
-
-	if err != nil {
-		return utils.ErrContextNotSet
-	}
+func (mmo *Mmo) RunTests() error {
 
 	cli, err := client.NewEnvClient()
 	if err != nil {
 		return err
-	}
-
-	pConfig, err := config.ReadConfig()
-	if err != nil {
-		return utils.ErrNoProject
 	}
 
 	pwd, err := os.Getwd()
@@ -127,21 +133,21 @@ func RunTests() error {
 		return err
 	}
 
-	for _, serviceName := range mmoContext.Services {
+	for _, serviceName := range mmo.Context.Services {
 
 		fmt.Println("Running tests for service \"" + serviceName + "\":")
 
 		testContainer, err := cli.ContainerCreate(context.Background(), &container.Config{
 			Image:      "flowup/mmo-webrpc",
 			Cmd:        []string{"bash", "-c", "go test $(glide novendor)"},
-			WorkingDir: "/go/src/" + pConfig.GetGoPrefix() + "/" + serviceName,
+			WorkingDir: "/go/src/" + mmo.Config.GoPackage + "/" + serviceName,
 		}, &container.HostConfig{
 			AutoRemove: true,
 			Mounts: []mount.Mount{
 				{
 					Type:   mount.TypeBind,
 					Source: pwd,
-					Target: "/go/src/" + pConfig.GetGoPrefix(),
+					Target: "/go/src/" + mmo.Config.GoPackage,
 				},
 			},
 		}, nil, "")
@@ -162,7 +168,7 @@ func RunTests() error {
 }
 
 // SetContext is cli function to set context of mmo to specified service or services
-func SetContext(services []string) error {
+func (mmo *Mmo) SetContext(services []string) error {
 	for _, service := range services {
 		if _, err := os.Stat(service); os.IsNotExist(err) {
 			return errors.Wrap(utils.ErrServiceNotExists, service)
@@ -179,30 +185,20 @@ func SetContext(services []string) error {
 }
 
 // ProtoGen is cli function to generate API clients and server stubs of specified service or services
-func ProtoGen() error {
+func (mmo *Mmo) ProtoGen() error {
 
-	mmoContext, err := config.LoadContext()
-
-	if err != nil {
-		return utils.ErrContextNotSet
-	}
-
-	pConfig, err := config.ReadConfig()
-	if err != nil {
-		return utils.ErrNoProject
-	}
-
-	for _, serviceName := range mmoContext.Services {
+	for _, serviceName := range mmo.Context.Services {
 		if _, err := os.Stat(serviceName + "/sdk"); os.IsNotExist(err) {
 			os.Mkdir(serviceName+"/sdk", os.ModePerm)
 		}
 
-		err := commands.GenerateProto(pConfig.GetLang(), serviceName)
+		err := commands.GenerateProto(mmo.Config.Lang, serviceName)
 		if err != nil {
 			return err
 		}
 
-		if pConfig.HasWebRPC() {
+		// TODO: get config of service
+		if true {
 			err = commands.GenerateProto(commands.TypeScript, serviceName)
 			if err != nil {
 				return err

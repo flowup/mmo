@@ -4,7 +4,7 @@
 // template/ISSUE_TEMPLATE.md
 // template/README.md
 // template/gitignore
-// template/mmo.json
+// template/mmo.yaml
 // template/wercker.yml
 // DO NOT EDIT!
 
@@ -88,7 +88,7 @@ func templateContributingMd() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "template/CONTRIBUTING.md", size: 0, mode: os.FileMode(436), modTime: time.Unix(1498498506, 0)}
+	info := bindataFileInfo{name: "template/CONTRIBUTING.md", size: 0, mode: os.FileMode(420), modTime: time.Unix(1499670648, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -108,7 +108,7 @@ func templateIssue_templateMd() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "template/ISSUE_TEMPLATE.md", size: 0, mode: os.FileMode(436), modTime: time.Unix(1498498506, 0)}
+	info := bindataFileInfo{name: "template/ISSUE_TEMPLATE.md", size: 0, mode: os.FileMode(420), modTime: time.Unix(1499670648, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -128,7 +128,7 @@ func templateReadmeMd() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "template/README.md", size: 12, mode: os.FileMode(436), modTime: time.Unix(1498498506, 0)}
+	info := bindataFileInfo{name: "template/README.md", size: 12, mode: os.FileMode(420), modTime: time.Unix(1499670648, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -148,27 +148,27 @@ func templateGitignore() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "template/gitignore", size: 0, mode: os.FileMode(436), modTime: time.Unix(1498498506, 0)}
+	info := bindataFileInfo{name: "template/gitignore", size: 0, mode: os.FileMode(420), modTime: time.Unix(1499670648, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
 
-var _templateMmoJson = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xaa\xe6\x52\x50\x50\xca\x4b\xcc\x4d\x55\xb2\x52\x50\xaa\xae\xd6\xf3\x4b\xcc\x4d\xad\xad\x55\xd2\x01\x09\xe7\x24\xe6\xa5\x83\x84\xd3\xf3\x21\xfc\x94\xd4\x82\xd4\xbc\x94\xd4\xbc\xe4\x4a\xdf\xc4\xbc\xc4\xf4\xd4\x22\xb0\x64\x4e\x66\x4a\xaa\x12\x57\x2d\x20\x00\x00\xff\xff\x5e\x43\x43\xb9\x49\x00\x00\x00")
+var _templateMmoYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xca\x4b\xcc\x4d\xb5\x52\xa8\xae\xd6\xf3\x4b\xcc\x4d\xad\xad\xe5\xca\x49\xcc\x4b\xb7\x52\x48\xcf\xe7\x4a\x49\x2d\x48\xcd\x4b\x49\xcd\x4b\xae\xf4\x4d\xcc\x4b\x4c\x4f\x2d\xb2\x52\x48\xcf\xc9\x4c\x49\x05\x04\x00\x00\xff\xff\x14\x69\x12\x72\x31\x00\x00\x00")
 
-func templateMmoJsonBytes() ([]byte, error) {
+func templateMmoYamlBytes() ([]byte, error) {
 	return bindataRead(
-		_templateMmoJson,
-		"template/mmo.json",
+		_templateMmoYaml,
+		"template/mmo.yaml",
 	)
 }
 
-func templateMmoJson() (*asset, error) {
-	bytes, err := templateMmoJsonBytes()
+func templateMmoYaml() (*asset, error) {
+	bytes, err := templateMmoYamlBytes()
 	if err != nil {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "template/mmo.json", size: 73, mode: os.FileMode(436), modTime: time.Unix(1498498506, 0)}
+	info := bindataFileInfo{name: "template/mmo.yaml", size: 49, mode: os.FileMode(420), modTime: time.Unix(1499772525, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -188,7 +188,7 @@ func templateWerckerYml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "template/wercker.yml", size: 23, mode: os.FileMode(436), modTime: time.Unix(1498521298, 0)}
+	info := bindataFileInfo{name: "template/wercker.yml", size: 23, mode: os.FileMode(420), modTime: time.Unix(1499670648, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -249,7 +249,7 @@ var _bindata = map[string]func() (*asset, error){
 	"template/ISSUE_TEMPLATE.md": templateIssue_templateMd,
 	"template/README.md": templateReadmeMd,
 	"template/gitignore": templateGitignore,
-	"template/mmo.json": templateMmoJson,
+	"template/mmo.yaml": templateMmoYaml,
 	"template/wercker.yml": templateWerckerYml,
 }
 
@@ -298,7 +298,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		"ISSUE_TEMPLATE.md": &bintree{templateIssue_templateMd, map[string]*bintree{}},
 		"README.md": &bintree{templateReadmeMd, map[string]*bintree{}},
 		"gitignore": &bintree{templateGitignore, map[string]*bintree{}},
-		"mmo.json": &bintree{templateMmoJson, map[string]*bintree{}},
+		"mmo.yaml": &bintree{templateMmoYaml, map[string]*bintree{}},
 		"wercker.yml": &bintree{templateWerckerYml, map[string]*bintree{}},
 	}},
 }}

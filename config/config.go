@@ -1,45 +1,64 @@
 package config
 
 import (
-	"github.com/spf13/viper"
-	"github.com/flowup/mmo/commands"
+	"io/ioutil"
+	"os"
+	"gopkg.in/yaml.v2"
 )
 
-// Config represents a configuration manager
+const (
+	filenameConfig = "mmo.yaml"
+)
+
 type Config struct {
-	config *viper.Viper
+	Name       string `yaml:"name"`
+	Lang       string `yaml:"lang"`
+	DepManager string `yaml:"dependencyManager"`
+	GoPackage  string `yaml:"goPackage"`
+	Services   []Service `yaml:"services"`
 }
 
-// ReadConfig returns the new configuration
-// TODO: return struct instead of viper configuration
-func ReadConfig() (*Config, error) {
-	viper.SetConfigName("mmo")
-	viper.AddConfigPath(".")
-
-	err := viper.ReadInConfig()
-
-	return &Config{config: viper.GetViper()}, err
+type Service struct {
+	Name         string `yaml:"name"`
+	Description  string `yaml:"description"`
+	WebRPC       bool `yaml:"webRPC"`
+	Dependencies []Dependency `yaml:"dependencies"`
 }
 
-// GetGoPrefix returns the golang directory prefix
-// TODO: deprecate this
-func (c *Config) GetGoPrefix() string {
-	return viper.GetString("goPrefix")
+type Dependency struct {
+	Name string `yaml:"name"`
+	Type string `yaml:"type"`
+	Run  DependencyRun `yaml:"run"`
 }
 
-// GetProjectName returns name of the project from the
-// configuration
-func (c *Config) GetProjectName() string {
-	return viper.GetString("name")
+type DependencyRun struct {
+	Name     string `yaml:"name"`
+	Location string `yaml:"location"`
 }
 
-// GetLang returns language of the current project
-func (c *Config) GetLang() commands.Language {
-	return commands.Language(viper.GetString("lang"))
+// LoadContext loads project context from the given directory
+func LoadConfig() (Config, error) {
+	b, err := ioutil.ReadFile(filenameConfig)
+	if err != nil {
+		return Config{}, err
+	}
+
+	var cfg Config
+	err = yaml.Unmarshal(b, &cfg)
+
+	return cfg, err
 }
 
-// HasWebRPC resolves if the project has activated the web-rpc
-// TODO: deprecate this. Each service should have this flag
-func (c *Config) HasWebRPC() bool {
-	return viper.GetBool("webRPC")
+// SaveContext saves given context to the current path
+func SaveConfig(cfg Config) error {
+	b, err := yaml.Marshal(cfg)
+
+	if err != nil {
+		return nil
+	}
+
+	f, err := os.Create(filenameConfig)
+	_, err = f.Write(b)
+
+	return err
 }

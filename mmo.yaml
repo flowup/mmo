@@ -1,0 +1,23 @@
+name: example-project-name
+lang: go
+dependencyManager: glide
+goPrefix: github.com/flowup/goginn
+webRPC: true
+services:
+ - name: auth
+   description: handles authentication and authorization of users
+ - name: product
+   description: handles product creation and reading
+   dependencies:
+    - name: auth
+      type: grpc
+      run:
+        name: auth
+        location: local
+    - name: auth2
+      type: grpc
+      run:
+        name: auth
+        location: octo
+    - name: db
+      type: postgres
