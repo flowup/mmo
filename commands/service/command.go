@@ -46,12 +46,12 @@ func Init(serv SetviceOptions) error {
 		filePath := ""
 
 		switch asset.info.Name() {
-		case "template/main.go":
-			filePath = strings.Replace(asset.info.Name(), "template", serv.Name+"/cmd/"+serv.Name, 1)
-		case "template/proto.proto":
-			filePath = strings.Replace(asset.info.Name(), "template", serv.Name+"/protobuf", 1)
+		case "commands/service/template/main.go":
+			filePath = strings.Replace(asset.info.Name(), "commands/service/template", serv.Name+"/cmd/"+serv.Name, 1)
+		case "commands/service/template/proto.proto":
+			filePath = strings.Replace(asset.info.Name(), "commands/service/template", serv.Name+"/protobuf", 1)
 		default:
-			filePath = strings.Replace(asset.info.Name(), "template", serv.Name, 1)
+			filePath = strings.Replace(asset.info.Name(), "commands/service/template", serv.Name, 1)
 		}
 
 		// create template for the file
