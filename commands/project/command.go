@@ -25,9 +25,9 @@ type ProjectOptions struct {
 	DependencyManager string
 }
 
-// Create extends all assets using project options passed by the caller
+// Init extends all assets using project options passed by the caller
 // This automatically creates a project folder with all files
-func Create(opts ProjectOptions) error {
+func Init(opts ProjectOptions) error {
 
 	// create project folder
 	err := os.Mkdir(opts.Name, os.ModePerm)

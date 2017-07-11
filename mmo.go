@@ -15,7 +15,7 @@ func main() {
 
 	app.Commands = []cli.Command{
 		{
-			Name:    "project",
+			Name:    "init",
 			Aliases: []string{},
 			Usage:   "creates new project with a given name",
 			Action: func(c *cli.Context) error {
@@ -23,18 +23,11 @@ func main() {
 					return errors.New("Missing project name argument")
 				}
 
-				return project.Create(project.ProjectOptions{
+				return project.Init(project.ProjectOptions{
 					Name:              c.Args().First(),
 					Language:          "go",
 					DependencyManager: "glide",
 				})
-			},
-		},
-		{
-			Name:  "service",
-			Usage: "creates new service within the project",
-			Action: func(c *cli.Context) error {
-				return utils.ErrNotImplemented
 			},
 		},
 		{
@@ -63,7 +56,7 @@ func main() {
 			},
 		},
 		{
-			Name: "run",
+			Name:  "run",
 			Usage: "runs services and their dependencies using docker on your machine",
 			Action: func(c *cli.Context) error {
 				return utils.ErrNotImplemented
@@ -77,15 +70,8 @@ func main() {
 			},
 		},
 		{
-			Name:  "e2e",
-			Usage: "spins up e2e tests for all services targeted by the context. Make sure you are targeting all dependencies",
-			Action: func(c *cli.Context) error {
-				return utils.ErrNotImplemented
-			},
-		},
-		{
-			Name:  "deploy",
-			Usage: "performs clean build and applies all configurations to the current kubectl context",
+			Name:  "integration",
+			Usage: "builds all the services, deploys them to the kubernetes development cluster and starts up the integration tests. ",
 			Action: func(c *cli.Context) error {
 				return utils.ErrNotImplemented
 			},
@@ -98,12 +84,12 @@ func main() {
 			},
 		},
 		{
-			Name:  "gen",
-			Usage: "is used to generate various components across services",
+			Name:  "proto",
+			Usage: "",
 			Subcommands: []cli.Command{
 				{
-					Name: "proto",
-					Usage: "generates API clients and server stubs from proto definition for all services targeted by the context",
+					Name:  "regen",
+					Usage: "regenerate proto files for the given services (in context)",
 					Action: func(c *cli.Context) error {
 						return project.ProtoGen()
 					},
@@ -122,8 +108,14 @@ func main() {
 					},
 				},
 				{
-					Name:  "dep",
-					Usage: "adds dependency with the given name to the service",
+					Name:  "service",
+					Usage: "creates new service within the project",
+					Action: func(c *cli.Context) error {
+						return utils.ErrNotImplemented
+					},
+				}, {
+					Name:  "plugin",
+					Usage: "adds plugin to the current service",
 					Action: func(c *cli.Context) error {
 						return utils.ErrNotImplemented
 					},
