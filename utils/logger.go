@@ -17,8 +17,8 @@ func init() {
 
 	Log = logrus.New()
 
-	// Logging format is JSON
-	Log.Formatter = &logrus.JSONFormatter{}
+	// Logging format is Text
+	Log.Formatter = &logrus.TextFormatter{}
 
 	Log.Out = os.Stdout
 
