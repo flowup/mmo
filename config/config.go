@@ -40,7 +40,7 @@ type DependencyRun struct {
 	Location string `yaml:"location"`
 }
 
-// LoadContext loads project context from the given directory
+// LoadConfig loads project config from the given directory
 func LoadConfig(filenameConfig string) (Config, error) {
 	b, err := ioutil.ReadFile(filenameConfig)
 	if err != nil {
@@ -53,7 +53,7 @@ func LoadConfig(filenameConfig string) (Config, error) {
 	return cfg, err
 }
 
-// SaveContext saves given context to the current path
+// SaveConfig saves given config to  the given directory
 func SaveConfig(cfg Config, filenameConfig string) error {
 	b, err := yaml.Marshal(cfg)
 

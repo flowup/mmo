@@ -12,6 +12,7 @@ import (
 )
 
 const (
+	// Go represents supported languages
 	Go  = "go"
 	Python = "python"
 	TypeScript = "ts"
