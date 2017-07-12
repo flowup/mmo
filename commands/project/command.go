@@ -43,7 +43,7 @@ func GetMmo() *Mmo {
 	return &mmo
 }
 
-// InitService extends all assets using project options passed by the caller
+// InitProject extends all assets using project options passed by the caller
 // This automatically creates a project folder with all files
 func (mmo *Mmo) InitProject() error {
 

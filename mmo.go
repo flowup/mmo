@@ -6,8 +6,8 @@ import (
 	"github.com/urfave/cli"
 	"github.com/flowup/mmo/config"
 	"github.com/flowup/mmo/commands/project"
-	"os"
 	"github.com/flowup/mmo/commands/service"
+	"os"
 )
 
 func main() {
@@ -157,13 +157,8 @@ func main() {
 					Action: func(c *cli.Context) error {
 						mmo := project.GetMmo()
 
-						//TODO interaktivni pruvodce konfig
 						mmo.Config.Services = make(map[string]config.Service, 1)
-						mmo.Config.Services[c.Args().First()] = config.Service{
-							Name:   c.Args().First(),
-							WebRPC: false,
-							Dsn:    "",
-						}
+						mmo.Config.Services[c.Args().First()] = service.ServiceWizzar(c.Args().First())
 
 						/*if mmo.Config == nil {
 							return utils.ErrNoProject
