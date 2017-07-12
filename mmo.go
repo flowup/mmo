@@ -154,14 +154,34 @@ func main() {
 				{
 					Name:  "service",
 					Usage: "creates new service within the project",
+					Flags: []cli.Flag{
+						cli.StringFlag{
+							Name:  "description, d",
+							Usage: "set service description",
+						},
+						cli.BoolFlag{
+							Name:  "webrpc",
+							Usage: "set webrpc to service",
+						},
+						cli.StringFlag{
+							Name:  "sentry-dsn",
+							Usage: "set sentry dns",
+						},
+					},
+
 					Action: func(c *cli.Context) error {
+						if c.NArg() == 0 {
+							return utils.ErrSetContextNoArg
+						}
+
 						mmo := project.GetMmo()
 						if mmo.Config == nil {
 							return utils.ErrNoProject
 						}
 
 						mmo.Config.Services = make(map[string]config.Service, len(mmo.Config.Services)+1)
-						mmo.Config.Services[c.Args().First()] = service.Wizzar(c.Args().First())
+						//mmo.Config.Services[c.Args().First()] = service.Wizzar(c.Args().First())
+						mmo.Config.Services[c.Args().First()] = service.Flags(c.Args().First(), c)
 
 						if err := config.SaveConfig(*mmo.Config, config.FilenameConfig); err != nil {
 							utils.Log.Fatal(err)

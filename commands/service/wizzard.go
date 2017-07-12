@@ -5,6 +5,7 @@ import (
 	"bufio"
 	"os"
 	"fmt"
+	"github.com/urfave/cli"
 )
 
 // Wizzar for setup service
@@ -27,6 +28,19 @@ func Wizzar(serviceName string) config.Service {
 	if text, _ := reader.ReadString('\n'); text != "\n" {
 		newService.Dsn = text[:len(text)-1]
 	}
+
+	return newService
+}
+
+// Create new service according to flags
+func Flags(serviceName string, ctx *cli.Context) config.Service {
+	newService := config.Service{Name: serviceName}
+
+	newService.Description = ctx.String("description")
+
+	newService.WebRPC = ctx.Bool("webrpc")
+
+	newService.Dsn = ctx.String("sentry-dsn")
 
 	return newService
 }
