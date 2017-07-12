@@ -2,12 +2,11 @@ package main
 
 import (
 	"errors"
-	"github.com/flowup/mmo/commands/project"
-	"github.com/flowup/mmo/commands/service"
 	"github.com/flowup/mmo/utils"
 	"github.com/urfave/cli"
 	"os"
 	"github.com/flowup/mmo/config"
+	"github.com/flowup/mmo/commands"
 )
 
 func main() {
@@ -25,14 +24,14 @@ func main() {
 					return errors.New("Missing project name argument")
 				}
 
-				mmo := project.Mmo{}
+				mmo := commands.Mmo{}
 				mmo.Config = &config.Config{}
 
 				mmo.Config.Name = c.Args().First()
 				mmo.Config.Lang = "go"
 				mmo.Config.DepManager = "glide"
 
-				if err := mmo.Init(); err != nil {
+				if err := mmo.InitProject(); err != nil {
 					utils.Log.Fatal(err)
 				}
 				return nil
@@ -48,7 +47,7 @@ func main() {
 					return utils.ErrSetContextNoArg
 				}
 
-				mmo := project.GetMmo()
+				mmo := commands.GetMmo()
 				if mmo.Config == nil {
 					return utils.ErrNoProject
 				}
@@ -97,7 +96,7 @@ func main() {
 			Usage: "runs tests for all services targeted by the context",
 			Action: func(c *cli.Context) error {
 
-				mmo := project.GetMmo()
+				mmo := commands.GetMmo()
 
 				if mmo.Config == nil {
 					return utils.ErrNoProject
@@ -122,7 +121,7 @@ func main() {
 					Usage: "generates API clients and server stubs from proto definition for all services targeted by the context",
 					Action: func(c *cli.Context) error {
 
-						mmo := project.GetMmo()
+						mmo := commands.GetMmo()
 
 						if mmo.Config == nil {
 							return utils.ErrNoProject
@@ -155,11 +154,20 @@ func main() {
 					Name:  "service",
 					Usage: "creates new service within the project",
 					Action: func(c *cli.Context) error {
-						if err := service.Init(service.SetviceOptions{
-							Name:    c.Args().First(),
-							ProjectName: "test",
-							WebGrpc: true,
-							Dsn:     "",
+						//TODO interaktivni pruvodce konfig
+						mmo := commands.GetMmo()
+
+						if mmo.Config == nil {
+							return utils.ErrNoProject
+						}
+
+						if mmo.Context == nil {
+							return utils.ErrContextNotSet
+						}
+
+						if err := mmo.InitService(c.Args().First(), config.Service{
+							WebRPC: false,
+							Dsn:    "",
 						}); err != nil {
 							utils.Log.Fatal(err)
 						}

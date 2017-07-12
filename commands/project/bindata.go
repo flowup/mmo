@@ -168,7 +168,7 @@ func commandsProjectTemplateMmoYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "commands/project/template/mmo.yaml", size: 49, mode: os.FileMode(436), modTime: time.Unix(1499848363, 0)}
+	info := bindataFileInfo{name: "commands/project/template/mmo.yaml", size: 49, mode: os.FileMode(436), modTime: time.Unix(1499854890, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }

@@ -4,10 +4,10 @@ import (
 	"net"
 	"sync"
 	"google.golang.org/grpc"
-	"net/http"
 	"github.com/flowup/mmo/{{.ProjectName}}/{{.Name}}"
-	"google.golang.org/grpc/reflection"
-{{if .WebGrpc}}	"github.com/improbable-eng/grpc-web/go/grpcweb"{{end}}
+	"google.golang.org/grpc/reflection"{{if .WebGrpc}}
+	"github.com/improbable-eng/grpc-web/go/grpcweb"
+    "net/http"{{end}}
 )
 
 func main(){
@@ -45,9 +45,8 @@ func main(){
 		}
 
 		wg.Done()
-	}()
-
-	{{if .WebGrpc}}go func() {
+	}()	{{if .WebGrpc}}
+	go func() {
 		{{.Name}}.Log.Println("starting gRPC Web server on", "")
 		if err := httpServer.ListenAndServe(); err != nil {
 			{{.Name}}.Log.Fatalf("grpc-web: failed to serve: %v", err)

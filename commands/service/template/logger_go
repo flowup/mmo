@@ -10,7 +10,7 @@ import (
 var (
 	// Log global settings of logger
 	Log *logrus.Logger
-	dsn = "{{.Dsn}}"
+	{{if .Dsn}}dsn = "{{.Dsn}}"{{end}}
 )
 
 func init() {
@@ -22,7 +22,7 @@ func init() {
 
 	Log.Out = os.Stdout
 
-	levels := []logrus.Level{
+	{{if .Dsn}}levels := []logrus.Level{
 		logrus.PanicLevel,
 		logrus.FatalLevel,
 		logrus.ErrorLevel,
@@ -33,5 +33,5 @@ func init() {
 
 	if err == nil {
 		Log.Hooks.Add(hook)
-	}
+	}{{end}}
 }

@@ -3,34 +3,20 @@ package service
 import (
 	"github.com/flowup/mmo/utils"
 	"strings"
-	"text/template"
 	"os"
 	"github.com/flowup/mmo/commands"
+	"github.com/docker/docker/cli/command/commands"
 )
 
-// SetviceOptions encapsulates options that can be passed to the
-// service creator
-type SetviceOptions struct {
-	Name        string
-	WebGrpc     bool
-	Dsn         string
-	ProjectName string
-}
-
-// Init is cli function to generate service with given name
-func Init(serv SetviceOptions) error {
-
-	if err := utils.CreateDir(serv.Name); err != nil {
-		return err
-	}
-
+// InitService is cli function to generate service with given name
+func (mmo *commands.Mmo) InitService() error {
 	// create proto dir
-	if err := utils.CreateDir(serv.Name + "/protobuf"); err != nil {
+	if err := utils.CreateDir(mmo.Config.Name + "/protobuf"); err != nil {
 		return err
 	}
 
 	// create main dir
-	if err := utils.CreateDir(serv.Name + "/cmd/" + serv.Name); err != nil {
+	if err := utils.CreateDir(mmo.Config.Name + "/cmd/" + mmo.Config.Name); err != nil {
 		return err
 	}
 
@@ -47,11 +33,11 @@ func Init(serv SetviceOptions) error {
 
 		switch asset.info.Name() {
 		case "commands/service/template/main_go":
-			filePath = strings.Replace(asset.info.Name(), "commands/service/template", serv.Name+"/cmd/"+serv.Name, 1)
+			filePath = strings.Replace(asset.info.Name(), "commands/service/template", mmo.Config.Name+"/cmd/"+mmo.Config.Name, 1)
 		case "commands/service/template/proto.proto":
-			filePath = strings.Replace(asset.info.Name(), "commands/service/template", serv.Name+"/protobuf", 1)
+			filePath = strings.Replace(asset.info.Name(), "commands/service/template", mmo.Config.Name+"/protobuf", 1)
 		default:
-			filePath = strings.Replace(asset.info.Name(), "commands/service/template", serv.Name, 1)
+			filePath = strings.Replace(asset.info.Name(), "commands/service/template", mmo.Config.Name, 1)
 		}
 
 		filePath = strings.Replace(filePath, "_go", ".go", 1)
@@ -67,13 +53,13 @@ func Init(serv SetviceOptions) error {
 		defer file.Close()
 
 		// execute the template to the file
-		err = tmpl.Execute(file, serv)
+		err = tmpl.Execute(file, config)
 		if err != nil {
 			return err
 		}
 	}
 
-	if err := commands.GenerateProto(commands.Go, serv.Name); err != nil {
+	if err := commands.GenerateProto(commands.Go, mmo.Config.Name); err != nil {
 		return err
 	}
 

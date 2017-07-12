@@ -22,9 +22,11 @@ type Config struct {
 
 // Service represents service configuration from Config
 type Service struct {
+	Name         string
 	Description  string `yaml:"description"`
 	WebRPC       bool `yaml:"webRPC"`
 	Dependencies []Dependency `yaml:"dependencies"`
+	Dsn          string `yaml:"dsn"`
 }
 
 // Dependency represents service dependency configuration from Config
