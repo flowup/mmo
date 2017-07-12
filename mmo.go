@@ -158,7 +158,7 @@ func main() {
 						mmo := project.GetMmo()
 
 						mmo.Config.Services = make(map[string]config.Service, 1)
-						mmo.Config.Services[c.Args().First()] = service.ServiceWizzar(c.Args().First())
+						mmo.Config.Services[c.Args().First()] = service.Wizzar(c.Args().First())
 
 						/*if mmo.Config == nil {
 							return utils.ErrNoProject
