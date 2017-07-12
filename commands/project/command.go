@@ -191,6 +191,11 @@ func (mmo *Mmo) SetContext(services []string) error {
 func (mmo *Mmo) ProtoGen() error {
 
 	for _, serviceName := range mmo.Context.Services {
+		if _, err := os.Stat(serviceName + "/protobuf"); os.IsNotExist(err) {
+			fmt.Println("No protobuf files found for service \"" + serviceName + "\". Skipping...\n")
+			continue
+		}
+
 		if _, err := os.Stat(serviceName + "/sdk"); os.IsNotExist(err) {
 			os.Mkdir(serviceName+"/sdk", os.ModePerm)
 		}
