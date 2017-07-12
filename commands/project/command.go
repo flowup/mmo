@@ -31,7 +31,7 @@ func GetMmo() *Mmo {
 		mmo.Context = &mmoContext
 	}
 
-	mmoConfig, err := config.LoadConfig()
+	mmoConfig, err := config.LoadConfig(config.FilenameConfig)
 	if err != nil {
 		mmo.Config = nil
 	} else {
@@ -170,6 +170,10 @@ func (mmo *Mmo) RunTests() error {
 // SetContext is cli function to set context of mmo to specified service or services
 func (mmo *Mmo) SetContext(services []string) error {
 	for _, service := range services {
+		if _, ok := mmo.Config.Services[service]; !ok {
+			return utils.ErrServiceNotExists
+		}
+
 		if _, err := os.Stat(service); os.IsNotExist(err) {
 			return errors.Wrap(utils.ErrServiceNotExists, service)
 		}
@@ -197,8 +201,7 @@ func (mmo *Mmo) ProtoGen() error {
 			return err
 		}
 
-		// TODO: get config of service
-		if true {
+		if mmo.Config.Services[serviceName].WebRPC {
 			err = commands.GenerateProto(commands.TypeScript, serviceName)
 			if err != nil {
 				return err

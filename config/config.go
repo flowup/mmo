@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	filenameConfig = "mmo.yaml"
+	FilenameConfig = "mmo.yaml"
 )
 
 type Config struct {
@@ -15,11 +15,10 @@ type Config struct {
 	Lang       string `yaml:"lang"`
 	DepManager string `yaml:"dependencyManager"`
 	GoPackage  string `yaml:"goPackage"`
-	Services   []Service `yaml:"services"`
+	Services   map[string]Service `yaml:"services"`
 }
 
 type Service struct {
-	Name         string `yaml:"name"`
 	Description  string `yaml:"description"`
 	WebRPC       bool `yaml:"webRPC"`
 	Dependencies []Dependency `yaml:"dependencies"`
@@ -37,7 +36,7 @@ type DependencyRun struct {
 }
 
 // LoadContext loads project context from the given directory
-func LoadConfig() (Config, error) {
+func LoadConfig(filenameConfig string) (Config, error) {
 	b, err := ioutil.ReadFile(filenameConfig)
 	if err != nil {
 		return Config{}, err
@@ -50,7 +49,7 @@ func LoadConfig() (Config, error) {
 }
 
 // SaveContext saves given context to the current path
-func SaveConfig(cfg Config) error {
+func SaveConfig(cfg Config, filenameConfig string) error {
 	b, err := yaml.Marshal(cfg)
 
 	if err != nil {
