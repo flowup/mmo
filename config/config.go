@@ -7,9 +7,11 @@ import (
 )
 
 const (
+	// FilenameConfig name of default mmo.yaml file
 	FilenameConfig = "mmo.yaml"
 )
 
+// Config represents projects configuration
 type Config struct {
 	Name       string `yaml:"name"`
 	Lang       string `yaml:"lang"`
@@ -18,18 +20,21 @@ type Config struct {
 	Services   map[string]Service `yaml:"services"`
 }
 
+// Service represents service configuration from Config
 type Service struct {
 	Description  string `yaml:"description"`
 	WebRPC       bool `yaml:"webRPC"`
 	Dependencies []Dependency `yaml:"dependencies"`
 }
 
+// Dependency represents service dependency configuration from Config
 type Dependency struct {
 	Name string `yaml:"name"`
 	Type string `yaml:"type"`
 	Run  DependencyRun `yaml:"run"`
 }
 
+// DependencyRun represents what should dependency run
 type DependencyRun struct {
 	Name     string `yaml:"name"`
 	Location string `yaml:"location"`
