@@ -7,6 +7,9 @@ import (
 	"github.com/flowup/mmo/commands"
 	"text/template"
 	"github.com/flowup/mmo/config"
+	"os/exec"
+	"path/filepath"
+	"fmt"
 )
 
 // InitService is cli function to generate service with given name
@@ -60,9 +63,45 @@ func InitService(configService config.Service) error {
 		}
 	}
 
+	if err := addGoImportManager("./"); err != nil {
+		return err
+	}
+
 	if err := commands.GenerateProto(commands.Go, configService.Name); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+func addGoImportManager(root string) error {
+	fmt.Println("ADD GO IMPORTS")
+
+	goImportsInstallCmd := exec.Command("go", "get", "golang.org/x/tools/cmd/goimports")
+	if err := goImportsInstallCmd.Run(); err != nil {
+		return err
+	}
+
+	if err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+
+		if !strings.HasSuffix(info.Name(), ".go") || info.IsDir() {
+			return nil
+		}
+
+		out, err := exec.Command("goimports", path).Output()
+		if err != nil {
+			return err
+		}
+
+		if err := utils.WriteFile(path, string(out)); err != nil {
+			return err
+		}
+
+		return nil
+	}); err != nil {
+		return err
+	}
+
+	return nil
+
 }

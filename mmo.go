@@ -171,7 +171,7 @@ func main() {
 
 					Action: func(c *cli.Context) error {
 						if c.NArg() == 0 {
-							return utils.ErrSetContextNoArg
+							return utils.ErrNoArg
 						}
 
 						mmo := project.GetMmo()
