@@ -2,9 +2,9 @@ package {{.Name}}
 
 import (
 	"github.com/sirupsen/logrus"
-	"github.com/evalphobia/logrus_sentry"
-	"os"
+	"os"{{if .Dsn}}
 	"time"
+	"github.com/evalphobia/logrus_sentry"{{end}}
 )
 
 var (
