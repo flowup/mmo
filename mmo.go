@@ -31,14 +31,10 @@ func main() {
 				mmo.Config.Lang = "go"
 				mmo.Config.DepManager = "glide"
 
-				return mmo.Create()
-			},
-		},
-		{
-			Name:  "service",
-			Usage: "creates new service within the project",
-			Action: func(c *cli.Context) error {
-				return utils.ErrNotImplemented
+				if err := mmo.Init(); err != nil {
+					utils.Log.Fatal(err)
+				}
+				return nil
 			},
 		},
 		{
@@ -61,7 +57,10 @@ func main() {
 					services[i] = c.Args().Get(i)
 				}
 
-				return mmo.SetContext(services)
+				if err := mmo.SetContext(services); err != nil {
+					utils.Log.Fatal(err)
+				}
+				return nil
 			},
 		},
 		{
@@ -86,15 +85,8 @@ func main() {
 			},
 		},
 		{
-			Name:  "e2e",
-			Usage: "spins up e2e tests for all services targeted by the context. Make sure you are targeting all dependencies",
-			Action: func(c *cli.Context) error {
-				return utils.ErrNotImplemented
-			},
-		},
-		{
-			Name:  "deploy",
-			Usage: "performs clean build and applies all configurations to the current kubectl context",
+			Name:  "integration",
+			Usage: "builds all the services, deploys them to the kubernetes development cluster and starts up the integration tests. ",
 			Action: func(c *cli.Context) error {
 				return utils.ErrNotImplemented
 			},
@@ -114,7 +106,10 @@ func main() {
 					return utils.ErrContextNotSet
 				}
 
-				return mmo.RunTests()
+				if err := mmo.RunTests(); err != nil {
+					utils.Log.Fatal(err)
+				}
+				return nil
 			},
 		},
 		{
@@ -136,7 +131,10 @@ func main() {
 							return utils.ErrContextNotSet
 						}
 
-						return mmo.ProtoGen()
+						if err := mmo.ProtoGen(); err != nil {
+							utils.Log.Fatal(err)
+						}
+						return nil
 					},
 				},
 			},
@@ -153,8 +151,14 @@ func main() {
 					},
 				},
 				{
-					Name:  "dep",
-					Usage: "adds dependency with the given name to the service",
+					Name:  "service",
+					Usage: "creates new service within the project",
+					Action: func(c *cli.Context) error {
+						return utils.ErrNotImplemented
+					},
+				}, {
+					Name:  "plugin",
+					Usage: "adds plugin to the current service",
 					Action: func(c *cli.Context) error {
 						return utils.ErrNotImplemented
 					},

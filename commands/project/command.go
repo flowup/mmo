@@ -41,9 +41,9 @@ func GetMmo() *Mmo {
 	return &mmo
 }
 
-// Create extends all assets using project options passed by the caller
+// Init extends all assets using project options passed by the caller
 // This automatically creates a project folder with all files
-func (mmo *Mmo) Create() error {
+func (mmo *Mmo) Init() error {
 
 	// create project folder
 	err := os.Mkdir(mmo.Config.Name, os.ModePerm)
@@ -59,7 +59,7 @@ func (mmo *Mmo) Create() error {
 		}
 
 		// get correct path to the file
-		filePath := strings.Replace(asset.info.Name(), "template", mmo.Config.Name, 1)
+		filePath := strings.Replace(asset.info.Name(), "commands/project/template", mmo.Config.Name, 1)
 		// create template for the file
 		tmpl := template.Must(template.New(name).Parse(string(asset.bytes)))
 
@@ -68,14 +68,13 @@ func (mmo *Mmo) Create() error {
 		if err != nil {
 			return err
 		}
+		defer file.Close()
 
 		// execute the template to the file
 		err = tmpl.Execute(file, mmo.Config)
 		if err != nil {
 			return err
 		}
-
-		file.Close()
 	}
 
 	// change to the newly created project and init the dep manager
