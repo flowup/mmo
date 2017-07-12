@@ -16,9 +16,36 @@ import (
 	"text/template"
 )
 
+// Mmo represents config and context
+type Mmo struct {
+	Config  *config.Config
+	Context *config.Context
+}
+
+// GetMmo Load context and config from config files
+func GetMmo() *Mmo {
+
+	var mmo Mmo
+	mmoContext, err := config.LoadContext()
+	if err != nil {
+		mmo.Context = nil
+	} else {
+		mmo.Context = &mmoContext
+	}
+
+	mmoConfig, err := config.LoadConfig(config.FilenameConfig)
+	if err != nil {
+		mmo.Config = nil
+	} else {
+		mmo.Config = &mmoConfig
+	}
+
+	return &mmo
+}
+
 // InitService extends all assets using project options passed by the caller
 // This automatically creates a project folder with all files
-func (mmo *commands.Mmo) InitProject() error {
+func (mmo *Mmo) InitProject() error {
 
 	// create project folder
 	err := os.Mkdir(mmo.Config.Name, os.ModePerm)
@@ -74,7 +101,7 @@ func (mmo *commands.Mmo) InitProject() error {
 // InitializeDependencyManager initializes given dependency manager
 // within the current project.
 // It will also automatically update the dependency manager
-func (mmo *commands.Mmo) InitializeDependencyManager() error {
+func (mmo *Mmo) InitializeDependencyManager() error {
 	switch mmo.Config.DepManager {
 	case "glide":
 		glideInstallCmd := exec.Command("go", "get", "github.com/Masterminds/glide")
@@ -95,7 +122,7 @@ func (mmo *commands.Mmo) InitializeDependencyManager() error {
 }
 
 // RunTests is cli function to run tests of application in docker
-func (mmo *commands.Mmo) RunTests() error {
+func (mmo *Mmo) RunTests() error {
 
 	cli, err := client.NewEnvClient()
 	if err != nil {
@@ -142,7 +169,7 @@ func (mmo *commands.Mmo) RunTests() error {
 }
 
 // SetContext is cli function to set context of mmo to specified service or services
-func (mmo *commands.Mmo) SetContext(services []string) error {
+func (mmo *Mmo) SetContext(services []string) error {
 	for _, service := range services {
 		if _, ok := mmo.Config.Services[service]; !ok {
 			return utils.ErrServiceNotExists
@@ -163,7 +190,7 @@ func (mmo *commands.Mmo) SetContext(services []string) error {
 }
 
 // ProtoGen is cli function to generate API clients and server stubs of specified service or services
-func (mmo *commands.Mmo) ProtoGen() error {
+func (mmo *Mmo) ProtoGen() error {
 
 	for _, serviceName := range mmo.Context.Services {
 		if _, err := os.Stat(serviceName + "/protobuf"); os.IsNotExist(err) {

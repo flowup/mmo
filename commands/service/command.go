@@ -5,18 +5,19 @@ import (
 	"strings"
 	"os"
 	"github.com/flowup/mmo/commands"
-	"github.com/docker/docker/cli/command/commands"
+	"text/template"
+	"github.com/flowup/mmo/config"
 )
 
 // InitService is cli function to generate service with given name
-func (mmo *commands.Mmo) InitService() error {
+func InitService(configService config.Service) error {
 	// create proto dir
-	if err := utils.CreateDir(mmo.Config.Name + "/protobuf"); err != nil {
+	if err := utils.CreateDir(configService.Name + "/protobuf"); err != nil {
 		return err
 	}
 
 	// create main dir
-	if err := utils.CreateDir(mmo.Config.Name + "/cmd/" + mmo.Config.Name); err != nil {
+	if err := utils.CreateDir(configService.Name + "/cmd/" + configService.Name); err != nil {
 		return err
 	}
 
@@ -33,11 +34,11 @@ func (mmo *commands.Mmo) InitService() error {
 
 		switch asset.info.Name() {
 		case "commands/service/template/main_go":
-			filePath = strings.Replace(asset.info.Name(), "commands/service/template", mmo.Config.Name+"/cmd/"+mmo.Config.Name, 1)
+			filePath = strings.Replace(asset.info.Name(), "commands/service/template", configService.Name+"/cmd/"+configService.Name, 1)
 		case "commands/service/template/proto.proto":
-			filePath = strings.Replace(asset.info.Name(), "commands/service/template", mmo.Config.Name+"/protobuf", 1)
+			filePath = strings.Replace(asset.info.Name(), "commands/service/template", configService.Name+"/protobuf", 1)
 		default:
-			filePath = strings.Replace(asset.info.Name(), "commands/service/template", mmo.Config.Name, 1)
+			filePath = strings.Replace(asset.info.Name(), "commands/service/template", configService.Name, 1)
 		}
 
 		filePath = strings.Replace(filePath, "_go", ".go", 1)
@@ -53,13 +54,13 @@ func (mmo *commands.Mmo) InitService() error {
 		defer file.Close()
 
 		// execute the template to the file
-		err = tmpl.Execute(file, config)
+		err = tmpl.Execute(file, configService)
 		if err != nil {
 			return err
 		}
 	}
 
-	if err := commands.GenerateProto(commands.Go, mmo.Config.Name); err != nil {
+	if err := commands.GenerateProto(commands.Go, configService.Name); err != nil {
 		return err
 	}
 

@@ -4,8 +4,7 @@ import (
 	"net"
 	"sync"
 	"google.golang.org/grpc"
-	"github.com/flowup/mmo/{{.ProjectName}}/{{.Name}}"
-	"google.golang.org/grpc/reflection"{{if .WebGrpc}}
+	"google.golang.org/grpc/reflection"{{if .WebRPC}}
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
     "net/http"{{end}}
 )
@@ -21,7 +20,7 @@ func main(){
 	// Register reflection service on gRPC server.
 	reflection.Register(s)
 
-	{{if .WebGrpc}}options := []grpcweb.Option{}
+	{{if .WebRPC}}options := []grpcweb.Option{}
 
 	// Wrap grpc server to grpc-web server
 	wrappedServer := grpcweb.WrapServer(s, options...)
@@ -45,7 +44,7 @@ func main(){
 		}
 
 		wg.Done()
-	}()	{{if .WebGrpc}}
+	}()	{{if .WebRPC}}
 	go func() {
 		{{.Name}}.Log.Println("starting gRPC Web server on", "")
 		if err := httpServer.ListenAndServe(); err != nil {
