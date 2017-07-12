@@ -12,15 +12,21 @@ func Wizzar(serviceName string) config.Service {
 	newService := config.Service{Name: serviceName}
 
 	reader := bufio.NewReader(os.Stdin)
+
+	fmt.Print("Description : ")
+	if text, _ := reader.ReadString('\n'); text != "\n" {
+		newService.Description = text[:len(text)-1]
+	}
+
 	fmt.Print("WebRPC [y]: ")
-	text, _ := reader.ReadString('\n')
-	if text == "y\n" {
+	if text, _ := reader.ReadString('\n'); text == "y\n" {
 		newService.WebRPC = true
 	}
 
 	fmt.Print("Dsn: ")
-	text, _ = reader.ReadString('\n')
-	newService.Dsn = text
+	if text, _ := reader.ReadString('\n'); text != "\n" {
+		newService.Dsn = text[:len(text)-1]
+	}
 
 	return newService
 }

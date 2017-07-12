@@ -156,17 +156,16 @@ func main() {
 					Usage: "creates new service within the project",
 					Action: func(c *cli.Context) error {
 						mmo := project.GetMmo()
-
-						mmo.Config.Services = make(map[string]config.Service, 1)
-						mmo.Config.Services[c.Args().First()] = service.Wizzar(c.Args().First())
-
-						/*if mmo.Config == nil {
+						if mmo.Config == nil {
 							return utils.ErrNoProject
 						}
 
-						if mmo.Context == nil {
-							return utils.ErrContextNotSet
-						}*/
+						mmo.Config.Services = make(map[string]config.Service, len(mmo.Config.Services)+1)
+						mmo.Config.Services[c.Args().First()] = service.Wizzar(c.Args().First())
+
+						if err := config.SaveConfig(*mmo.Config, config.FilenameConfig); err != nil {
+							utils.Log.Fatal(err)
+						}
 
 						if err := service.InitService(mmo.Config.Services[c.Args().First()]); err != nil {
 							utils.Log.Fatal(err)
