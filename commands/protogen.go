@@ -11,10 +11,9 @@ import (
 	"os"
 )
 
-type Language string
-
 const (
-	Go Language = "go"
+	// Go represents supported languages
+	Go  = "go"
 	Python = "python"
 	TypeScript = "ts"
 )
@@ -22,7 +21,7 @@ const (
 // GenerateProto generates proto files in a given language for
 // the given service.
 // Current Support: go, python, typescript(ts)
-func GenerateProto(lang Language, serviceName string) error {
+func GenerateProto(lang string, serviceName string) error {
 
 	pwd, err := os.Getwd()
 	if err != nil {

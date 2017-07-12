@@ -6,6 +6,7 @@ import (
 	"github.com/flowup/mmo/utils"
 	"github.com/urfave/cli"
 	"os"
+	"github.com/flowup/mmo/config"
 )
 
 func main() {
@@ -23,11 +24,14 @@ func main() {
 					return errors.New("Missing project name argument")
 				}
 
-				if err := project.Init(project.ProjectOptions{
-					Name:              c.Args().First(),
-					Language:          "go",
-					DependencyManager: "glide",
-				}); err != nil {
+				mmo := project.Mmo{}
+				mmo.Config = &config.Config{}
+
+				mmo.Config.Name = c.Args().First()
+				mmo.Config.Lang = "go"
+				mmo.Config.DepManager = "glide"
+
+				if err := mmo.Init(); err != nil {
 					utils.Log.Fatal(err)
 				}
 				return nil
@@ -43,12 +47,17 @@ func main() {
 					return utils.ErrSetContextNoArg
 				}
 
+				mmo := project.GetMmo()
+				if mmo.Config == nil {
+					return utils.ErrNoProject
+				}
+
 				services := make([]string, c.NArg())
 				for i := 0; i < c.NArg(); i++ {
 					services[i] = c.Args().Get(i)
 				}
 
-				if err := project.SetContext(services); err != nil {
+				if err := mmo.SetContext(services); err != nil {
 					utils.Log.Fatal(err)
 				}
 				return nil
@@ -86,7 +95,18 @@ func main() {
 			Name:  "test",
 			Usage: "runs tests for all services targeted by the context",
 			Action: func(c *cli.Context) error {
-				if err := project.RunTests(); err != nil {
+
+				mmo := project.GetMmo()
+
+				if mmo.Config == nil {
+					return utils.ErrNoProject
+				}
+
+				if mmo.Context == nil {
+					return utils.ErrContextNotSet
+				}
+
+				if err := mmo.RunTests(); err != nil {
 					utils.Log.Fatal(err)
 				}
 				return nil
@@ -100,7 +120,18 @@ func main() {
 					Name:  "proto",
 					Usage: "generates API clients and server stubs from proto definition for all services targeted by the context",
 					Action: func(c *cli.Context) error {
-						if err := project.ProtoGen(); err != nil {
+
+						mmo := project.GetMmo()
+
+						if mmo.Config == nil {
+							return utils.ErrNoProject
+						}
+
+						if mmo.Context == nil {
+							return utils.ErrContextNotSet
+						}
+
+						if err := mmo.ProtoGen(); err != nil {
 							utils.Log.Fatal(err)
 						}
 						return nil

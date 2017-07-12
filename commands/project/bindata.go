@@ -4,7 +4,7 @@
 // commands/project/template/ISSUE_TEMPLATE.md
 // commands/project/template/README.md
 // commands/project/template/gitignore
-// commands/project/template/mmo.json
+// commands/project/template/mmo.yaml
 // commands/project/template/wercker.yml
 // DO NOT EDIT!
 
@@ -153,22 +153,22 @@ func commandsProjectTemplateGitignore() (*asset, error) {
 	return a, nil
 }
 
-var _commandsProjectTemplateMmoJson = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xaa\xe6\x52\x50\x50\xca\x4b\xcc\x4d\x55\xb2\x52\x50\xaa\xae\xd6\xf3\x4b\xcc\x4d\xad\xad\x55\xd2\x01\x09\xe7\x24\xe6\xa5\x83\x84\xd3\xf3\x21\xfc\x94\xd4\x82\xd4\xbc\x94\xd4\xbc\xe4\x4a\xdf\xc4\xbc\xc4\xf4\xd4\x22\xb0\x64\x4e\x66\x4a\xaa\x12\x57\x2d\x20\x00\x00\xff\xff\x5e\x43\x43\xb9\x49\x00\x00\x00")
+var _commandsProjectTemplateMmoYaml = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\xca\x4b\xcc\x4d\xb5\x52\xa8\xae\xd6\xf3\x4b\xcc\x4d\xad\xad\xe5\xca\x49\xcc\x4b\xb7\x52\x48\xcf\xe7\x4a\x49\x2d\x48\xcd\x4b\x49\xcd\x4b\xae\xf4\x4d\xcc\x4b\x4c\x4f\x2d\xb2\x52\x48\xcf\xc9\x4c\x49\x05\x04\x00\x00\xff\xff\x14\x69\x12\x72\x31\x00\x00\x00")
 
-func commandsProjectTemplateMmoJsonBytes() ([]byte, error) {
+func commandsProjectTemplateMmoYamlBytes() ([]byte, error) {
 	return bindataRead(
-		_commandsProjectTemplateMmoJson,
-		"commands/project/template/mmo.json",
+		_commandsProjectTemplateMmoYaml,
+		"commands/project/template/mmo.yaml",
 	)
 }
 
-func commandsProjectTemplateMmoJson() (*asset, error) {
-	bytes, err := commandsProjectTemplateMmoJsonBytes()
+func commandsProjectTemplateMmoYaml() (*asset, error) {
+	bytes, err := commandsProjectTemplateMmoYamlBytes()
 	if err != nil {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "commands/project/template/mmo.json", size: 73, mode: os.FileMode(436), modTime: time.Unix(1499416903, 0)}
+	info := bindataFileInfo{name: "commands/project/template/mmo.yaml", size: 49, mode: os.FileMode(436), modTime: time.Unix(1499848363, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -249,7 +249,7 @@ var _bindata = map[string]func() (*asset, error){
 	"commands/project/template/ISSUE_TEMPLATE.md": commandsProjectTemplateIssue_templateMd,
 	"commands/project/template/README.md": commandsProjectTemplateReadmeMd,
 	"commands/project/template/gitignore": commandsProjectTemplateGitignore,
-	"commands/project/template/mmo.json": commandsProjectTemplateMmoJson,
+	"commands/project/template/mmo.yaml": commandsProjectTemplateMmoYaml,
 	"commands/project/template/wercker.yml": commandsProjectTemplateWerckerYml,
 }
 
@@ -300,7 +300,7 @@ var _bintree = &bintree{nil, map[string]*bintree{
 				"ISSUE_TEMPLATE.md": &bintree{commandsProjectTemplateIssue_templateMd, map[string]*bintree{}},
 				"README.md": &bintree{commandsProjectTemplateReadmeMd, map[string]*bintree{}},
 				"gitignore": &bintree{commandsProjectTemplateGitignore, map[string]*bintree{}},
-				"mmo.json": &bintree{commandsProjectTemplateMmoJson, map[string]*bintree{}},
+				"mmo.yaml": &bintree{commandsProjectTemplateMmoYaml, map[string]*bintree{}},
 				"wercker.yml": &bintree{commandsProjectTemplateWerckerYml, map[string]*bintree{}},
 			}},
 		}},
