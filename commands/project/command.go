@@ -23,24 +23,26 @@ type Mmo struct {
 }
 
 // GetMmo Load context and config from config files
-func GetMmo() *Mmo {
+func GetMmo() (*Mmo, error) {
 
-	var mmo Mmo
+	mmo := &Mmo{
+		&config.Config{},
+		&config.Context{},
+	}
+
 	mmoContext, err := config.LoadContext()
 	if err != nil {
-		mmo.Context = nil
-	} else {
-		mmo.Context = &mmoContext
+		return nil, err
 	}
+	mmo.Context = mmoContext
 
 	mmoConfig, err := config.LoadConfig(config.FilenameConfig)
 	if err != nil {
-		mmo.Config = nil
-	} else {
-		mmo.Config = &mmoConfig
+		return nil, err
 	}
+	mmo.Config = mmoConfig
 
-	return &mmo
+	return mmo, nil
 }
 
 // Init extends all assets using project options passed by the caller
@@ -180,7 +182,7 @@ func (mmo *Mmo) SetContext(services []string) error {
 		}
 	}
 
-	serviceContext := config.Context{
+	serviceContext := &config.Context{
 		Services: services,
 	}
 

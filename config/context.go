@@ -16,20 +16,18 @@ type Context struct {
 }
 
 // LoadContext loads project context from the given directory
-func LoadContext() (Context, error) {
+func LoadContext() (*Context, error) {
 	b, err := ioutil.ReadFile(filenameContext)
 	if err != nil {
-		return Context{}, err
+		return &Context{}, err
 	}
 
-	var context Context
-	err = json.Unmarshal(b, &context)
-
-	return context,err
+	context := &Context{}
+	return context, json.Unmarshal(b, &context)
 }
 
 // SaveContext saves given context to the current path
-func SaveContext(context Context) error {
+func SaveContext(context *Context) error {
 	b, err := json.Marshal(context)
 
 	if err != nil {

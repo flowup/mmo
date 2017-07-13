@@ -38,18 +38,21 @@ func main() {
 			},
 		},
 		{
-			Name:    "set-context",
+			Name:    "context",
 			Aliases: []string{"ctx"},
 			Usage:   "sets context to the service(s) given by the argument(s)",
 			Action: func(c *cli.Context) error {
 
-				if c.NArg() == 0 {
-					return utils.ErrSetContextNoArg
+				mmo, err := project.GetMmo()
+				if err != nil {
+					return utils.ErrNoProject
 				}
 
-				mmo := project.GetMmo()
-				if mmo.Config == nil {
-					return utils.ErrNoProject
+				utils.Log.Println(mmo)
+
+				if c.NArg() == 0 {
+					utils.Log.Println("Current context:", mmo.Context.Services)
+					return nil
 				}
 
 				services := make([]string, c.NArg())
@@ -96,9 +99,9 @@ func main() {
 			Usage: "runs tests for all services targeted by the context",
 			Action: func(c *cli.Context) error {
 
-				mmo := project.GetMmo()
+				mmo, err := project.GetMmo()
 
-				if mmo.Config == nil {
+				if err != nil {
 					return utils.ErrNoProject
 				}
 
@@ -121,13 +124,13 @@ func main() {
 					Usage: "generates API clients and server stubs from proto definition for all services targeted by the context",
 					Action: func(c *cli.Context) error {
 
-						mmo := project.GetMmo()
+						mmo, err := project.GetMmo()
 
-						if mmo.Config == nil {
+						if err != nil {
 							return utils.ErrNoProject
 						}
 
-						if mmo.Context == nil {
+						if len(mmo.Context.Services) == 0 {
 							return utils.ErrContextNotSet
 						}
 

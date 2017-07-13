@@ -41,20 +41,18 @@ type DependencyRun struct {
 }
 
 // LoadConfig loads project config from the given directory
-func LoadConfig(filenameConfig string) (Config, error) {
+func LoadConfig(filenameConfig string) (*Config, error) {
 	b, err := ioutil.ReadFile(filenameConfig)
 	if err != nil {
-		return Config{}, err
+		return &Config{}, err
 	}
 
-	var cfg Config
-	err = yaml.Unmarshal(b, &cfg)
-
-	return cfg, err
+	cfg := &Config{}
+	return cfg, yaml.Unmarshal(b, &cfg)
 }
 
 // SaveConfig saves given config to  the given directory
-func SaveConfig(cfg Config, filenameConfig string) error {
+func SaveConfig(cfg *Config, filenameConfig string) error {
 	b, err := yaml.Marshal(cfg)
 
 	if err != nil {
