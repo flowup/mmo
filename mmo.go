@@ -48,8 +48,6 @@ func main() {
 					return utils.ErrNoProject
 				}
 
-				utils.Log.Println(mmo)
-
 				if c.NArg() == 0 {
 					utils.Log.Println("Current context:", mmo.Context.Services)
 					return nil
@@ -130,11 +128,13 @@ func main() {
 							return utils.ErrNoProject
 						}
 
-						if len(mmo.Context.Services) == 0 {
-							return utils.ErrContextNotSet
+						services := mmo.Context.Services
+						if len(services) == 0 {
+							utils.Log.Warnln("No context set, using global")
+							services = mmo.Config.ServiceNames()
 						}
 
-						if err := mmo.ProtoGen(); err != nil {
+						if err := mmo.ProtoGen(services); err != nil {
 							utils.Log.Fatal(err)
 						}
 						return nil

@@ -20,6 +20,16 @@ type Config struct {
 	Services   map[string]Service `yaml:"services"`
 }
 
+// ServiceNames returns an array of all services registered within the config
+func (c *Config) ServiceNames() []string {
+	names := make([]string, 0, len(c.Services))
+	for key := range c.Services {
+		names = append(names, key)
+	}
+
+	return names
+}
+
 // Service represents service configuration from Config
 type Service struct {
 	Description  string `yaml:"description"`

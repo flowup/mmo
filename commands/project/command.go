@@ -2,7 +2,6 @@ package project
 
 import (
 	"context"
-	"fmt"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/client"
@@ -31,10 +30,9 @@ func GetMmo() (*Mmo, error) {
 	}
 
 	mmoContext, err := config.LoadContext()
-	if err != nil {
-		return nil, err
+	if err == nil {
+		mmo.Context = mmoContext
 	}
-	mmo.Context = mmoContext
 
 	mmoConfig, err := config.LoadConfig(config.FilenameConfig)
 	if err != nil {
@@ -138,7 +136,7 @@ func (mmo *Mmo) RunTests() error {
 
 	for _, serviceName := range mmo.Context.Services {
 
-		fmt.Println("Running tests for service \"" + serviceName + "\":")
+		utils.Log.Infoln("Running tests for service \"" + serviceName + "\":")
 
 		testContainer, err := cli.ContainerCreate(context.Background(), &container.Config{
 			Image:      "flowup/mmo-webrpc",
@@ -163,8 +161,6 @@ func (mmo *Mmo) RunTests() error {
 		if err != nil {
 			return err
 		}
-
-		fmt.Println()
 	}
 
 	return nil
@@ -192,11 +188,13 @@ func (mmo *Mmo) SetContext(services []string) error {
 }
 
 // ProtoGen is cli function to generate API clients and server stubs of specified service or services
-func (mmo *Mmo) ProtoGen() error {
+func (mmo *Mmo) ProtoGen(services []string) error {
 
-	for _, serviceName := range mmo.Context.Services {
+	for _, serviceName := range services {
+		utils.Log.Infoln("Generating protobuf for:", serviceName)
+
 		if _, err := os.Stat(serviceName + "/protobuf"); os.IsNotExist(err) {
-			fmt.Println("No protobuf files found for service \"" + serviceName + "\". Skipping...\n")
+			utils.Log.Warnln("No protobuf files found for service:", serviceName, " -> Skipping")
 			continue
 		}
 
@@ -215,8 +213,6 @@ func (mmo *Mmo) ProtoGen() error {
 				return err
 			}
 		}
-
-		fmt.Println()
 	}
 
 	return nil

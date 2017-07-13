@@ -15,6 +15,11 @@ type Context struct {
 	Services []string
 }
 
+// IsGlobal returns true if current context is global (for all services)
+func (c *Context) IsGlobal() bool {
+	return len(c.Services) == 0
+}
+
 // LoadContext loads project context from the given directory
 func LoadContext() (*Context, error) {
 	b, err := ioutil.ReadFile(filenameContext)
