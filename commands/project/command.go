@@ -13,6 +13,7 @@ import (
 	"os/exec"
 	"strings"
 	"text/template"
+	log "github.com/sirupsen/logrus"
 )
 
 // Mmo represents config and context
@@ -136,7 +137,7 @@ func (mmo *Mmo) RunTests() error {
 
 	for _, serviceName := range mmo.Context.Services {
 
-		utils.Log.Infoln("Running tests for service \"" + serviceName + "\":")
+		log.Infoln("Running tests for service \"" + serviceName + "\":")
 
 		testContainer, err := cli.ContainerCreate(context.Background(), &container.Config{
 			Image:      "flowup/mmo-webrpc",
@@ -191,10 +192,10 @@ func (mmo *Mmo) SetContext(services []string) error {
 func (mmo *Mmo) ProtoGen(services []string) error {
 
 	for _, serviceName := range services {
-		utils.Log.Infoln("Generating protobuf for:", serviceName)
+		log.Infoln("Generating protobuf for:", serviceName)
 
 		if _, err := os.Stat(serviceName + "/protobuf"); os.IsNotExist(err) {
-			utils.Log.Warnln("No protobuf files found for service:", serviceName, " -> Skipping")
+			log.Warnln("No protobuf files found for service:", serviceName, " -> Skipping")
 			continue
 		}
 

@@ -7,9 +7,46 @@ import (
 	"github.com/urfave/cli"
 	"os"
 	"github.com/flowup/mmo/config"
+	"github.com/evalphobia/logrus_sentry"
+	log "github.com/sirupsen/logrus"
+	"time"
 )
 
+const (
+	// Log global settings of logger
+	dsn = "https://5554d201ce064e8790792540de39c608:fb93a01a320a486ab40b4fbb5feaf7ac@sentry.io/190135"
+)
+
+func init() {
+	// Logging format is Text
+	log.SetFormatter(&log.TextFormatter{})
+	log.SetOutput(os.Stdout)
+	// this should be override-able by some debug flag
+	log.SetLevel(log.InfoLevel)
+
+	levels := []log.Level{
+		log.PanicLevel,
+		log.FatalLevel,
+		log.ErrorLevel,
+	}
+
+	hook, err := logrus_sentry.NewSentryHook(dsn, levels)
+	hook.Timeout = 20 * time.Second
+	hook.StacktraceConfiguration.Enable = true
+
+	if err == nil {
+		log.AddHook(hook)
+	}
+}
+
+
 func main() {
+	defer func() {
+		if err := recover(); err != nil {
+			log.Fatalln("Got Nuked :( :", err)
+		}
+	}()
+
 	app := cli.NewApp()
 	app.Name = "mmo"
 	app.Usage = ""
@@ -32,7 +69,7 @@ func main() {
 				mmo.Config.DepManager = "glide"
 
 				if err := mmo.Init(); err != nil {
-					utils.Log.Fatal(err)
+					log.Fatal(err)
 				}
 				return nil
 			},
@@ -49,7 +86,7 @@ func main() {
 				}
 
 				if c.NArg() == 0 {
-					utils.Log.Println("Current context:", mmo.Context.Services)
+					log.Println("Current context:", mmo.Context.Services)
 					return nil
 				}
 
@@ -59,7 +96,7 @@ func main() {
 				}
 
 				if err := mmo.SetContext(services); err != nil {
-					utils.Log.Fatal(err)
+					log.Fatal(err)
 				}
 				return nil
 			},
@@ -108,7 +145,7 @@ func main() {
 				}
 
 				if err := mmo.RunTests(); err != nil {
-					utils.Log.Fatal(err)
+					log.Fatal(err)
 				}
 				return nil
 			},
@@ -130,12 +167,12 @@ func main() {
 
 						services := mmo.Context.Services
 						if len(services) == 0 {
-							utils.Log.Warnln("No context set, using global")
+							log.Warnln("No context set, using global")
 							services = mmo.Config.ServiceNames()
 						}
 
 						if err := mmo.ProtoGen(services); err != nil {
-							utils.Log.Fatal(err)
+							log.Fatal(err)
 						}
 						return nil
 					},
