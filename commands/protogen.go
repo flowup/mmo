@@ -2,19 +2,19 @@ package commands
 
 import (
 	"context"
-	"fmt"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/client"
 	"github.com/flowup/mmo/utils"
 	"github.com/flowup/mmo/utils/dockercmd"
 	"os"
+	log "github.com/sirupsen/logrus"
 )
 
 const (
 	// Go represents supported languages
-	Go  = "go"
-	Python = "python"
+	Go         = "go"
+	Python     = "python"
 	TypeScript = "ts"
 )
 
@@ -28,7 +28,7 @@ func GenerateProto(lang string, serviceName string) error {
 		return err
 	}
 
-	fmt.Println("Generating " + string(lang) + " API clients and server stubs for service \"" + serviceName + "\"...")
+	log.Infoln("Generating " + string(lang) + " API clients and server stubs for service:", serviceName)
 
 	var inputMount string
 	var outputMount string

@@ -2,7 +2,6 @@ package project
 
 import (
 	"context"
-	"fmt"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/client"
@@ -14,6 +13,7 @@ import (
 	"os/exec"
 	"strings"
 	"text/template"
+	log "github.com/sirupsen/logrus"
 )
 
 // Mmo represents config and context
@@ -23,24 +23,25 @@ type Mmo struct {
 }
 
 // GetMmo Load context and config from config files
-func GetMmo() *Mmo {
+func GetMmo() (*Mmo, error) {
 
-	var mmo Mmo
+	mmo := &Mmo{
+		&config.Config{},
+		&config.Context{},
+	}
+
 	mmoContext, err := config.LoadContext()
-	if err != nil {
-		mmo.Context = nil
-	} else {
-		mmo.Context = &mmoContext
+	if err == nil {
+		mmo.Context = mmoContext
 	}
 
 	mmoConfig, err := config.LoadConfig(config.FilenameConfig)
 	if err != nil {
-		mmo.Config = nil
-	} else {
-		mmo.Config = &mmoConfig
+		return nil, err
 	}
+	mmo.Config = mmoConfig
 
-	return &mmo
+	return mmo, nil
 }
 
 // InitProject extends all assets using project options passed by the caller
@@ -136,7 +137,7 @@ func (mmo *Mmo) RunTests() error {
 
 	for _, serviceName := range mmo.Context.Services {
 
-		fmt.Println("Running tests for service \"" + serviceName + "\":")
+		log.Infoln("Running tests for service \"" + serviceName + "\":")
 
 		testContainer, err := cli.ContainerCreate(context.Background(), &container.Config{
 			Image:      "flowup/mmo-webrpc",
@@ -161,8 +162,6 @@ func (mmo *Mmo) RunTests() error {
 		if err != nil {
 			return err
 		}
-
-		fmt.Println()
 	}
 
 	return nil
@@ -180,7 +179,7 @@ func (mmo *Mmo) SetContext(services []string) error {
 		}
 	}
 
-	serviceContext := config.Context{
+	serviceContext := &config.Context{
 		Services: services,
 	}
 
@@ -190,11 +189,13 @@ func (mmo *Mmo) SetContext(services []string) error {
 }
 
 // ProtoGen is cli function to generate API clients and server stubs of specified service or services
-func (mmo *Mmo) ProtoGen() error {
+func (mmo *Mmo) ProtoGen(services []string) error {
 
-	for _, serviceName := range mmo.Context.Services {
+	for _, serviceName := range services {
+		log.Infoln("Generating protobuf for:", serviceName)
+
 		if _, err := os.Stat(serviceName + "/protobuf"); os.IsNotExist(err) {
-			fmt.Println("No protobuf files found for service \"" + serviceName + "\". Skipping...\n")
+			log.Warnln("No protobuf files found for service:", serviceName, " -> Skipping")
 			continue
 		}
 
@@ -213,8 +214,6 @@ func (mmo *Mmo) ProtoGen() error {
 				return err
 			}
 		}
-
-		fmt.Println()
 	}
 
 	return nil
