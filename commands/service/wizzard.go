@@ -32,7 +32,7 @@ func Wizzar(serviceName string) config.Service {
 	return newService
 }
 
-// Create new service according to flags
+// Flags Create new service according to flags
 func Flags(serviceName string, ctx *cli.Context) config.Service {
 	newService := config.Service{Name: serviceName}
 
