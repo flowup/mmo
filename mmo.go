@@ -69,7 +69,7 @@ func main() {
 				mmo.Config.Lang = "go"
 				mmo.Config.DepManager = "glide"
 
-				if err := mmo.Init(); err != nil {
+				if err := mmo.InitProject(); err != nil {
 					log.Fatal(err)
 				}
 				return nil
@@ -214,8 +214,8 @@ func main() {
 							return utils.ErrNoArg
 						}
 
-						mmo := project.GetMmo()
-						if mmo.Config == nil {
+						mmo, err := project.GetMmo()
+						if err != nil {
 							return utils.ErrNoProject
 						}
 
@@ -223,12 +223,12 @@ func main() {
 						//mmo.Config.Services[c.Args().First()] = service.Wizzar(c.Args().First())
 						mmo.Config.Services[c.Args().First()] = service.Flags(c.Args().First(), c)
 
-						if err := config.SaveConfig(*mmo.Config, config.FilenameConfig); err != nil {
-							utils.Log.Fatal(err)
+						if err := config.SaveConfig(mmo.Config, config.FilenameConfig); err != nil {
+							log.Fatal(err)
 						}
 
 						if err := service.InitService(mmo.Config.Services[c.Args().First()]); err != nil {
-							utils.Log.Fatal(err)
+							log.Fatal(err)
 						}
 						return nil
 					},
