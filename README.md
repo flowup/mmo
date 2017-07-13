@@ -2,6 +2,8 @@
 
 `mmo` is a cli tool for monorepo microservice orchestration. It helps to easily create, build, test and deploy services within the same repo.
 
+> Tested on Go > 1.8
+
 ## Commands
 
 ### Help
