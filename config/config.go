@@ -32,9 +32,11 @@ func (c *Config) ServiceNames() []string {
 
 // Service represents service configuration from Config
 type Service struct {
+	Name         string `yaml:"-"`
 	Description  string `yaml:"description"`
 	WebRPC       bool `yaml:"webRPC"`
 	Dependencies []Dependency `yaml:"dependencies"`
+	Dsn          string `yaml:"dsn"`
 }
 
 // Dependency represents service dependency configuration from Config

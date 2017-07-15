@@ -44,9 +44,9 @@ func GetMmo() (*Mmo, error) {
 	return mmo, nil
 }
 
-// Init extends all assets using project options passed by the caller
+// InitProject extends all assets using project options passed by the caller
 // This automatically creates a project folder with all files
-func (mmo *Mmo) Init() error {
+func (mmo *Mmo) InitProject() error {
 
 	// create project folder
 	err := os.Mkdir(mmo.Config.Name, os.ModePerm)

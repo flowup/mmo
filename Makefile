@@ -3,3 +3,7 @@ test:
 
 bindata:
 	go-bindata -pkg project -o commands/project/bindata.go commands/project/template
+	go-bindata -pkg service -o commands/service/bindata.go commands/service/template
+
+build:
+	go build

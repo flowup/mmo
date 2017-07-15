@@ -1,0 +1,37 @@
+package {{.Name}}
+
+import (
+	"github.com/sirupsen/logrus"
+	"os"{{if .Dsn}}
+	"time"
+	"github.com/evalphobia/logrus_sentry"{{end}}
+)
+
+var (
+	// Log global settings of logger
+	Log *logrus.Logger
+	{{if .Dsn}}dsn = "{{.Dsn}}"{{end}}
+)
+
+func init() {
+
+	Log = logrus.New()
+
+	// Logging format is JSON
+	Log.Formatter = &logrus.JSONFormatter{}
+
+	Log.Out = os.Stdout
+
+	{{if .Dsn}}levels := []logrus.Level{
+		logrus.PanicLevel,
+		logrus.FatalLevel,
+		logrus.ErrorLevel,
+	}
+	hook, err := logrus_sentry.NewSentryHook(dsn, levels)
+	hook.Timeout = 20 * time.Second
+	hook.StacktraceConfiguration.Enable = true
+
+	if err == nil {
+		Log.Hooks.Add(hook)
+	}{{end}}
+}

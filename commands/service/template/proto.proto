@@ -1,0 +1,7 @@
+syntax = "proto3";
+
+package {{.Name}};
+
+service {{.Name}} {
+
+}
