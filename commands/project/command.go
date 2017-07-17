@@ -7,15 +7,15 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/flowup/mmo/commands"
 	"github.com/flowup/mmo/config"
+	"github.com/flowup/mmo/docker"
+	"github.com/flowup/mmo/minikube"
 	"github.com/flowup/mmo/utils"
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	"os"
 	"os/exec"
 	"strings"
 	"text/template"
-	log "github.com/sirupsen/logrus"
-	"github.com/flowup/mmo/minikube"
-	"github.com/flowup/mmo/docker"
 )
 
 // Mmo represents config and context
@@ -221,6 +221,7 @@ func (mmo *Mmo) ProtoGen(services []string) error {
 	return nil
 }
 
+// Run is command to run all services in cluster (minikube) - all services are built as docker images and deployed to cluster
 func (mmo *Mmo) Run() error {
 
 	kubeClient, err := minikube.ConnectToCluster()

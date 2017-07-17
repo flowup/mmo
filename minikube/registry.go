@@ -1,13 +1,14 @@
 package minikube
 
 import (
-	apiv1 "k8s.io/client-go/pkg/api/v1"
-	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	apiv1 "k8s.io/client-go/pkg/api/v1"
 	"k8s.io/client-go/pkg/apis/extensions/v1beta1"
 	"k8s.io/client-go/pkg/util"
 )
 
+// RegistryReplicationController is k8s resource for deploying docker registry replication controller
 var RegistryReplicationController = apiv1.ReplicationController{
 	ObjectMeta: metav1.ObjectMeta{
 		Name:      "kube-registry-v0",
@@ -36,10 +37,6 @@ var RegistryReplicationController = apiv1.ReplicationController{
 						Name:  "registry",
 						Image: "registry:2",
 						Resources: apiv1.ResourceRequirements{
-							Limits: apiv1.ResourceList{
-								"cpu":    resource.MustParse("100m"),
-								"memory": resource.MustParse("100Mi"),
-							},
 							Requests: apiv1.ResourceList{
 								"cpu":    resource.MustParse("10m"),
 								"memory": resource.MustParse("10Mi"),
@@ -76,6 +73,7 @@ var RegistryReplicationController = apiv1.ReplicationController{
 	},
 }
 
+// RegistryService is k8s resource for deploying docker registry service
 var RegistryService = apiv1.Service{
 	ObjectMeta: metav1.ObjectMeta{
 		Name:      "kube-registry",
@@ -98,6 +96,7 @@ var RegistryService = apiv1.Service{
 	},
 }
 
+// RegistryDaemonSet is k8s resource for deploying docker registry daemon set
 var RegistryDaemonSet = v1beta1.DaemonSet{
 	ObjectMeta: metav1.ObjectMeta{
 		Name:      "kube-registry-proxy",
@@ -121,12 +120,6 @@ var RegistryDaemonSet = v1beta1.DaemonSet{
 					{
 						Name:  "kube-registry-proxy",
 						Image: "gcr.io/google_containers/kube-registry-proxy:0.4",
-						Resources: apiv1.ResourceRequirements{
-							Limits: apiv1.ResourceList{
-								"cpu":    resource.MustParse("100m"),
-								"memory": resource.MustParse("50Mi"),
-							},
-						},
 						Env: []apiv1.EnvVar{
 							{Name: "REGISTRY_HOST", Value: "kube-registry.kube-system.svc.cluster.local"},
 							{Name: "REGISTRY_PORT", Value: "17465"},

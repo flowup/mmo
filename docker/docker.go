@@ -1,38 +1,42 @@
 package docker
 
 import (
-	"github.com/docker/docker/client"
-	"context"
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/mount"
-	"github.com/flowup/mmo/utils"
-	"github.com/flowup/mmo/utils/dockercmd"
-	"os"
-	"crypto/sha1"
-	"encoding/base64"
-	"time"
-	"github.com/docker/docker/api/types"
 	"archive/tar"
 	"bytes"
-	"io/ioutil"
+	"context"
+	"crypto/sha1"
+	"encoding/base64"
 	"fmt"
+	"github.com/docker/docker/api/types"
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/mount"
+	"github.com/docker/docker/client"
+	"github.com/flowup/mmo/utils"
+	"github.com/flowup/mmo/utils/dockercmd"
+	"io/ioutil"
+	"os"
 	"strings"
+	"time"
 )
 
+// Builder is structure to hold instance of service builder
 type Builder struct {
-	cli       *client.Client
-	goPackage string
+	cli           *client.Client
+	goPackage     string
+	buildServices []string
 }
 
+// GetBuilder is function to get instance of builder
 func GetBuilder(goPackage string) (*Builder, error) {
 	cli, err := client.NewEnvClient()
 	if err != nil {
 		return nil, err
 	}
 
-	return &Builder{cli: cli, goPackage: goPackage}, nil
+	return &Builder{cli: cli, goPackage: goPackage, buildServices: make([]string, 0)}, nil
 }
 
+// BuildService is function to build service's binary and alpine docker image
 func (b *Builder) BuildService(service string) (string, error) {
 
 	err := b.buildBinary(service)
@@ -41,10 +45,25 @@ func (b *Builder) BuildService(service string) (string, error) {
 	}
 
 	image, err := b.buildImage(service)
+	if err != nil {
+		return "", err
+	}
 
-	fmt.Println(image)
+	b.buildServices = append(b.buildServices, image)
 
-	return image, err
+	return image, nil
+}
+
+// Clean is function to remove built images - can be used to after pushing images to external registry
+func (b *Builder) Clean() error {
+	for _, service := range b.buildServices {
+		_, err := b.cli.ImageRemove(context.Background(), service, types.ImageRemoveOptions{})
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (b *Builder) buildBinary(service string) error {
@@ -101,7 +120,7 @@ func (b *Builder) buildImage(service string) (string, error) {
 
 	buildTag := dockercmd.MinikubeRegistry + "/" + b.goPackage + ":" + imageTag
 	buildOptions := types.ImageBuildOptions{
-		Tags: []string{buildTag },
+		Tags: []string{buildTag},
 	}
 
 	ctx, err := b.createContext(service)

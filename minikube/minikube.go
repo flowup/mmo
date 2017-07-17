@@ -1,12 +1,12 @@
 package minikube
 
 import (
-	"os/exec"
 	"github.com/pkg/errors"
-	"k8s.io/client-go/kubernetes"
-	"os/user"
-	"k8s.io/client-go/rest"
 	"k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
+	"os/exec"
+	"os/user"
 )
 
 const (
@@ -33,12 +33,7 @@ func IsRunning() error {
 
 	cmdCube := exec.Command("minikube", "ip")
 
-	err = cmdCube.Start()
-	if err != nil {
-		return errNotRunning
-	}
-
-	err = cmdCube.Wait()
+	err = cmdCube.Run()
 	if err != nil {
 		return errNotRunning
 	}
@@ -46,6 +41,7 @@ func IsRunning() error {
 	return nil
 }
 
+// ConnectToCluster is function to connect to local minikube cluster
 func ConnectToCluster() (*kubernetes.Clientset, error) {
 
 	usr, err := user.Current()
@@ -63,6 +59,7 @@ func ConnectToCluster() (*kubernetes.Clientset, error) {
 	return kubernetes.NewForConfig(config)
 }
 
+// IsRegistryRunning is function to check if all parts of docker registry are deployed
 func IsRegistryRunning(client *kubernetes.Clientset) error {
 	rplInterface := client.CoreV1Client.ReplicationControllers(RegistryReplicationController.ObjectMeta.Namespace)
 	_, err := rplInterface.Get(RegistryReplicationController.ObjectMeta.Name, v1.GetOptions{})
@@ -81,10 +78,12 @@ func IsRegistryRunning(client *kubernetes.Clientset) error {
 	return err
 }
 
+// IsRegistryAccessible is function to check if docker registry running in minikube is accessible
 func IsRegistryAccessible() error {
 	return nil
 }
 
+// DeployDockerRegistry is function to deploy docker registry to connected k8s cluster
 func DeployDockerRegistry(client *kubernetes.Clientset) error {
 	rplInterface := client.CoreV1Client.ReplicationControllers(RegistryReplicationController.ObjectMeta.Namespace)
 	_, err := rplInterface.Create(&RegistryReplicationController)
@@ -103,8 +102,9 @@ func DeployDockerRegistry(client *kubernetes.Clientset) error {
 	return err
 }
 
+// ForwardRegistryPort is function to forward minikube's registry port, returned Cmd should be killed when forwarding is not needed
 func ForwardRegistryPort() (*exec.Cmd, error) {
-	cmdCube := exec.Command("bash", "-c", "kubectl port-forward --namespace kube-system " +
+	cmdCube := exec.Command("bash", "-c", "kubectl port-forward --namespace kube-system "+
 		"$(kubectl get po -n kube-system | grep kube-registry-v0 | awk '{print $1;}') 17465:17465")
 
 	err := cmdCube.Start()
