@@ -103,15 +103,13 @@ func DeployDockerRegistry(client *kubernetes.Clientset) error {
 	return err
 }
 
-func ForwardRegistryPort(client *kubernetes.Clientset) error {
+func ForwardRegistryPort() (*exec.Cmd, error) {
 	cmdCube := exec.Command("bash", "-c", "kubectl port-forward --namespace kube-system " +
 		"$(kubectl get po -n kube-system | grep kube-registry-v0 | awk '{print $1;}') 17465:17465")
 
 	err := cmdCube.Start()
 	if err != nil {
-		return errPwFailed
+		return cmdCube, errors.Wrap(errPwFailed, err.Error())
 	}
-
-	err = cmdCube.Wait()
-	return err
+	return cmdCube, nil
 }

@@ -113,7 +113,17 @@ func main() {
 			Name:  "run",
 			Usage: "runs services and their dependencies using docker on your machine",
 			Action: func(c *cli.Context) error {
-				return utils.ErrNotImplemented
+				mmo, err := project.GetMmo()
+
+				if err != nil {
+					return utils.ErrNoProject
+				}
+
+				if err := mmo.Run(); err != nil {
+					log.Fatal(err)
+				}
+
+				return nil
 			},
 		},
 		{

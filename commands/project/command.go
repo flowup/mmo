@@ -14,6 +14,8 @@ import (
 	"strings"
 	"text/template"
 	log "github.com/sirupsen/logrus"
+	"github.com/flowup/mmo/minikube"
+	"github.com/flowup/mmo/docker"
 )
 
 // Mmo represents config and context
@@ -215,6 +217,44 @@ func (mmo *Mmo) ProtoGen(services []string) error {
 			}
 		}
 	}
+
+	return nil
+}
+
+func (mmo *Mmo) Run() error {
+
+	kubeClient, err := minikube.ConnectToCluster()
+	if err != nil {
+		return err
+	}
+
+	err = minikube.IsRegistryRunning(kubeClient)
+	if err != nil {
+		err = minikube.DeployDockerRegistry(kubeClient)
+		if err != nil {
+			return err
+		}
+	}
+
+	portFwdCmd, err := minikube.ForwardRegistryPort()
+
+	builder, err := docker.GetBuilder(mmo.Config.GoPackage)
+	if err != nil {
+		return err
+	}
+
+	for service := range mmo.Config.Services {
+		_, err := builder.BuildService(service)
+		if err != nil {
+			return err
+		}
+	}
+
+	// TODO: build service
+
+	// TODO: deploy service
+
+	portFwdCmd.Process.Kill()
 
 	return nil
 }
