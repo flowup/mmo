@@ -11,6 +11,8 @@ import (
 	"github.com/evalphobia/logrus_sentry"
 	log "github.com/sirupsen/logrus"
 	"time"
+	"bufio"
+	"strings"
 )
 
 const (
@@ -69,8 +71,29 @@ func main() {
 				mmo.Config.Lang = "go"
 				mmo.Config.DepManager = "glide"
 
+				// if we can't stat the folder, we'll just create new
+				if _, err := os.Stat(mmo.Config.Name); err != nil {
+					// create project folder
+					err := os.Mkdir(mmo.Config.Name, os.ModePerm)
+					if err != nil {
+						return err
+					}
+				} else {
+					reader := bufio.NewReader(os.Stdin)
+					answer := ""
+					log.Info("Initializing project in an existing folder. Do you want to proceed? [y/n]: ")
+					for answer != "y" && answer != "n" {
+						answer, _ = reader.ReadString('\n')
+						answer = strings.Trim(answer, "\n")
+					}
+
+					if answer == "n" {
+						return nil
+					}
+				}
+
 				if err := mmo.InitProject(); err != nil {
-					log.Fatal(err)
+					log.Fatal(err.Error())
 				}
 				return nil
 			},
@@ -87,7 +110,7 @@ func main() {
 				}
 
 				if c.NArg() == 0 {
-					log.Println("Current context:", mmo.Context.Services)
+					log.Infoln("Current context:", mmo.Context.Services)
 					return nil
 				}
 

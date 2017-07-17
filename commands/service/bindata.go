@@ -85,7 +85,7 @@ func commandsServiceTemplateLogger_go() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "commands/service/template/logger_go", size: 646, mode: os.FileMode(436), modTime: time.Unix(1499863739, 0)}
+	info := bindataFileInfo{name: "commands/service/template/logger_go", size: 646, mode: os.FileMode(420), modTime: time.Unix(1500286209, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -105,7 +105,7 @@ func commandsServiceTemplateMain_go() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "commands/service/template/main_go", size: 1214, mode: os.FileMode(436), modTime: time.Unix(1499863640, 0)}
+	info := bindataFileInfo{name: "commands/service/template/main_go", size: 1214, mode: os.FileMode(420), modTime: time.Unix(1500286209, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -125,7 +125,7 @@ func commandsServiceTemplateProtoProto() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "commands/service/template/proto.proto", size: 62, mode: os.FileMode(436), modTime: time.Unix(1499854874, 0)}
+	info := bindataFileInfo{name: "commands/service/template/proto.proto", size: 62, mode: os.FileMode(420), modTime: time.Unix(1500286209, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }

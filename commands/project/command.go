@@ -14,6 +14,7 @@ import (
 	"strings"
 	"text/template"
 	log "github.com/sirupsen/logrus"
+	"bufio"
 )
 
 // Mmo represents config and context
@@ -47,12 +48,7 @@ func GetMmo() (*Mmo, error) {
 // InitProject extends all assets using project options passed by the caller
 // This automatically creates a project folder with all files
 func (mmo *Mmo) InitProject() error {
-
-	// create project folder
-	err := os.Mkdir(mmo.Config.Name, os.ModePerm)
-	if err != nil {
-		return err
-	}
+	rewriteAll := false
 
 	// go through assets and generate them
 	for name, assetGetter := range _bindata {
@@ -61,39 +57,77 @@ func (mmo *Mmo) InitProject() error {
 			return err
 		}
 
-		// get correct path to the file
+		// get correct path to the handle
 		filePath := strings.Replace(asset.info.Name(), "commands/project/template", mmo.Config.Name, 1)
-		// create template for the file
+		// create template for the handle
 		tmpl := template.Must(template.New(name).Parse(string(asset.bytes)))
 
-		// create the file in path
-		file, err := os.Create(filePath)
+		var handle *os.File
+
+		if _, err := os.Stat(filePath); err == nil {
+			// ask user if he want's to rewrite if not rewritten
+			if !rewriteAll {
+				log.Info("File ", filePath, " already exists. Do you want to rewrite it? [y/yy/n]:")
+
+				reader := bufio.NewReader(os.Stdin)
+				answer := ""
+				for answer != "y" && answer != "n" && answer != "yy" {
+					answer, _ = reader.ReadString('\n')
+					answer = strings.Trim(answer, "\n")
+				}
+
+				// rewrites all files automatically
+				if answer == "yy" {
+					rewriteAll = true
+				}
+			}
+
+			log.Infoln("Rewriting file:", filePath)
+			err = os.Remove(filePath)
+			if err != nil {
+				log.Info("ERROGING")
+				return err
+			}
+		}
+
+		log.Debugln("Creating file", filePath)
+		// create the handle in path
+		handle, err = os.Create(filePath)
 		if err != nil {
 			return err
 		}
-		defer file.Close()
 
-		// execute the template to the file
-		err = tmpl.Execute(file, mmo.Config)
+		// execute the template to the handle
+		err = tmpl.Execute(handle, mmo.Config)
+		if err != nil {
+			return err
+		}
+
+		err = handle.Close()
 		if err != nil {
 			return err
 		}
 	}
 
 	// change to the newly created project and init the dep manager
-	err = os.Chdir(mmo.Config.Name)
+	err := os.Chdir(mmo.Config.Name)
+	if err != nil {
+		return errors.Wrap(err, "chdir failed with an error")
+	}
+
+	err = mmo.ClearDependencyManager()
 	if err != nil {
 		return err
 	}
 
 	err = mmo.InitializeDependencyManager()
 	if err != nil {
-		return err
+		return errors.Wrap(err, "dependency manager initialization failed")
 	}
 
 	err = os.Chdir("..")
 	if err != nil {
-		return err
+		return errors.Wrap(err, "chdir back failed with an error")
 	}
 
 	return nil
@@ -106,14 +140,34 @@ func (mmo *Mmo) InitializeDependencyManager() error {
 	switch mmo.Config.DepManager {
 	case "glide":
 		glideInstallCmd := exec.Command("go", "get", "github.com/Masterminds/glide")
+		glideInstallCmd.Stdout = os.Stdout
+		glideInstallCmd.Stderr = os.Stdout
 		if err := glideInstallCmd.Run(); err != nil {
-			return err
+			return errors.Wrap(err, "glide installation failed")
 		}
 
 		glideInitCmd := exec.Command("glide", "init", "--non-interactive")
+		glideInitCmd.Stdout = os.Stdout
+		glideInitCmd.Stderr = os.Stdout
 		if err := glideInitCmd.Run(); err != nil {
-			return err
+			return errors.Wrap(err, "glide initialization failed")
 		}
+
+	default:
+		return errors.New("Unrecognized dependency manager: " + mmo.Config.DepManager)
+	}
+
+	return nil
+}
+
+// ClearDependencyManager clears contents of the content manager
+func (mmo *Mmo) ClearDependencyManager() error {
+	switch mmo.Config.DepManager {
+	case "glide":
+		// remove mail glide file
+		os.Remove("glide.yaml")
+		// cache removal
+		os.RemoveAll(".glide/")
 
 	default:
 		return errors.New("Unrecognized dependency manager: " + mmo.Config.DepManager)
