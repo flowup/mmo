@@ -73,13 +73,14 @@ func (mmo *Mmo) InitProject() error {
 		if err != nil {
 			return err
 		}
-		defer file.Close()
 
 		// execute the template to the file
 		err = tmpl.Execute(file, mmo.Config)
 		if err != nil {
 			return err
 		}
+
+		file.Close()
 	}
 
 	// change to the newly created project and init the dep manager
@@ -107,11 +108,6 @@ func (mmo *Mmo) InitProject() error {
 func (mmo *Mmo) InitializeDependencyManager() error {
 	switch mmo.Config.DepManager {
 	case "glide":
-		glideInstallCmd := exec.Command("go", "get", "github.com/Masterminds/glide")
-		if err := glideInstallCmd.Run(); err != nil {
-			return err
-		}
-
 		glideInitCmd := exec.Command("glide", "init", "--non-interactive")
 		if err := glideInitCmd.Run(); err != nil {
 			return err
@@ -202,7 +198,10 @@ func (mmo *Mmo) ProtoGen(services []string) error {
 		}
 
 		if _, err := os.Stat(serviceName + "/sdk"); os.IsNotExist(err) {
-			os.Mkdir(serviceName+"/sdk", os.ModePerm)
+			err := os.Mkdir(serviceName+"/sdk", os.ModePerm)
+			if err != nil {
+				return err
+			}
 		}
 
 		err := commands.GenerateProto(mmo.Config.Lang, serviceName)
@@ -255,7 +254,15 @@ func (mmo *Mmo) Run() error {
 
 	// TODO: deploy service
 
-	portFwdCmd.Process.Kill()
+	err = builder.Clean()
+	if err != nil {
+		return err
+	}
+
+	err = portFwdCmd.Process.Kill()
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

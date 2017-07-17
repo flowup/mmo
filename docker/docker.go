@@ -103,6 +103,7 @@ func (b *Builder) buildBinary(service string) error {
 		return err
 	}
 
+	// TODO: error of container not returned
 	err = utils.ContainerRunStdout(b.cli, cont.ID)
 	return err
 }
@@ -114,7 +115,10 @@ func (b *Builder) buildImage(service string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	h.Write(timeNow)
+	_, err = h.Write(timeNow)
+	if err != nil {
+		return "", err
+	}
 
 	imageTag := service + "-" + strings.ToLower(base64.URLEncoding.WithPadding(base64.NoPadding).EncodeToString(h.Sum(nil)))
 
@@ -124,6 +128,10 @@ func (b *Builder) buildImage(service string) (string, error) {
 	}
 
 	ctx, err := b.createContext(service)
+
+	if err != nil {
+		return "", err
+	}
 
 	_, err = b.cli.ImageBuild(context.Background(), ctx, buildOptions)
 

@@ -1,9 +1,9 @@
 package utils
 
 import (
-	"regexp"
 	"os"
 	"path/filepath"
+	"regexp"
 )
 
 func SepareteFileNameFromPath(path string) (string, error) {
@@ -22,6 +22,6 @@ func ImportPath() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	filepath := golintRegex.FindStringSubmatch(dir)
-	return filepath[0], nil
+	fp := golintRegex.FindStringSubmatch(dir)
+	return fp[0], nil
 }

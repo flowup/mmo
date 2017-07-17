@@ -18,9 +18,9 @@ func templateReader(definition Definition, path string) (string, error) {
 		return "", err
 	}
 
-	t.Execute(templateString, definition)
+	err = t.Execute(templateString, definition)
 
-	return templateString.String(), nil
+	return templateString.String(), err
 }
 
 func CreateFileFromTemplate(definition Definition, path string) error {
@@ -38,6 +38,6 @@ func CreateFileFromTemplate(definition Definition, path string) error {
 		return err
 	}
 
-	WriteFile(definition.Name+"/"+filename, resultString)
-	return nil
+	err = WriteFile(definition.Name+"/"+filename, resultString)
+	return err
 }

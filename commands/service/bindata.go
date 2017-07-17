@@ -85,7 +85,7 @@ func commandsServiceTemplateLogger_go() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "commands/service/template/logger_go", size: 646, mode: os.FileMode(436), modTime: time.Unix(1499863739, 0)}
+	info := bindataFileInfo{name: "commands/service/template/logger_go", size: 646, mode: os.FileMode(420), modTime: time.Unix(1500308489, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -105,7 +105,7 @@ func commandsServiceTemplateMain_go() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "commands/service/template/main_go", size: 1214, mode: os.FileMode(436), modTime: time.Unix(1499863640, 0)}
+	info := bindataFileInfo{name: "commands/service/template/main_go", size: 1214, mode: os.FileMode(420), modTime: time.Unix(1500305738, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -125,7 +125,7 @@ func commandsServiceTemplateProtoProto() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "commands/service/template/proto.proto", size: 62, mode: os.FileMode(436), modTime: time.Unix(1499854874, 0)}
+	info := bindataFileInfo{name: "commands/service/template/proto.proto", size: 62, mode: os.FileMode(420), modTime: time.Unix(1500299639, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -182,8 +182,8 @@ func AssetNames() []string {
 
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() (*asset, error){
-	"commands/service/template/logger_go": commandsServiceTemplateLogger_go,
-	"commands/service/template/main_go": commandsServiceTemplateMain_go,
+	"commands/service/template/logger_go":   commandsServiceTemplateLogger_go,
+	"commands/service/template/main_go":     commandsServiceTemplateMain_go,
 	"commands/service/template/proto.proto": commandsServiceTemplateProtoProto,
 }
 
@@ -226,12 +226,13 @@ type bintree struct {
 	Func     func() (*asset, error)
 	Children map[string]*bintree
 }
+
 var _bintree = &bintree{nil, map[string]*bintree{
 	"commands": &bintree{nil, map[string]*bintree{
 		"service": &bintree{nil, map[string]*bintree{
 			"template": &bintree{nil, map[string]*bintree{
-				"logger_go": &bintree{commandsServiceTemplateLogger_go, map[string]*bintree{}},
-				"main_go": &bintree{commandsServiceTemplateMain_go, map[string]*bintree{}},
+				"logger_go":   &bintree{commandsServiceTemplateLogger_go, map[string]*bintree{}},
+				"main_go":     &bintree{commandsServiceTemplateMain_go, map[string]*bintree{}},
 				"proto.proto": &bintree{commandsServiceTemplateProtoProto, map[string]*bintree{}},
 			}},
 		}},
@@ -284,4 +285,3 @@ func _filePath(dir, name string) string {
 	cannonicalName := strings.Replace(name, "\\", "/", -1)
 	return filepath.Join(append([]string{dir}, strings.Split(cannonicalName, "/")...)...)
 }
-

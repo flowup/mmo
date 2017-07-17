@@ -1,14 +1,14 @@
 package service
 
 import (
-	"github.com/flowup/mmo/utils"
-	"strings"
-	"os"
 	"github.com/flowup/mmo/commands"
-	"text/template"
 	"github.com/flowup/mmo/config"
+	"github.com/flowup/mmo/utils"
+	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
+	"text/template"
 )
 
 // InitService is cli function to generate service with given name
@@ -53,15 +53,17 @@ func InitService(configService config.Service) error {
 		if err != nil {
 			return err
 		}
-		defer file.Close()
 
 		// execute the template to the file
 		err = tmpl.Execute(file, configService)
 		if err != nil {
 			return err
 		}
+
+		file.Close()
 	}
 
+	// FIXME
 	if err := addGoImportManager("./"); err != nil {
 		return err
 	}

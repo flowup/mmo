@@ -90,7 +90,7 @@ func commandsProjectTemplateContributingMd() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "commands/project/template/CONTRIBUTING.md", size: 4216, mode: os.FileMode(436), modTime: time.Unix(1499865003, 0)}
+	info := bindataFileInfo{name: "commands/project/template/CONTRIBUTING.md", size: 4216, mode: os.FileMode(420), modTime: time.Unix(1500299639, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -110,7 +110,7 @@ func commandsProjectTemplateIssue_templateMd() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "commands/project/template/ISSUE_TEMPLATE.md", size: 178, mode: os.FileMode(436), modTime: time.Unix(1499931939, 0)}
+	info := bindataFileInfo{name: "commands/project/template/ISSUE_TEMPLATE.md", size: 178, mode: os.FileMode(420), modTime: time.Unix(1500299639, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -130,7 +130,7 @@ func commandsProjectTemplateLicense() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "commands/project/template/LICENSE", size: 1079, mode: os.FileMode(436), modTime: time.Unix(1499865835, 0)}
+	info := bindataFileInfo{name: "commands/project/template/LICENSE", size: 1079, mode: os.FileMode(420), modTime: time.Unix(1500299639, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -150,7 +150,7 @@ func commandsProjectTemplatePull_request_templateMd() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "commands/project/template/PULL_REQUEST_TEMPLATE.md", size: 65, mode: os.FileMode(436), modTime: time.Unix(1499932171, 0)}
+	info := bindataFileInfo{name: "commands/project/template/PULL_REQUEST_TEMPLATE.md", size: 65, mode: os.FileMode(420), modTime: time.Unix(1500299639, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -170,7 +170,7 @@ func commandsProjectTemplateReadmeMd() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "commands/project/template/README.md", size: 12, mode: os.FileMode(436), modTime: time.Unix(1499416903, 0)}
+	info := bindataFileInfo{name: "commands/project/template/README.md", size: 12, mode: os.FileMode(420), modTime: time.Unix(1499953812, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -190,7 +190,7 @@ func commandsProjectTemplateGitignore() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "commands/project/template/gitignore", size: 199, mode: os.FileMode(436), modTime: time.Unix(1499864216, 0)}
+	info := bindataFileInfo{name: "commands/project/template/gitignore", size: 199, mode: os.FileMode(420), modTime: time.Unix(1500299639, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -210,7 +210,7 @@ func commandsProjectTemplateMmoYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "commands/project/template/mmo.yaml", size: 49, mode: os.FileMode(436), modTime: time.Unix(1499854890, 0)}
+	info := bindataFileInfo{name: "commands/project/template/mmo.yaml", size: 49, mode: os.FileMode(420), modTime: time.Unix(1499953812, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -230,7 +230,7 @@ func commandsProjectTemplateWerckerYml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "commands/project/template/wercker.yml", size: 23, mode: os.FileMode(436), modTime: time.Unix(1499416903, 0)}
+	info := bindataFileInfo{name: "commands/project/template/wercker.yml", size: 23, mode: os.FileMode(420), modTime: time.Unix(1499953812, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -287,14 +287,14 @@ func AssetNames() []string {
 
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() (*asset, error){
-	"commands/project/template/CONTRIBUTING.md": commandsProjectTemplateContributingMd,
-	"commands/project/template/ISSUE_TEMPLATE.md": commandsProjectTemplateIssue_templateMd,
-	"commands/project/template/LICENSE": commandsProjectTemplateLicense,
+	"commands/project/template/CONTRIBUTING.md":          commandsProjectTemplateContributingMd,
+	"commands/project/template/ISSUE_TEMPLATE.md":        commandsProjectTemplateIssue_templateMd,
+	"commands/project/template/LICENSE":                  commandsProjectTemplateLicense,
 	"commands/project/template/PULL_REQUEST_TEMPLATE.md": commandsProjectTemplatePull_request_templateMd,
-	"commands/project/template/README.md": commandsProjectTemplateReadmeMd,
-	"commands/project/template/gitignore": commandsProjectTemplateGitignore,
-	"commands/project/template/mmo.yaml": commandsProjectTemplateMmoYaml,
-	"commands/project/template/wercker.yml": commandsProjectTemplateWerckerYml,
+	"commands/project/template/README.md":                commandsProjectTemplateReadmeMd,
+	"commands/project/template/gitignore":                commandsProjectTemplateGitignore,
+	"commands/project/template/mmo.yaml":                 commandsProjectTemplateMmoYaml,
+	"commands/project/template/wercker.yml":              commandsProjectTemplateWerckerYml,
 }
 
 // AssetDir returns the file names below a certain
@@ -336,18 +336,19 @@ type bintree struct {
 	Func     func() (*asset, error)
 	Children map[string]*bintree
 }
+
 var _bintree = &bintree{nil, map[string]*bintree{
 	"commands": &bintree{nil, map[string]*bintree{
 		"project": &bintree{nil, map[string]*bintree{
 			"template": &bintree{nil, map[string]*bintree{
-				"CONTRIBUTING.md": &bintree{commandsProjectTemplateContributingMd, map[string]*bintree{}},
-				"ISSUE_TEMPLATE.md": &bintree{commandsProjectTemplateIssue_templateMd, map[string]*bintree{}},
-				"LICENSE": &bintree{commandsProjectTemplateLicense, map[string]*bintree{}},
+				"CONTRIBUTING.md":          &bintree{commandsProjectTemplateContributingMd, map[string]*bintree{}},
+				"ISSUE_TEMPLATE.md":        &bintree{commandsProjectTemplateIssue_templateMd, map[string]*bintree{}},
+				"LICENSE":                  &bintree{commandsProjectTemplateLicense, map[string]*bintree{}},
 				"PULL_REQUEST_TEMPLATE.md": &bintree{commandsProjectTemplatePull_request_templateMd, map[string]*bintree{}},
-				"README.md": &bintree{commandsProjectTemplateReadmeMd, map[string]*bintree{}},
-				"gitignore": &bintree{commandsProjectTemplateGitignore, map[string]*bintree{}},
-				"mmo.yaml": &bintree{commandsProjectTemplateMmoYaml, map[string]*bintree{}},
-				"wercker.yml": &bintree{commandsProjectTemplateWerckerYml, map[string]*bintree{}},
+				"README.md":                &bintree{commandsProjectTemplateReadmeMd, map[string]*bintree{}},
+				"gitignore":                &bintree{commandsProjectTemplateGitignore, map[string]*bintree{}},
+				"mmo.yaml":                 &bintree{commandsProjectTemplateMmoYaml, map[string]*bintree{}},
+				"wercker.yml":              &bintree{commandsProjectTemplateWerckerYml, map[string]*bintree{}},
 			}},
 		}},
 	}},
@@ -399,4 +400,3 @@ func _filePath(dir, name string) string {
 	cannonicalName := strings.Replace(name, "\\", "/", -1)
 	return filepath.Join(append([]string{dir}, strings.Split(cannonicalName, "/")...)...)
 }
-
