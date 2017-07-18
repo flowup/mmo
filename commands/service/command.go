@@ -4,6 +4,7 @@ import (
 	"github.com/flowup/mmo/commands"
 	"github.com/flowup/mmo/config"
 	"github.com/flowup/mmo/utils"
+	"github.com/pkg/errors"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -71,11 +72,11 @@ func InitService(configService config.Service) error {
 	}
 
 	if err := addGoImportManager("./"); err != nil {
-		return err
+		return errors.Wrap(err, "Failed to run import manager")
 	}
 
 	if err := commands.GenerateProto(commands.Go, configService.Name); err != nil {
-		return err
+		return errors.Wrap(err, "Failed to generate API servers and stubs from proto")
 	}
 
 	return nil

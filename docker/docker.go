@@ -6,7 +6,6 @@ import (
 	"context"
 	"crypto/sha1"
 	"encoding/base64"
-	"fmt"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
@@ -42,12 +41,12 @@ func (b *Builder) BuildService(service string) (Image, error) {
 
 	err := b.buildBinary(service)
 	if err != nil {
-		return Image{}, err
+		return Image{}, errors.Wrap(err, "Failed to build binary of the service "+service)
 	}
 
 	img, err := b.buildImage(service)
 	if err != nil {
-		return Image{}, err
+		return Image{}, errors.Wrap(err, "Failed to build docker image of the service "+service)
 	}
 
 	b.builtServices = append(b.builtServices, img)
@@ -68,10 +67,7 @@ func (b *Builder) PushService(image Image) error {
 // Clean is function to remove built images - can be used to after pushing images to external registry
 func (b *Builder) Clean() error {
 	for _, service := range b.builtServices {
-		_, err := b.cli.ImageRemove(context.Background(), service.GetFullname(), types.ImageRemoveOptions{})
-		if err != nil {
-			return err
-		}
+		b.cli.ImageRemove(context.Background(), service.GetFullname(), types.ImageRemoveOptions{})
 	}
 
 	return nil
@@ -173,7 +169,6 @@ func (b *Builder) createContext(service string) (*bytes.Buffer, error) {
 	for _, file := range files {
 		if file.Body == nil {
 			body, err := ioutil.ReadFile(service + "/" + file.Name)
-			fmt.Println(len(body))
 			if err != nil {
 				return nil, err
 			}

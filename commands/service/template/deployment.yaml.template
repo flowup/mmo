@@ -6,12 +6,12 @@ spec:
   selector:
     app: ${SERVICE}
   ports:
-    {{if .WebRPC}}- name: grpc-web
-      protocol: TCP
-      port: 50060{{end}}
     - name: grpc
       protocol: TCP
       port: 50051
+    {{if .WebRPC}}- name: grpc-web
+      protocol: TCP
+      port: 50060{{end}}
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment

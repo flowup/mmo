@@ -27,7 +27,7 @@ func ExpandTemplate(env DeployEnvironment) error {
 		return err
 	}
 
-	file, err := ioutil.ReadFile(env["SERVICE"] + "deployment/deployment.yaml.template")
+	file, err := ioutil.ReadFile(env["SERVICE"] + "/deployment/deployment.yaml.template")
 	if err != nil {
 		return err
 	}

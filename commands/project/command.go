@@ -254,16 +254,19 @@ func (mmo *Mmo) Run() error {
 			return err
 		}
 
-		err = builder.PushService(image)
-		if err != nil {
-			//builder.Clean()
-			return err
-		}
+		//err = builder.PushService(image)
+		//if err != nil {
+		//	//builder.Clean()
+		//	return err
+		//}
 
 		env["SERVICE"] = service
 		env["WERCKER_GIT_COMMIT"] = image.Tag
 
-		kubernetes.ExpandTemplate(env)
+		err = kubernetes.ExpandTemplate(env)
+		if err != nil {
+			return err
+		}
 	}
 
 	// TODO: build service
