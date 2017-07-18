@@ -17,6 +17,7 @@ import (
 	"os"
 	"strings"
 	"time"
+	"github.com/sirupsen/logrus"
 )
 
 // Builder is structure to hold instance of service builder
@@ -132,6 +133,8 @@ func (b *Builder) buildImage(service string) (Image, error) {
 	img.Registry = dockercmd.MinikubeRegistry
 	img.Name = b.goPackage + "-" + service
 	img.Tag = strings.ToLower(base64.URLEncoding.WithPadding(base64.NoPadding).EncodeToString(h.Sum(nil)))
+
+	logrus.Debug("Building image " + img.GetFullname())
 	buildOptions := types.ImageBuildOptions{
 		Tags: []string{img.GetFullname()},
 	}
