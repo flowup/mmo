@@ -36,7 +36,7 @@ type Service struct {
 	Description  string `yaml:"description"`
 	WebRPC       bool `yaml:"webRPC"`
 	Dependencies []Dependency `yaml:"dependencies"`
-	Dsn          string `yaml:"dsn"`
+	Sentry       bool `yaml:"sentry"`
 }
 
 // Dependency represents service dependency configuration from Config
