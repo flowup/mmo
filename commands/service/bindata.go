@@ -2,6 +2,7 @@
 // sources:
 // commands/service/template/access_go
 // commands/service/template/cmd/{{.Name}}/main_go
+// commands/service/template/deployment/deployment.yaml.template
 // commands/service/template/protobuf/proto.proto
 // commands/service/template/service_go
 // DO NOT EDIT!
@@ -86,7 +87,7 @@ func access_go() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "access_go", size: 349, mode: os.FileMode(420), modTime: time.Unix(1500386054, 0)}
+	info := bindataFileInfo{name: "access_go", size: 349, mode: os.FileMode(420), modTime: time.Unix(1500388904, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -106,7 +107,27 @@ func cmdNameMain_go() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "cmd/{{.Name}}/main_go", size: 2033, mode: os.FileMode(420), modTime: time.Unix(1500388228, 0)}
+	info := bindataFileInfo{name: "cmd/{{.Name}}/main_go", size: 2033, mode: os.FileMode(420), modTime: time.Unix(1500388904, 0)}
+	a := &asset{bytes: bytes, info: info}
+	return a, nil
+}
+
+var _deploymentDeploymentYamlTemplate = []byte("\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff\x8c\x52\x4d\x8f\xa2\x40\x10\xbd\xf3\x2b\xea\xe0\x95\x15\x0e\x7a\xe8\xdb\x06\x89\x61\x77\x5d\x09\x12\xcd\x9e\x4c\xd3\xd6\xba\x9d\xed\xaf\x34\x1d\x67\x26\x84\xff\x3e\x01\x64\x84\x19\x34\xd6\xa9\x53\x55\xef\xe5\xd5\xeb\xf7\x9f\xab\x13\x81\x1d\xda\x0b\x67\xe8\x51\xc3\xf7\x68\x4b\xae\x15\x81\x4b\xe8\x49\x74\xf4\x44\x1d\x25\x1e\x80\xa2\x12\x09\xcc\xaa\x5d\x9c\xed\x93\x28\xae\xbd\xd2\x20\x6b\x06\x25\x0a\x64\x4e\xdb\xe6\x0d\x40\x8d\x19\x6d\x01\x18\x6d\x5d\xd9\x0d\xfd\x2b\xcb\xd9\x1a\xd6\x36\x00\x8c\xd5\x4e\x33\x2d\x08\xe4\x51\xda\xf7\xb4\x75\x04\x16\x41\xb0\x08\xdb\x4e\x55\xf1\xbf\xf0\xed\x80\x45\x96\x46\x75\x3d\x24\xf1\x5f\xb0\x78\x86\x68\x19\x54\x15\xaa\x53\x5d\x7b\xbe\xef\x8f\xae\xc4\x57\x87\xaa\x79\x96\xf3\x4b\x58\xa0\xa3\xa1\xd7\x59\xb2\x42\x23\xf4\x9b\x44\xe5\x1e\xdb\x00\x20\x68\x81\xe2\x7a\x21\xd3\x52\x72\xd7\x2c\x1c\xe2\x2c\xfa\x19\x67\xc7\x75\x92\x1f\xa3\xed\x66\x93\xe4\x37\xcb\x2c\x1a\xc1\x19\x2d\x09\x84\x5f\x0c\x94\xd4\xb1\x7f\xbf\x06\x94\x53\x9e\x3a\x94\x46\x50\x87\x57\xc8\x40\x5f\x53\x62\x84\x9e\xc2\x77\xf5\x58\x6c\xb3\xd1\x0b\xee\xb6\x95\xa3\x5c\xa1\xfd\x60\xf6\xa7\xdc\xe8\x8a\x4b\x7a\x6e\x27\xab\x6d\x4b\x9c\xc5\xeb\x64\x97\x67\x7f\xea\xf9\xac\x4a\xb3\xed\x8f\x38\xca\x8f\xbf\xbf\x6f\xe2\xda\xbf\x81\xc9\x7d\x1d\xfd\x67\x0e\x8e\x9a\xc8\xd2\x48\x65\xfa\x29\x44\xf7\x53\xf2\x64\xc0\xa6\xd9\x97\xc1\x3d\xf6\x3e\x71\xef\x01\x00\x00\xff\xff\x34\x54\x82\x42\x62\x03\x00\x00")
+
+func deploymentDeploymentYamlTemplateBytes() ([]byte, error) {
+	return bindataRead(
+		_deploymentDeploymentYamlTemplate,
+		"deployment/deployment.yaml.template",
+	)
+}
+
+func deploymentDeploymentYamlTemplate() (*asset, error) {
+	bytes, err := deploymentDeploymentYamlTemplateBytes()
+	if err != nil {
+		return nil, err
+	}
+
+	info := bindataFileInfo{name: "deployment/deployment.yaml.template", size: 866, mode: os.FileMode(420), modTime: time.Unix(1500388891, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -126,7 +147,7 @@ func protobufProtoProto() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "protobuf/proto.proto", size: 62, mode: os.FileMode(420), modTime: time.Unix(1500286209, 0)}
+	info := bindataFileInfo{name: "protobuf/proto.proto", size: 62, mode: os.FileMode(420), modTime: time.Unix(1500380106, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -146,7 +167,7 @@ func service_go() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "service_go", size: 556, mode: os.FileMode(420), modTime: time.Unix(1500386090, 0)}
+	info := bindataFileInfo{name: "service_go", size: 556, mode: os.FileMode(420), modTime: time.Unix(1500388904, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -203,10 +224,11 @@ func AssetNames() []string {
 
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() (*asset, error){
-	"access_go":             access_go,
-	"cmd/{{.Name}}/main_go": cmdNameMain_go,
-	"protobuf/proto.proto":  protobufProtoProto,
-	"service_go":            service_go,
+	"access_go":                           access_go,
+	"cmd/{{.Name}}/main_go":               cmdNameMain_go,
+	"deployment/deployment.yaml.template": deploymentDeploymentYamlTemplate,
+	"protobuf/proto.proto":                protobufProtoProto,
+	"service_go":                          service_go,
 }
 
 // AssetDir returns the file names below a certain
@@ -255,6 +277,9 @@ var _bintree = &bintree{nil, map[string]*bintree{
 		"{{.Name}}": &bintree{nil, map[string]*bintree{
 			"main_go": &bintree{cmdNameMain_go, map[string]*bintree{}},
 		}},
+	}},
+	"deployment": &bintree{nil, map[string]*bintree{
+		"deployment.yaml.template": &bintree{deploymentDeploymentYamlTemplate, map[string]*bintree{}},
 	}},
 	"protobuf": &bintree{nil, map[string]*bintree{
 		"proto.proto": &bintree{protobufProtoProto, map[string]*bintree{}},
