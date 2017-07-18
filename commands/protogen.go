@@ -11,8 +11,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+// Supported languages
 const (
-	// Go represents supported languages
 	Go         = "go"
 	Python     = "python"
 	TypeScript = "ts"

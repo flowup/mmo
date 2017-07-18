@@ -14,16 +14,6 @@ import (
 
 // InitService is cli function to generate service with given name
 func InitService(configService config.Service) error {
-	// create proto dir
-	if err := utils.CreateDir(configService.Name + "/protobuf"); err != nil {
-		return err
-	}
-
-	// create main dir
-	if err := utils.CreateDir(configService.Name + "/cmd/" + configService.Name); err != nil {
-		return err
-	}
-
 	// go through assets and generate them
 	for name, assetGetter := range _bindata {
 
