@@ -7,7 +7,39 @@ import (
 	"google.golang.org/grpc/reflection"{{if .WebRPC}}
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
     "net/http"{{end}}
+
+    "github.com/sirupsen/logrus"
+    "github.com/evalphobia/logrus_sentry"
 )
+
+func init() {
+	func init() {
+    	log.SetFormatter(&log.JSONFormatter{})
+
+    	log.SetOutput(os.Stdout)
+
+    	log.SetLevel(log.DebugLevel)
+
+    	// Init Logrus with Sentry
+    	sentryDsn, ok := os.LookupEnv("SENTRY_DSN")
+    	if ok {
+    		hook, err := logrus_sentry.NewSentryHook(sentryDsn, []log.Level{
+    			log.PanicLevel,
+    			log.FatalLevel,
+    			log.ErrorLevel,
+    		})
+
+    		if err == nil {
+    			hook.Timeout = 20 * time.Second
+    			hook.StacktraceConfiguration.Enable = true
+    			log.AddHook(hook)
+    		}
+    	} else {
+    		log.Warnln("No SENTRY_DSN was found, sentry reporting won't work")
+    	}
+    }
+}
+
 
 func main(){
 	lis, err := net.Listen("tcp", "")

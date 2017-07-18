@@ -4,12 +4,13 @@ import (
 	"github.com/flowup/mmo/commands"
 	"github.com/flowup/mmo/config"
 	"github.com/flowup/mmo/utils"
+	"github.com/flowup/mmo/utils/cookiecutter"
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
-	"text/template"
 )
 
 // InitService is cli function to generate service with given name
@@ -37,38 +38,18 @@ func InitService(configService config.Service) error {
 			return err
 		}
 
-		// get correct path to the file
-		filePath := ""
+		log.Debugln("Restoring file:", name)
+		err = cookiecutter.Restore(
+			configService.Name,
+			strings.Replace(name, "_go", ".go", 1),
+			string(asset.bytes),
+			configService,
+		)
 
-		switch asset.info.Name() {
-		case "commands/service/template/main_go":
-			filePath = strings.Replace(asset.info.Name(), "commands/service/template", configService.Name+"/cmd/"+configService.Name, 1)
-		case "commands/service/template/proto.proto":
-			filePath = strings.Replace(asset.info.Name(), "commands/service/template", configService.Name+"/protobuf", 1)
-		case "commands/service/template/deployment.yaml.template":
-			filePath = strings.Replace(asset.info.Name(), "commands/service/template", configService.Name+"/deployment", 1)
-		default:
-			filePath = strings.Replace(asset.info.Name(), "commands/service/template", configService.Name, 1)
-		}
-
-		filePath = strings.Replace(filePath, "_go", ".go", 1)
-
-		// create template for the file
-		tmpl := template.Must(template.New(name).Parse(string(asset.bytes)))
-
-		// create the file in path
-		file, err := os.Create(filePath)
 		if err != nil {
 			return err
 		}
 
-		// execute the template to the file
-		err = tmpl.Execute(file, configService)
-		if err != nil {
-			return err
-		}
-
-		file.Close()
 	}
 
 	if err := addGoImportManager("./"); err != nil {
@@ -84,6 +65,8 @@ func InitService(configService config.Service) error {
 
 func addGoImportManager(root string) error {
 	goImportsInstallCmd := exec.Command("go", "get", "golang.org/x/tools/cmd/goimports")
+	goImportsInstallCmd.Stdout = os.Stdout
+	goImportsInstallCmd.Stderr = os.Stdout
 	if err := goImportsInstallCmd.Run(); err != nil {
 		return err
 	}
@@ -94,14 +77,15 @@ func addGoImportManager(root string) error {
 			return nil
 		}
 
-		out, err := exec.Command("goimports", path).Output()
-		if err != nil {
-			return err
+		/*out := exec.Command("goimports", path)
+
+		if err := out.Run(); err != nil {
+			return errors.Wrap(err, "goimports failed")
 		}
 
 		if err := utils.WriteFile(path, string(out)); err != nil {
 			return err
-		}
+		}*/
 
 		return nil
 	}); err != nil {
