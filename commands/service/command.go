@@ -5,12 +5,11 @@ import (
 	"strings"
 	"os"
 	"github.com/flowup/mmo/commands"
-	"text/template"
 	"github.com/flowup/mmo/config"
 	"os/exec"
 	"path/filepath"
-	"bytes"
 	log "github.com/sirupsen/logrus"
+	"github.com/flowup/mmo/utils/cookiecutter"
 )
 
 // InitService is cli function to generate service with given name
@@ -33,40 +32,14 @@ func InitService(configService config.Service) error {
 			return err
 		}
 
-		// get the file path to the directory
-		filePath := strings.Replace(name, "commands/service/template/", "", 1)
-		// add the config service name to the asset path
-		filePath = configService.Name + "/" + strings.Replace(filePath, "_go", ".go", 1)
+		log.Debugln("Restoring file:", name)
+		err = cookiecutter.Restore(
+			configService.Name,
+			strings.Replace(name, "_go", ".go", 1),
+			string(asset.bytes),
+			configService,
+		)
 
-		// template the path
-		assetTmpl := template.Must(template.New("assetPath").Parse(filePath))
-		buf := &bytes.Buffer{}
-		assetTmpl.Execute(buf, configService)
-
-		assetPath := buf.String()
-		log.Debugln("New asset path was templated:", assetPath)
-
-		// create the directory if it doesn't exist
-		if stat, err := os.Stat(filepath.Dir(assetPath)); err != nil || !stat.IsDir() {
-			err := os.MkdirAll(filepath.Dir(assetPath), os.ModePerm)
-			if err != nil {
-				return err
-			}
-		}
-
-		// create template for the file
-		tmpl := template.Must(template.New(name).Parse(string(asset.bytes)))
-
-		log.Debugln("Creating new file:", assetPath)
-		// create the file in path
-		file, err := os.Create(assetPath)
-		if err != nil {
-			return err
-		}
-		defer file.Close()
-
-		// execute the template to the file
-		err = tmpl.Execute(file, configService)
 		if err != nil {
 			return err
 		}

@@ -25,7 +25,7 @@ func init() {
 	log.SetFormatter(&log.TextFormatter{})
 	log.SetOutput(os.Stdout)
 	// this should be override-able by some debug flag
-	log.SetLevel(log.InfoLevel)
+	log.SetLevel(log.DebugLevel)
 
 	levels := []log.Level{
 		log.PanicLevel,
