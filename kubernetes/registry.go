@@ -1,4 +1,4 @@
-package minikube
+package kubernetes
 
 import (
 	"k8s.io/apimachinery/pkg/api/resource"

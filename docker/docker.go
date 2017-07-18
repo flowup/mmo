@@ -13,6 +13,7 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/flowup/mmo/utils"
 	"github.com/flowup/mmo/utils/dockercmd"
+	"github.com/pkg/errors"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -23,7 +24,7 @@ import (
 type Builder struct {
 	cli           *client.Client
 	goPackage     string
-	buildServices []string
+	builtServices []Image
 }
 
 // GetBuilder is function to get instance of builder
@@ -33,31 +34,41 @@ func GetBuilder(goPackage string) (*Builder, error) {
 		return nil, err
 	}
 
-	return &Builder{cli: cli, goPackage: goPackage, buildServices: make([]string, 0)}, nil
+	return &Builder{cli: cli, goPackage: goPackage, builtServices: make([]Image, 0)}, nil
 }
 
 // BuildService is function to build service's binary and alpine docker image
-func (b *Builder) BuildService(service string) (string, error) {
+func (b *Builder) BuildService(service string) (Image, error) {
 
 	err := b.buildBinary(service)
 	if err != nil {
-		return "", err
+		return Image{}, err
 	}
 
-	image, err := b.buildImage(service)
+	img, err := b.buildImage(service)
 	if err != nil {
-		return "", err
+		return Image{}, err
 	}
 
-	b.buildServices = append(b.buildServices, image)
+	b.builtServices = append(b.builtServices, img)
 
-	return image, nil
+	return img, nil
+}
+
+// PushService is function to push image to local minikube registry
+func (b *Builder) PushService(image Image) error {
+	err := utils.PushImage(b.cli, image.GetFullname())
+	if err != nil {
+		return errors.Wrap(err, "Error pushing image "+image.GetFullname())
+	}
+
+	return nil
 }
 
 // Clean is function to remove built images - can be used to after pushing images to external registry
 func (b *Builder) Clean() error {
-	for _, service := range b.buildServices {
-		_, err := b.cli.ImageRemove(context.Background(), service, types.ImageRemoveOptions{})
+	for _, service := range b.builtServices {
+		_, err := b.cli.ImageRemove(context.Background(), service.GetFullname(), types.ImageRemoveOptions{})
 		if err != nil {
 			return err
 		}
@@ -108,34 +119,36 @@ func (b *Builder) buildBinary(service string) error {
 	return err
 }
 
-func (b *Builder) buildImage(service string) (string, error) {
+func (b *Builder) buildImage(service string) (Image, error) {
 
 	h := sha1.New()
 	timeNow, err := time.Now().MarshalBinary()
 	if err != nil {
-		return "", err
+		return Image{}, err
 	}
 	_, err = h.Write(timeNow)
 	if err != nil {
-		return "", err
+		return Image{}, err
 	}
 
-	imageTag := service + "-" + strings.ToLower(base64.URLEncoding.WithPadding(base64.NoPadding).EncodeToString(h.Sum(nil)))
+	var img = Image{}
 
-	buildTag := dockercmd.MinikubeRegistry + "/" + b.goPackage + ":" + imageTag
+	img.Registry = dockercmd.MinikubeRegistry
+	img.Name = b.goPackage + "-" + service
+	img.Tag = strings.ToLower(base64.URLEncoding.WithPadding(base64.NoPadding).EncodeToString(h.Sum(nil)))
 	buildOptions := types.ImageBuildOptions{
-		Tags: []string{buildTag},
+		Tags: []string{img.GetFullname()},
 	}
 
 	ctx, err := b.createContext(service)
 
 	if err != nil {
-		return "", err
+		return Image{}, err
 	}
 
 	_, err = b.cli.ImageBuild(context.Background(), ctx, buildOptions)
 
-	return buildTag, err
+	return img, err
 }
 
 func (b *Builder) createContext(service string) (*bytes.Buffer, error) {

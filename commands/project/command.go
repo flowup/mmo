@@ -8,8 +8,9 @@ import (
 	"github.com/flowup/mmo/commands"
 	"github.com/flowup/mmo/config"
 	"github.com/flowup/mmo/docker"
-	"github.com/flowup/mmo/minikube"
+	"github.com/flowup/mmo/kubernetes"
 	"github.com/flowup/mmo/utils"
+	"github.com/flowup/mmo/utils/dockercmd"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"os"
@@ -223,31 +224,46 @@ func (mmo *Mmo) ProtoGen(services []string) error {
 // Run is command to run all services in cluster (minikube) - all services are built as docker images and deployed to cluster
 func (mmo *Mmo) Run() error {
 
-	kubeClient, err := minikube.ConnectToCluster()
+	kubeClient, err := kubernetes.ConnectToCluster()
 	if err != nil {
 		return err
 	}
 
-	err = minikube.IsRegistryRunning(kubeClient)
+	err = kubernetes.IsRegistryRunning(kubeClient)
 	if err != nil {
-		err = minikube.DeployDockerRegistry(kubeClient)
+		err = kubernetes.DeployDockerRegistry(kubeClient)
 		if err != nil {
 			return err
 		}
 	}
 
-	portFwdCmd, err := minikube.ForwardRegistryPort()
+	portFwdCmd, err := kubernetes.ForwardRegistryPort()
 
 	builder, err := docker.GetBuilder(mmo.Config.GoPackage)
 	if err != nil {
 		return err
 	}
 
+	var env = make(kubernetes.DeployEnvironment)
+	env["DOCKER_REGISTRY"] = dockercmd.MinikubeRegistry
+	env["PROJECT_NAME"] = mmo.Config.GoPackage
+
 	for service := range mmo.Config.Services {
-		_, err := builder.BuildService(service)
+		image, err := builder.BuildService(service)
 		if err != nil {
 			return err
 		}
+
+		err = builder.PushService(image)
+		if err != nil {
+			//builder.Clean()
+			return err
+		}
+
+		env["SERVICE"] = service
+		env["WERCKER_GIT_COMMIT"] = image.Tag
+
+		kubernetes.ExpandTemplate(env)
 	}
 
 	// TODO: build service

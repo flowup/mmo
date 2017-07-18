@@ -1,4 +1,4 @@
-package minikube
+package kubernetes
 
 import (
 	"github.com/pkg/errors"
