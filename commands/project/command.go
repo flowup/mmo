@@ -126,6 +126,7 @@ func (mmo *Mmo) InitProject() error {
 // within the current project.
 // It will also automatically update the dependency manager
 func (mmo *Mmo) InitializeDependencyManager() error {
+	log.Debugln("Initializing dep. manager:", mmo.Config.DepManager)
 	switch mmo.Config.DepManager {
 	case "glide":
 		glideInstallCmd := exec.Command("go", "get", "github.com/Masterminds/glide")
@@ -151,6 +152,7 @@ func (mmo *Mmo) InitializeDependencyManager() error {
 
 // ClearDependencyManager clears contents of the content manager
 func (mmo *Mmo) ClearDependencyManager() error {
+	log.Debugln("Clearning dep. manager:", mmo.Config.DepManager)
 	switch mmo.Config.DepManager {
 	case "glide":
 		// remove mail glide file
@@ -212,6 +214,7 @@ func (mmo *Mmo) RunTests() error {
 
 // SetContext is cli function to set context of mmo to specified service or services
 func (mmo *Mmo) SetContext(services []string) error {
+	log.Debugln("Trying to set context for services:", services)
 	for _, service := range services {
 		if _, ok := mmo.Config.Services[service]; !ok {
 			return utils.ErrServiceNotExists
@@ -268,21 +271,26 @@ func (mmo *Mmo) ProtoGen(services []string) error {
 // Run is command to run all services in cluster (minikube) - all services are built as docker images and deployed to cluster
 func (mmo *Mmo) Run() error {
 
+	log.Infoln("Connecting to the kubernetes cluster")
 	kubeClient, err := kubernetes.ConnectToCluster()
 	if err != nil {
 		return err
 	}
 
+	log.Debugln("Checking container registry status")
 	err = kubernetes.IsRegistryRunning(kubeClient)
 	if err != nil {
+		log.Infoln("Registry not running, deploying now")
 		err = kubernetes.DeployDockerRegistry(kubeClient)
 		if err != nil {
 			return err
 		}
 	}
 
+	log.Infoln("Forwarding registry port to localhost")
 	portFwdCmd, err := kubernetes.ForwardRegistryPort()
 
+	log.Debugln("Getting builder for the project configuration")
 	builder, err := docker.GetBuilder(mmo.Config.GoPackage)
 	if err != nil {
 		return err
@@ -293,6 +301,8 @@ func (mmo *Mmo) Run() error {
 	env["PROJECT_NAME"] = mmo.Config.GoPackage
 
 	for service := range mmo.Config.Services {
+
+		log.Infoln("Building service:", service)
 		image, err := builder.BuildService(service)
 		if err != nil {
 			return err
@@ -307,6 +317,7 @@ func (mmo *Mmo) Run() error {
 		env["SERVICE"] = service
 		env["WERCKER_GIT_COMMIT"] = image.Tag
 
+		log.Debugln("Expanding templates for service:", service)
 		err = kubernetes.ExpandTemplate(env)
 		if err != nil {
 			return err
