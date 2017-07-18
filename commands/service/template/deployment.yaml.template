@@ -1,0 +1,42 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: ${SERVICE}
+spec:
+  selector:
+    app: ${SERVICE}
+  ports:
+    {{if .WebRPC}}- name: grpc-web
+      protocol: TCP
+      port: 50060{{end}}
+    - name: grpc
+      protocol: TCP
+      port: 50051
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: ${SERVICE}
+  labels:
+    commit: ${WERCKER_GIT_COMMIT}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ${SERVICE}
+  template:
+    metadata:
+      labels:
+        app: ${SERVICE}
+        commit: ${WERCKER_GIT_COMMIT}
+    spec:
+      containers:
+      - name: ${SERVICE}
+        image: ${DOCKER_REGISTRY}/${PROJECT_NAME}-${SERVICE}:${WERCKER_GIT_COMMIT}
+        ports:
+        - name: grpc
+          containerPort: 50051
+          protocol: TCP
+        {{if .WebRPC}}- name: grpc-web
+          containerPort: 50060
+          protocol: TCP{{end}}

@@ -23,6 +23,11 @@ func InitService(configService config.Service) error {
 		return err
 	}
 
+	// deployment dir
+	if err := utils.CreateDir(configService.Name + "/deployment/"); err != nil {
+		return err
+	}
+
 	// go through assets and generate them
 	for name, assetGetter := range _bindata {
 
@@ -39,6 +44,8 @@ func InitService(configService config.Service) error {
 			filePath = strings.Replace(asset.info.Name(), "commands/service/template", configService.Name+"/cmd/"+configService.Name, 1)
 		case "commands/service/template/proto.proto":
 			filePath = strings.Replace(asset.info.Name(), "commands/service/template", configService.Name+"/protobuf", 1)
+		case "commands/service/template/deployment.yaml.template":
+			filePath = strings.Replace(asset.info.Name(), "commands/service/template", configService.Name+"/deployment", 1)
 		default:
 			filePath = strings.Replace(asset.info.Name(), "commands/service/template", configService.Name, 1)
 		}
@@ -63,7 +70,6 @@ func InitService(configService config.Service) error {
 		file.Close()
 	}
 
-	// FIXME
 	if err := addGoImportManager("./"); err != nil {
 		return err
 	}
