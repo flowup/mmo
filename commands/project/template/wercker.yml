@@ -1,3 +1,46 @@
 box: golang:1.9
 
 build:
+  steps:
+
+build-service:
+  steps:
+    - add-to-known_hosts:
+      hostname: github.com
+      fingerprint: 16:27:ac:a5:76:28:2d:36:63:1b:56:4d:eb:df:a6:48
+      type: rsa
+    - setup-go-workspace
+    - glide-install
+    - script:
+      name: build service
+      code: CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o $WERCKER_OUTPUT_DIR/main ./cmd/$SERVICE
+      cwd: $SERVICE
+    - script:
+      name: copy to the scheduling pipeline
+      code: cp --verbose -r deployment $WERCKER_OUTPUT_DIR/deployment
+      cwd: $SERVICE
+
+schedule-deploy:
+  box:
+    id: alpine
+    cmd: /bin/sh
+  steps:
+    - internal/docker-push:
+      username: _json_key
+      password: $GCLOUD_CERT
+      repository: gcr.io/$GCR_PROJECT_NAME/dashly-gf-$SERVICE
+      tag: $WERCKER_GIT_BRANCH-$WERCKER_GIT_COMMIT
+      entrypoint: ./main
+      working-dir: $WERCKER_ROOT
+      registry: https://gcr.io/v2
+
+    - bash-template:
+      cwd: deployment
+
+    - kubectl:
+      name: deploy to kubernetes
+      server: $KUBERNETES_MASTER
+      username: $KUBERNETES_USERNAME
+      password: $KUBERNETES_PASSWORD
+      insecure-skip-tls-verify: true
+      command: apply --namespace=$KUBERNETES_NAMESPACE -f deployment/
