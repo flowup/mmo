@@ -1,0 +1,17 @@
+package {{.Name}}
+
+// I{{.Name | Title}}Access represents an interface that needs to be satisfied
+// for any data access used by the Service
+type I{{.Name | Title}}Access
+
+// {{.Name | Title}}Service represents an implementation of the service interface
+type {{.Name | Title}}Service struct {
+    access I{{.Name | Title}}Access
+}
+
+// New{{.Name | Title}}Service creates a new service object
+func New{{.Name | Title}}Service(access I{{.Name | Title}}Access) *{{.Name | Title}}Service {
+    return &{{.Name | Title}}Service{
+        access: access,
+    }
+}

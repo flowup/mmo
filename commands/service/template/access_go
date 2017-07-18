@@ -1,0 +1,12 @@
+package {{.Name}}
+
+// {{.Name | Title}}Access represents a structure that implements data access
+// for the {{.Name | Title}}Service
+type {{.Name | Title}}Access struct {
+
+}
+
+// New{{.Name | Title}}Access creates a new access object and returns it
+func New{{.Name | Title }}Access() I{{.Name | Title}}Access {
+    return &{{.Name | Title}}Access{}
+}

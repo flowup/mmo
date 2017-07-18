@@ -1,50 +1,56 @@
 package main
 
 import (
+    "os"
 	"net"
 	"sync"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"{{if .WebRPC}}
+	"google.golang.org/grpc/reflection"
+	{{if .WebRPC}}
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
-    "net/http"{{end}}
+    "net/http"
+    {{end}}
 
-    "github.com/sirupsen/logrus"
+    log "github.com/sirupsen/logrus"
+
+    {{if .Sentry}}
     "github.com/evalphobia/logrus_sentry"
+    {{end}}
 )
 
 func init() {
-	func init() {
-    	log.SetFormatter(&log.JSONFormatter{})
+    log.SetFormatter(&log.JSONFormatter{})
 
-    	log.SetOutput(os.Stdout)
+    log.SetOutput(os.Stdout)
 
-    	log.SetLevel(log.DebugLevel)
+    log.SetLevel(log.DebugLevel)
 
-    	// Init Logrus with Sentry
-    	sentryDsn, ok := os.LookupEnv("SENTRY_DSN")
-    	if ok {
-    		hook, err := logrus_sentry.NewSentryHook(sentryDsn, []log.Level{
-    			log.PanicLevel,
-    			log.FatalLevel,
-    			log.ErrorLevel,
-    		})
+    {{if .Sentry}}
+    // Init Logrus with Sentry
+    sentryDsn, ok := os.LookupEnv("SENTRY_DSN")
+    if ok {
+        hook, err := logrus_sentry.NewSentryHook(sentryDsn, []log.Level{
+            log.PanicLevel,
+            log.FatalLevel,
+            log.ErrorLevel,
+        })
 
-    		if err == nil {
-    			hook.Timeout = 20 * time.Second
-    			hook.StacktraceConfiguration.Enable = true
-    			log.AddHook(hook)
-    		}
-    	} else {
-    		log.Warnln("No SENTRY_DSN was found, sentry reporting won't work")
-    	}
+        if err == nil {
+            hook.Timeout = 20 * time.Second
+            hook.StacktraceConfiguration.Enable = true
+            log.AddHook(hook)
+        }
+    } else {
+        log.Warnln("No SENTRY_DSN was found, sentry reporting won't work")
     }
+    {{end}}
 }
 
 
 func main(){
 	lis, err := net.Listen("tcp", "")
 	if err != nil {
-		{{.Name}}.Log.Fatalf("failed to listen: %v", err)
+		log.Fatalf("failed to listen: %v", err)
 	}
 
 	s := grpc.NewServer()
@@ -52,39 +58,43 @@ func main(){
 	// Register reflection service on gRPC server.
 	reflection.Register(s)
 
-	{{if .WebRPC}}options := []grpcweb.Option{}
-
-	// Wrap grpc server to grpc-web server
-	wrappedServer := grpcweb.WrapServer(s, options...)
-
-	handler := func(resp http.ResponseWriter, req *http.Request) {
-		wrappedServer.ServeHTTP(resp, req)
-	}
-
-	httpServer := http.Server{
-		Addr:    "",
-		Handler: http.HandlerFunc(handler),
-	}
-	{{end}}
+    // if any service fails, whole app should fail
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
 
 	go func() {
-		{{.Name}}.Log.Println("Starting gRPC server on", "")
+		log.Infoln("Starting gRPC server on", "")
 		if err := s.Serve(lis); err != nil {
-			{{.Name}}.Log.Fatalf("grpc: failed to serve: %v", err)
+			log.Fatalf("grpc: failed to serve: %v", err)
 		}
 
 		wg.Done()
-	}()	{{if .WebRPC}}
+	}()
+
+	{{if .WebRPC}}
+
+	options := []grpcweb.Option{}
+    // Wrap grpc server to grpc-web server
+    wrappedServer := grpcweb.WrapServer(s, options...)
+
+    handler := func(resp http.ResponseWriter, req *http.Request) {
+        wrappedServer.ServeHTTP(resp, req)
+    }
+
+    httpServer := http.Server{
+        Addr:    "",
+        Handler: http.HandlerFunc(handler),
+    }
+
 	go func() {
-		{{.Name}}.Log.Println("starting gRPC Web server on", "")
+		log.Infoln("starting gRPC Web server on", "")
 		if err := httpServer.ListenAndServe(); err != nil {
-			{{.Name}}.Log.Fatalf("grpc-web: failed to serve: %v", err)
+			log.Fatalf("grpc-web: failed to serve: %v", err)
 		}
 
 		wg.Done()
-	}(){{end}}
+	}()
+	{{end}}
 
 	wg.Wait()
 }

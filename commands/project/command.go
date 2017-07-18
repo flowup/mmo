@@ -11,13 +11,13 @@ import (
 	"github.com/flowup/mmo/docker"
 	"github.com/flowup/mmo/kubernetes"
 	"github.com/flowup/mmo/utils"
+	"github.com/flowup/mmo/utils/cookiecutter"
 	"github.com/flowup/mmo/utils/dockercmd"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"os"
 	"os/exec"
 	"strings"
-	"text/template"
 )
 
 // Mmo represents config and context
@@ -60,17 +60,10 @@ func (mmo *Mmo) InitProject() error {
 			return err
 		}
 
-		// get correct path to the handle
-		filePath := strings.Replace(asset.info.Name(), "commands/project/template", mmo.Config.Name, 1)
-		// create template for the handle
-		tmpl := template.Must(template.New(name).Parse(string(asset.bytes)))
-
-		var handle *os.File
-
-		if _, err := os.Stat(filePath); err == nil {
+		if _, err := os.Stat(name); err == nil {
 			// ask user if he want's to rewrite if not rewritten
 			if !rewriteAll {
-				log.Info("File ", filePath, " already exists. Do you want to rewrite it? [y/yy/n]:")
+				log.Info("File ", name, " already exists. Do you want to rewrite it? [y/yy/n]:")
 
 				reader := bufio.NewReader(os.Stdin)
 				answer := ""
@@ -85,28 +78,21 @@ func (mmo *Mmo) InitProject() error {
 				}
 			}
 
-			log.Infoln("Rewriting file:", filePath)
-			err = os.Remove(filePath)
+			log.Infoln("Rewriting file:", name)
+			err = os.Remove(name)
 			if err != nil {
-				log.Info("ERROGING")
 				return err
 			}
 		}
 
-		log.Debugln("Creating file", filePath)
-		// create the handle in path
-		handle, err = os.Create(filePath)
-		if err != nil {
-			return err
-		}
-
-		// execute the template to the handle
-		err = tmpl.Execute(handle, mmo.Config)
-		if err != nil {
-			return err
-		}
-
-		err = handle.Close()
+		log.Debugln("Creating file:", name)
+		err = cookiecutter.Restore(
+			mmo.Config.Name,
+			name,
+			string(asset.bytes),
+			mmo.Config,
+			utils.DefaultFuncMap,
+		)
 		if err != nil {
 			return err
 		}

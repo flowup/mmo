@@ -7,8 +7,10 @@ go:
 install:
   - go get github.com/mattn/goveralls
   - go get github.com/Masterminds/glide
+  - go get -u github.com/golang/lint/golint
   - glide i
 
 script:
   - go build github.com/flowup/mmo
+  - golint $(glide nv)
   - $HOME/gopath/bin/goveralls -service=travis-ci
