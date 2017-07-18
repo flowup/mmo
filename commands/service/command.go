@@ -38,6 +38,7 @@ func InitService(configService config.Service) error {
 			strings.Replace(name, "_go", ".go", 1),
 			string(asset.bytes),
 			configService,
+			utils.DefaultFuncMap,
 		)
 
 		if err != nil {

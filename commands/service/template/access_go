@@ -1,0 +1,11 @@
+package {{.Name}}
+
+type I{{.Name | Title}}Access
+
+type {{.Name | Title}}Access struct {
+
+}
+
+func New{{.Name | Title }}Access() I{{.Name | Title}}Access {
+    return &{{.Name | Title}}Access{}
+}

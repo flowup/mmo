@@ -1,0 +1,11 @@
+package {{.Name}}
+
+type {{.Name | Title}}Service struct {
+    access I{{.Name | Title}}Access
+}
+
+func New{{.Name | Title}}Service(access I{{.Name | Title}}Access) *{{.Name | Title}}Service {
+    return &{{.Name | Title}}Service{
+        access: access,
+    }
+}

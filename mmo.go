@@ -103,6 +103,7 @@ func main() {
 				if err := mmo.InitProject(); err != nil {
 					log.Fatal(err.Error())
 				}
+
 				return nil
 			},
 		},
