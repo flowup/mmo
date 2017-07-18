@@ -7,3 +7,6 @@ bindata:
 
 build:
 	go build
+
+lint:
+	golint $(glide nv)
