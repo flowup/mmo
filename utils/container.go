@@ -45,3 +45,16 @@ func PullImage(cli *client.Client, image string) error {
 	_, err = io.Copy(ioutil.Discard, out)
 	return err
 }
+
+// PushImage is function to push image to registry
+func PushImage(cli *client.Client, image string) error {
+	out, err := cli.ImagePush(context.Background(), image, types.ImagePushOptions{})
+	if err != nil {
+		return err
+	}
+
+	defer out.Close()
+
+	_, err = io.Copy(ioutil.Discard, out)
+	return err
+}
