@@ -23,18 +23,18 @@ import (
 // Builder is structure to hold instance of service builder
 type Builder struct {
 	cli           *client.Client
-	goPackage     string
+	repository    string
 	builtServices []Image
 }
 
 // GetBuilder is function to get instance of builder
-func GetBuilder(goPackage string) (*Builder, error) {
+func GetBuilder(repo string) (*Builder, error) {
 	cli, err := client.NewEnvClient()
 	if err != nil {
 		return nil, err
 	}
 
-	return &Builder{cli: cli, goPackage: goPackage, builtServices: make([]Image, 0)}, nil
+	return &Builder{cli: cli, repository: repo, builtServices: make([]Image, 0)}, nil
 }
 
 // BuildService is function to build service's binary and alpine docker image
@@ -42,12 +42,12 @@ func (b *Builder) BuildService(service string) (Image, error) {
 
 	err := b.buildBinary(service)
 	if err != nil {
-		return Image{}, errors.Wrap(err, "Failed to build binary of the service "+service)
+		return Image{}, errors.Wrap(err, "Failed to build binary of the service: " + service)
 	}
 
 	img, err := b.buildImage(service)
 	if err != nil {
-		return Image{}, errors.Wrap(err, "Failed to build docker image of the service "+service)
+		return Image{}, errors.Wrap(err, "Failed to build docker image of the service: " + service)
 	}
 
 	b.builtServices = append(b.builtServices, img)
@@ -91,7 +91,7 @@ func (b *Builder) buildBinary(service string) error {
 	cont, err := b.cli.ContainerCreate(context.Background(), &container.Config{
 		Image:      dockercmd.Golang,
 		Cmd:        []string{"bash", "-c", cmd},
-		WorkingDir: "/go/src/" + b.goPackage,
+		WorkingDir: "/go/src/" + b.repository,
 		Env: []string{
 			"GOOS=linux",
 			"CGO_ENABLED=0",
@@ -102,7 +102,7 @@ func (b *Builder) buildBinary(service string) error {
 			{
 				Type:   mount.TypeBind,
 				Source: pwd,
-				Target: "/go/src/" + b.goPackage,
+				Target: "/go/src/" + b.repository,
 			},
 		},
 	}, nil, "")
@@ -116,7 +116,7 @@ func (b *Builder) buildBinary(service string) error {
 	return err
 }
 
-func (b *Builder) buildImage(service string) (Image, error) {
+func (b *Builder) buildImage(name string) (Image, error) {
 
 	h := sha1.New()
 	timeNow, err := time.Now().MarshalBinary()
@@ -131,15 +131,15 @@ func (b *Builder) buildImage(service string) (Image, error) {
 	var img = Image{}
 
 	img.Registry = dockercmd.MinikubeRegistry
-	img.Name = b.goPackage + "-" + service
+	img.Name = b.repository + "/" + name
 	img.Tag = strings.ToLower(base64.URLEncoding.WithPadding(base64.NoPadding).EncodeToString(h.Sum(nil)))
 
-	logrus.Debug("Building image " + img.GetFullname())
+	logrus.Debug("Building name: ", img.GetFullname())
 	buildOptions := types.ImageBuildOptions{
 		Tags: []string{img.GetFullname()},
 	}
 
-	ctx, err := b.createContext(service)
+	ctx, err := b.createContext(name)
 
 	if err != nil {
 		return Image{}, err

@@ -289,12 +289,26 @@ func (mmo *Mmo) Run() error {
 
 	log.Infoln("Forwarding registry port to localhost")
 	portFwdCmd, err := kubernetes.ForwardRegistryPort()
+	defer func() {
+		log.Debugln("Cleaning port forwarding for docker registry")
+		err := portFwdCmd.Process.Kill()
+		if err != nil {
+			log.Errorln(err)
+		}
+	}()
 
-	log.Debugln("Getting builder for the project configuration")
-	builder, err := docker.GetBuilder(mmo.Config.GoPackage)
+	log.Debugln("Getting builder for the repository:", mmo.Config.Name)
+	builder, err := docker.GetBuilder(mmo.Config.Name)
 	if err != nil {
 		return err
 	}
+	defer func() {
+		log.Debugln("Cleaning docker builder images")
+		err := builder.Clean()
+		if err != nil {
+			log.Errorln(err)
+		}
+	}()
 
 	var env = make(kubernetes.DeployEnvironment)
 	env["DOCKER_REGISTRY"] = dockercmd.MinikubeRegistry
@@ -308,11 +322,11 @@ func (mmo *Mmo) Run() error {
 			return err
 		}
 
-		//err = builder.PushService(image)
-		//if err != nil {
-		//	//builder.Clean()
-		//	return err
-		//}
+		err = builder.PushService(image)
+		if err != nil {
+			builder.Clean()
+			return err
+		}
 
 		env["SERVICE"] = service
 		env["WERCKER_GIT_COMMIT"] = image.Tag
@@ -327,16 +341,6 @@ func (mmo *Mmo) Run() error {
 	// TODO: build service
 
 	// TODO: deploy service
-
-	err = builder.Clean()
-	if err != nil {
-		return err
-	}
-
-	err = portFwdCmd.Process.Kill()
-	if err != nil {
-		return err
-	}
 
 	return nil
 }
