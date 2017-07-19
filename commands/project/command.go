@@ -322,9 +322,9 @@ func (mmo *Mmo) Run() error {
 			return err
 		}
 
+		log.Infoln("Pushing image:", image.GetFullname())
 		err = builder.PushService(image)
 		if err != nil {
-			builder.Clean()
 			return err
 		}
 

@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"context"
 	"crypto/sha1"
-	"encoding/base64"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
@@ -15,9 +14,8 @@ import (
 	"github.com/pkg/errors"
 	"io/ioutil"
 	"os"
-	"strings"
 	"time"
-	"github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 // Builder is structure to hold instance of service builder
@@ -42,12 +40,12 @@ func (b *Builder) BuildService(service string) (Image, error) {
 
 	err := b.buildBinary(service)
 	if err != nil {
-		return Image{}, errors.Wrap(err, "Failed to build binary of the service: " + service)
+		return Image{}, errors.Wrap(err, "Failed to build binary of the service: "+service)
 	}
 
 	img, err := b.buildImage(service)
 	if err != nil {
-		return Image{}, errors.Wrap(err, "Failed to build docker image of the service: " + service)
+		return Image{}, errors.Wrap(err, "Failed to build docker image of the service: "+service)
 	}
 
 	b.builtServices = append(b.builtServices, img)
@@ -132,9 +130,10 @@ func (b *Builder) buildImage(name string) (Image, error) {
 
 	img.Registry = dockercmd.MinikubeRegistry
 	img.Name = b.repository + "/" + name
-	img.Tag = strings.ToLower(base64.URLEncoding.WithPadding(base64.NoPadding).EncodeToString(h.Sum(nil)))
+	//img.Tag = strings.ToLower(base64.URLEncoding.WithPadding(base64.NoPadding).EncodeToString(h.Sum(nil)))
+	img.Tag = "latest"
 
-	logrus.Debug("Building name: ", img.GetFullname())
+	log.Debug("Building image: ", img.GetFullname())
 	buildOptions := types.ImageBuildOptions{
 		Tags: []string{img.GetFullname()},
 	}
