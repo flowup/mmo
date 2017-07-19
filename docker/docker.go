@@ -139,12 +139,15 @@ func (b *Builder) buildImage(name string) (Image, error) {
 	}
 
 	ctx, err := b.createContext(name)
-
 	if err != nil {
 		return Image{}, err
 	}
 
-	_, err = b.cli.ImageBuild(context.Background(), ctx, buildOptions)
+	res, err := b.cli.ImageBuild(context.Background(), ctx, buildOptions)
+	// looks like we need to read the stream until the end because of some docker
+	// daemon asynchronity. Response is returned before the command is finised.
+	// ReadAll will wait until the docker stream is ultimately closed.
+	ioutil.ReadAll(res.Body)
 
 	return img, err
 }
