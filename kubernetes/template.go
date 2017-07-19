@@ -1,7 +1,7 @@
 package kubernetes
 
 import (
-	"fmt"
+	"bytes"
 	"io/ioutil"
 	"os"
 )
@@ -21,20 +21,22 @@ func SetupDeployEnvironment(env DeployEnvironment) error {
 	return nil
 }
 
-func ExpandTemplate(env DeployEnvironment) error {
+// ExpandTemplate is function to expand default service's template with env variables
+func ExpandTemplate(env DeployEnvironment) ([]byte, error) {
 	err := SetupDeployEnvironment(env)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	file, err := ioutil.ReadFile(env["SERVICE"] + "/deployment/deployment.yaml.template")
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	s := string(file)
-	expanded := os.ExpandEnv(s)
+	return []byte(os.ExpandEnv(s)), nil
+}
 
-	fmt.Println(expanded)
-	return nil
+func splitYamlDocument(contents []byte) [][]byte {
+	return bytes.Split(contents, []byte("---\n"))
 }

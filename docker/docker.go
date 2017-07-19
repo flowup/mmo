@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"context"
 	"crypto/sha1"
+	"encoding/base64"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
@@ -12,10 +13,11 @@ import (
 	"github.com/flowup/mmo/utils"
 	"github.com/flowup/mmo/utils/dockercmd"
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	"io/ioutil"
 	"os"
+	"strings"
 	"time"
-	log "github.com/sirupsen/logrus"
 )
 
 // Builder is structure to hold instance of service builder
@@ -129,9 +131,8 @@ func (b *Builder) buildImage(name string) (Image, error) {
 	var img = Image{}
 
 	img.Registry = dockercmd.MinikubeRegistry
-	img.Name = b.repository + "/" + name
-	//img.Tag = strings.ToLower(base64.URLEncoding.WithPadding(base64.NoPadding).EncodeToString(h.Sum(nil)))
-	img.Tag = "latest"
+	img.Name = b.repository + "-" + name
+	img.Tag = strings.ToLower(base64.URLEncoding.WithPadding(base64.NoPadding).EncodeToString(h.Sum(nil)))
 
 	log.Debug("Building image: ", img.GetFullname())
 	buildOptions := types.ImageBuildOptions{
