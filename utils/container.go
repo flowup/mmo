@@ -8,6 +8,8 @@ import (
 	"io/ioutil"
 	"os"
 	"os/exec"
+	"errors"
+	"strconv"
 )
 
 // ContainerRunStdout is function to run created docker container and attach output of container to stdout of mmo
@@ -30,7 +32,12 @@ func ContainerRunStdout(cli *client.Client, containerID string) error {
 		return err
 	}
 
-	_, err = cli.ContainerWait(context.Background(), containerID)
+	code, err := cli.ContainerWait(context.Background(), containerID)
+
+	if code != 0 {
+		return errors.New("Container exited with code " + strconv.Itoa(int(code)))
+	}
+
 	return err
 }
 

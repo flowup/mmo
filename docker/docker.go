@@ -111,7 +111,6 @@ func (b *Builder) buildBinary(service string) error {
 		return err
 	}
 
-	// TODO: error of container not returned
 	err = utils.ContainerRunStdout(b.cli, cont.ID)
 	return err
 }
