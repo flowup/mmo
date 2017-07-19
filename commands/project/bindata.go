@@ -90,7 +90,7 @@ func GithubContributingMd() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: ".github/CONTRIBUTING.md", size: 4216, mode: os.FileMode(420), modTime: time.Unix(1500388904, 0)}
+	info := bindataFileInfo{name: ".github/CONTRIBUTING.md", size: 4216, mode: os.FileMode(420), modTime: time.Unix(1500389267, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -110,7 +110,7 @@ func GithubIssue_templateMd() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: ".github/ISSUE_TEMPLATE.md", size: 178, mode: os.FileMode(420), modTime: time.Unix(1500388904, 0)}
+	info := bindataFileInfo{name: ".github/ISSUE_TEMPLATE.md", size: 178, mode: os.FileMode(420), modTime: time.Unix(1500389267, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -130,7 +130,7 @@ func GithubPull_request_templateMd() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: ".github/PULL_REQUEST_TEMPLATE.md", size: 65, mode: os.FileMode(420), modTime: time.Unix(1500388904, 0)}
+	info := bindataFileInfo{name: ".github/PULL_REQUEST_TEMPLATE.md", size: 65, mode: os.FileMode(420), modTime: time.Unix(1500389267, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -150,7 +150,7 @@ func Gitignore() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: ".gitignore", size: 199, mode: os.FileMode(420), modTime: time.Unix(1500380106, 0)}
+	info := bindataFileInfo{name: ".gitignore", size: 199, mode: os.FileMode(420), modTime: time.Unix(1500286209, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -170,7 +170,7 @@ func license() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "LICENSE", size: 1079, mode: os.FileMode(420), modTime: time.Unix(1500299639, 0)}
+	info := bindataFileInfo{name: "LICENSE", size: 1079, mode: os.FileMode(420), modTime: time.Unix(1500286209, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -190,7 +190,7 @@ func readmeMd() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "README.md", size: 12, mode: os.FileMode(420), modTime: time.Unix(1499953812, 0)}
+	info := bindataFileInfo{name: "README.md", size: 12, mode: os.FileMode(420), modTime: time.Unix(1499349093, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -210,7 +210,7 @@ func mmoYaml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "mmo.yaml", size: 49, mode: os.FileMode(420), modTime: time.Unix(1499953812, 0)}
+	info := bindataFileInfo{name: "mmo.yaml", size: 49, mode: os.FileMode(420), modTime: time.Unix(1499948200, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -230,7 +230,7 @@ func werckerYml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "wercker.yml", size: 1219, mode: os.FileMode(420), modTime: time.Unix(1500388904, 0)}
+	info := bindataFileInfo{name: "wercker.yml", size: 1219, mode: os.FileMode(420), modTime: time.Unix(1500389267, 0)}
 	a := &asset{bytes: bytes, info: info}
 	return a, nil
 }
@@ -287,14 +287,14 @@ func AssetNames() []string {
 
 // _bindata is a table, holding each asset generator, mapped to its name.
 var _bindata = map[string]func() (*asset, error){
-	".github/CONTRIBUTING.md":          GithubContributingMd,
-	".github/ISSUE_TEMPLATE.md":        GithubIssue_templateMd,
+	".github/CONTRIBUTING.md": GithubContributingMd,
+	".github/ISSUE_TEMPLATE.md": GithubIssue_templateMd,
 	".github/PULL_REQUEST_TEMPLATE.md": GithubPull_request_templateMd,
-	".gitignore":                       Gitignore,
-	"LICENSE":                          license,
-	"README.md":                        readmeMd,
-	"mmo.yaml":                         mmoYaml,
-	"wercker.yml":                      werckerYml,
+	".gitignore": Gitignore,
+	"LICENSE": license,
+	"README.md": readmeMd,
+	"mmo.yaml": mmoYaml,
+	"wercker.yml": werckerYml,
 }
 
 // AssetDir returns the file names below a certain
@@ -336,17 +336,16 @@ type bintree struct {
 	Func     func() (*asset, error)
 	Children map[string]*bintree
 }
-
 var _bintree = &bintree{nil, map[string]*bintree{
 	".github": &bintree{nil, map[string]*bintree{
-		"CONTRIBUTING.md":          &bintree{GithubContributingMd, map[string]*bintree{}},
-		"ISSUE_TEMPLATE.md":        &bintree{GithubIssue_templateMd, map[string]*bintree{}},
+		"CONTRIBUTING.md": &bintree{GithubContributingMd, map[string]*bintree{}},
+		"ISSUE_TEMPLATE.md": &bintree{GithubIssue_templateMd, map[string]*bintree{}},
 		"PULL_REQUEST_TEMPLATE.md": &bintree{GithubPull_request_templateMd, map[string]*bintree{}},
 	}},
-	".gitignore":  &bintree{Gitignore, map[string]*bintree{}},
-	"LICENSE":     &bintree{license, map[string]*bintree{}},
-	"README.md":   &bintree{readmeMd, map[string]*bintree{}},
-	"mmo.yaml":    &bintree{mmoYaml, map[string]*bintree{}},
+	".gitignore": &bintree{Gitignore, map[string]*bintree{}},
+	"LICENSE": &bintree{license, map[string]*bintree{}},
+	"README.md": &bintree{readmeMd, map[string]*bintree{}},
+	"mmo.yaml": &bintree{mmoYaml, map[string]*bintree{}},
 	"wercker.yml": &bintree{werckerYml, map[string]*bintree{}},
 }}
 
@@ -396,3 +395,4 @@ func _filePath(dir, name string) string {
 	cannonicalName := strings.Replace(name, "\\", "/", -1)
 	return filepath.Join(append([]string{dir}, strings.Split(cannonicalName, "/")...)...)
 }
+

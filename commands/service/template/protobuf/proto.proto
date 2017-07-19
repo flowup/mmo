@@ -2,6 +2,13 @@ syntax = "proto3";
 
 package {{.Name}};
 
-service {{.Name}} {
+import "google/protobuf/empty.proto";
 
+service {{.Name}} {
+    rpc GetVersion (google.protobuf.Empty) returns (Version) {}
+}
+
+message Version {
+    string name = 1;
+    string stability = 2;
 }
