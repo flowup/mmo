@@ -1,9 +1,13 @@
 package kubernetes
 
 import (
+	"encoding/json"
 	"github.com/pkg/errors"
-	"k8s.io/apimachinery/pkg/apis/meta/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/yaml"
 	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/pkg/api/v1"
+	"k8s.io/client-go/pkg/apis/extensions/v1beta1"
 	"k8s.io/client-go/rest"
 	"os/exec"
 	"os/user"
@@ -62,25 +66,20 @@ func ConnectToCluster() (*kubernetes.Clientset, error) {
 // IsRegistryRunning is function to check if all parts of docker registry are deployed
 func IsRegistryRunning(client *kubernetes.Clientset) error {
 	rplInterface := client.CoreV1Client.ReplicationControllers(RegistryReplicationController.ObjectMeta.Namespace)
-	_, err := rplInterface.Get(RegistryReplicationController.ObjectMeta.Name, v1.GetOptions{})
+	_, err := rplInterface.Get(RegistryReplicationController.ObjectMeta.Name, metav1.GetOptions{})
 	if err != nil {
 		return err
 	}
 
 	svcInterface := client.CoreV1Client.Services(RegistryService.ObjectMeta.Namespace)
-	_, err = svcInterface.Get(RegistryService.ObjectMeta.Name, v1.GetOptions{})
+	_, err = svcInterface.Get(RegistryService.ObjectMeta.Name, metav1.GetOptions{})
 	if err != nil {
 		return err
 	}
 
 	daemonInterface := client.ExtensionsV1beta1Client.DaemonSets(RegistryDaemonSet.ObjectMeta.Namespace)
-	_, err = daemonInterface.Get(RegistryDaemonSet.ObjectMeta.Name, v1.GetOptions{})
+	_, err = daemonInterface.Get(RegistryDaemonSet.ObjectMeta.Name, metav1.GetOptions{})
 	return err
-}
-
-// IsRegistryAccessible is function to check if docker registry running in minikube is accessible
-func IsRegistryAccessible() error {
-	return nil
 }
 
 // DeployDockerRegistry is function to deploy docker registry to connected k8s cluster
@@ -112,4 +111,58 @@ func ForwardRegistryPort() (*exec.Cmd, error) {
 		return cmdCube, errors.Wrap(errPwFailed, err.Error())
 	}
 	return cmdCube, nil
+}
+
+// DeployService is function to deploy service with default deployment files
+func DeployService(client *kubernetes.Clientset, env DeployEnvironment) error {
+	expanded, err := ExpandTemplate(env)
+
+	deployments := splitYamlDocument(expanded)
+
+	var service v1.Service
+	var deployment v1beta1.Deployment
+
+	svcJSON, err := yaml.ToJSON(deployments[0])
+	if err != nil {
+		return err
+	}
+
+	deploymentJSON, err := yaml.ToJSON(deployments[1])
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(svcJSON, &service)
+	if err != nil {
+		return err
+	}
+	err = json.Unmarshal(deploymentJSON, &deployment)
+	if err != nil {
+		return err
+	}
+
+	svcInterface := client.CoreV1Client.Services(v1.NamespaceDefault)
+
+	_, err = svcInterface.Get(service.Name, metav1.GetOptions{})
+	if err != nil {
+		_, err = svcInterface.Create(&service)
+	}
+
+	if err != nil {
+		return err
+	}
+
+	dplInterface := client.ExtensionsV1beta1Client.Deployments(v1.NamespaceDefault)
+	_, err = dplInterface.Get(deployment.Name, metav1.GetOptions{})
+	if err != nil {
+		_, err = dplInterface.Create(&deployment)
+	} else {
+		_, err = dplInterface.Update(&deployment)
+	}
+
+	if err != nil {
+		return err
+	}
+
+	return err
 }

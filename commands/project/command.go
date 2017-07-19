@@ -312,7 +312,7 @@ func (mmo *Mmo) Run() error {
 
 	var env = make(kubernetes.DeployEnvironment)
 	env["DOCKER_REGISTRY"] = dockercmd.MinikubeRegistry
-	env["PROJECT_NAME"] = mmo.Config.GoPackage
+	env["PROJECT_NAME"] = mmo.Config.Name
 
 	for service := range mmo.Config.Services {
 
@@ -332,15 +332,11 @@ func (mmo *Mmo) Run() error {
 		env["WERCKER_GIT_COMMIT"] = image.Tag
 
 		log.Debugln("Expanding templates for service:", service)
-		err = kubernetes.ExpandTemplate(env)
+		err = kubernetes.DeployService(kubeClient, env)
 		if err != nil {
 			return err
 		}
 	}
-
-	// TODO: build service
-
-	// TODO: deploy service
 
 	return nil
 }
