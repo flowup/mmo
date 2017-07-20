@@ -53,7 +53,15 @@ func main(){
 		log.Fatalf("failed to listen: %v", err)
 	}
 
+	// create additional resources for the service
+	access := {{.Name}}.NewAccess()
+
+    // create the grpc server
 	s := grpc.NewServer()
+
+	// register the service
+	{{.Name}}.Register{{.Name | Title}}Server(s, {{.Name}}.NewService(access))
+
 
 	// Register reflection service on gRPC server.
 	reflection.Register(s)

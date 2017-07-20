@@ -1,12 +1,12 @@
 package cookiecutter
 
 import (
+	"bytes"
+	"io/ioutil"
 	"os"
 	"path/filepath"
-	"io/ioutil"
 	"strings"
 	"text/template"
-	"bytes"
 )
 
 // Restore restores contents of a given text to the given file, replacing
@@ -21,7 +21,7 @@ func Restore(dir string, path string, text string, data interface{}, funcs templ
 	}
 
 	fileBytes := &bytes.Buffer{}
-	template.Must(template.New("file:" + path).Funcs(funcs).Parse(text)).Execute(fileBytes, data)
+	template.Must(template.New("file:"+path).Funcs(funcs).Parse(text)).Execute(fileBytes, data)
 
 	err = ioutil.WriteFile(_filePath(dir, pathBytes.String()), fileBytes.Bytes(), os.FileMode(0755))
 	if err != nil {

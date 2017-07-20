@@ -1,9 +1,9 @@
 package config
 
 import (
+	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
-	"gopkg.in/yaml.v2"
 )
 
 const (
@@ -13,10 +13,10 @@ const (
 
 // Config represents projects configuration
 type Config struct {
-	Name       string `yaml:"name"`
-	Lang       string `yaml:"lang"`
-	DepManager string `yaml:"dependencyManager"`
-	GoPackage  string `yaml:"goPackage"`
+	Name       string             `yaml:"name"`
+	Lang       string             `yaml:"lang"`
+	DepManager string             `yaml:"dependencyManager"`
+	GoPackage  string             `yaml:"goPackage"`
 	Services   map[string]Service `yaml:"services"`
 }
 
@@ -32,17 +32,17 @@ func (c *Config) ServiceNames() []string {
 
 // Service represents service configuration from Config
 type Service struct {
-	Name         string `yaml:"-"`
-	Description  string `yaml:"description"`
-	WebRPC       bool `yaml:"webRPC"`
+	Name         string       `yaml:"-"`
+	Description  string       `yaml:"description"`
+	WebRPC       bool         `yaml:"webRPC"`
 	Dependencies []Dependency `yaml:"dependencies"`
-	Sentry       bool `yaml:"sentry"`
+	Sentry       bool         `yaml:"sentry"`
 }
 
 // Dependency represents service dependency configuration from Config
 type Dependency struct {
-	Name string `yaml:"name"`
-	Type string `yaml:"type"`
+	Name string        `yaml:"name"`
+	Type string        `yaml:"type"`
 	Run  DependencyRun `yaml:"run"`
 }
 

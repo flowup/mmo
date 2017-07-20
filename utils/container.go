@@ -7,6 +7,9 @@ import (
 	"io"
 	"io/ioutil"
 	"os"
+	"os/exec"
+	"errors"
+	"strconv"
 )
 
 // ContainerRunStdout is function to run created docker container and attach output of container to stdout of mmo
@@ -29,7 +32,12 @@ func ContainerRunStdout(cli *client.Client, containerID string) error {
 		return err
 	}
 
-	_, err = cli.ContainerWait(context.Background(), containerID)
+	code, err := cli.ContainerWait(context.Background(), containerID)
+
+	if code != 0 {
+		return errors.New("Container exited with code " + strconv.Itoa(int(code)))
+	}
+
 	return err
 }
 
@@ -44,4 +52,12 @@ func PullImage(cli *client.Client, image string) error {
 
 	_, err = io.Copy(ioutil.Discard, out)
 	return err
+}
+
+// PushImage is function to push image to registry
+func PushImage(cli *client.Client, image string) error {
+	cmd := exec.Command("docker", "push", image)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stdout
+	return cmd.Run()
 }

@@ -1,15 +1,16 @@
 package service
 
 import (
-	"github.com/flowup/mmo/utils"
-	"strings"
-	"os"
 	"github.com/flowup/mmo/commands"
 	"github.com/flowup/mmo/config"
+	"github.com/flowup/mmo/utils"
+	"github.com/flowup/mmo/utils/cookiecutter"
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
+	"os"
 	"os/exec"
 	"path/filepath"
-	log "github.com/sirupsen/logrus"
-	"github.com/flowup/mmo/utils/cookiecutter"
+	"strings"
 )
 
 // InitService is cli function to generate service with given name
@@ -37,11 +38,11 @@ func InitService(configService config.Service) error {
 	}
 
 	if err := addGoImportManager("./"); err != nil {
-		return err
+		return errors.Wrap(err, "Failed to run import manager")
 	}
 
 	if err := commands.GenerateProto(commands.Go, configService.Name); err != nil {
-		return err
+		return errors.Wrap(err, "Failed to generate API servers and stubs from proto")
 	}
 
 	return nil

@@ -1,8 +1,8 @@
 package utils
 
 import (
-	"text/template"
 	"strings"
+	"text/template"
 )
 
 var (

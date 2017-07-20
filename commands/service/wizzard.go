@@ -1,11 +1,11 @@
 package service
 
 import (
-	"github.com/flowup/mmo/config"
 	"bufio"
-	"os"
 	"fmt"
+	"github.com/flowup/mmo/config"
 	"github.com/urfave/cli"
+	"os"
 )
 
 // Wizzard for setup service
@@ -35,9 +35,9 @@ func Wizzard(serviceName string) config.Service {
 // FromCliContext Create new service according to flags
 func FromCliContext(serviceName string, ctx *cli.Context) config.Service {
 	return config.Service{
-		Name: serviceName,
+		Name:        serviceName,
 		Description: ctx.String("description"),
-		WebRPC: ctx.Bool("webrpc"),
-		Sentry: ctx.Bool("sentry"),
+		WebRPC:      ctx.Bool("webrpc"),
+		Sentry:      ctx.Bool("sentry"),
 	}
 }

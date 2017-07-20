@@ -1,18 +1,18 @@
 package main
 
 import (
-	"github.com/pkg/errors"
-	"github.com/flowup/mmo/utils"
-	"github.com/urfave/cli"
-	"github.com/flowup/mmo/config"
+	"bufio"
+	"github.com/evalphobia/logrus_sentry"
 	"github.com/flowup/mmo/commands/project"
 	"github.com/flowup/mmo/commands/service"
-	"os"
-	"github.com/evalphobia/logrus_sentry"
+	"github.com/flowup/mmo/config"
+	"github.com/flowup/mmo/utils"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	"time"
-	"bufio"
+	"github.com/urfave/cli"
+	"os"
 	"strings"
+	"time"
 )
 
 const (
@@ -150,7 +150,17 @@ func main() {
 			Action: func(c *cli.Context) error {
 				bootstrap(c)
 
-				return utils.ErrNotImplemented
+				mmo, err := project.GetMmo()
+
+				if err != nil {
+					return utils.ErrNoProject
+				}
+
+				if err := mmo.Run(); err != nil {
+					log.Fatal(err)
+				}
+
+				return nil
 			},
 		},
 		{

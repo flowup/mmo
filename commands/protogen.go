@@ -7,8 +7,8 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/flowup/mmo/utils"
 	"github.com/flowup/mmo/utils/dockercmd"
-	"os"
 	log "github.com/sirupsen/logrus"
+	"os"
 )
 
 // Supported languages
@@ -28,7 +28,7 @@ func GenerateProto(lang string, serviceName string) error {
 		return err
 	}
 
-	log.Infoln("Generating " + string(lang) + " API clients and server stubs for service:", serviceName)
+	log.Infoln("Generating "+string(lang)+" API clients and server stubs for service:", serviceName)
 
 	var inputMount string
 	var outputMount string

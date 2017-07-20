@@ -1,20 +1,23 @@
 package project
 
 import (
+	"bufio"
 	"context"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/client"
 	"github.com/flowup/mmo/commands"
 	"github.com/flowup/mmo/config"
+	"github.com/flowup/mmo/docker"
+	"github.com/flowup/mmo/kubernetes"
 	"github.com/flowup/mmo/utils"
+	"github.com/flowup/mmo/utils/cookiecutter"
+	"github.com/flowup/mmo/utils/dockercmd"
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	"os"
 	"os/exec"
 	"strings"
-	log "github.com/sirupsen/logrus"
-	"bufio"
-	"github.com/flowup/mmo/utils/cookiecutter"
 )
 
 // Mmo represents config and context
@@ -123,6 +126,7 @@ func (mmo *Mmo) InitProject() error {
 // within the current project.
 // It will also automatically update the dependency manager
 func (mmo *Mmo) InitializeDependencyManager() error {
+	log.Debugln("Initializing dep. manager:", mmo.Config.DepManager)
 	switch mmo.Config.DepManager {
 	case "glide":
 		glideInstallCmd := exec.Command("go", "get", "github.com/Masterminds/glide")
@@ -148,6 +152,7 @@ func (mmo *Mmo) InitializeDependencyManager() error {
 
 // ClearDependencyManager clears contents of the content manager
 func (mmo *Mmo) ClearDependencyManager() error {
+	log.Debugln("Clearning dep. manager:", mmo.Config.DepManager)
 	switch mmo.Config.DepManager {
 	case "glide":
 		// remove mail glide file
@@ -209,6 +214,7 @@ func (mmo *Mmo) RunTests() error {
 
 // SetContext is cli function to set context of mmo to specified service or services
 func (mmo *Mmo) SetContext(services []string) error {
+	log.Debugln("Trying to set context for services:", services)
 	for _, service := range services {
 		if _, ok := mmo.Config.Services[service]; !ok {
 			return utils.ErrServiceNotExists
@@ -240,7 +246,10 @@ func (mmo *Mmo) ProtoGen(services []string) error {
 		}
 
 		if _, err := os.Stat(serviceName + "/sdk"); os.IsNotExist(err) {
-			os.Mkdir(serviceName+"/sdk", os.ModePerm)
+			err := os.Mkdir(serviceName+"/sdk", os.ModePerm)
+			if err != nil {
+				return err
+			}
 		}
 
 		err := commands.GenerateProto(mmo.Config.Lang, serviceName)
@@ -253,6 +262,79 @@ func (mmo *Mmo) ProtoGen(services []string) error {
 			if err != nil {
 				return err
 			}
+		}
+	}
+
+	return nil
+}
+
+// Run is command to run all services in cluster (minikube) - all services are built as docker images and deployed to cluster
+func (mmo *Mmo) Run() error {
+
+	log.Infoln("Connecting to the kubernetes cluster")
+	kubeClient, err := kubernetes.ConnectToCluster()
+	if err != nil {
+		return err
+	}
+
+	log.Debugln("Checking container registry status")
+	err = kubernetes.IsRegistryRunning(kubeClient)
+	if err != nil {
+		log.Infoln("Registry not running, deploying now")
+		err = kubernetes.DeployDockerRegistry(kubeClient)
+		if err != nil {
+			return err
+		}
+	}
+
+	log.Infoln("Forwarding registry port to localhost")
+	portFwdCmd, err := kubernetes.ForwardRegistryPort()
+	defer func() {
+		log.Debugln("Cleaning port forwarding for docker registry")
+		err := portFwdCmd.Process.Kill()
+		if err != nil {
+			log.Errorln(err)
+		}
+	}()
+
+	log.Debugln("Getting builder for the repository:", mmo.Config.Name)
+	builder, err := docker.GetBuilder(mmo.Config.Name)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		log.Debugln("Cleaning docker builder images")
+		err := builder.Clean()
+		if err != nil {
+			log.Errorln(err)
+		}
+	}()
+
+	var env = make(kubernetes.DeployEnvironment)
+	env["DOCKER_REGISTRY"] = dockercmd.MinikubeRegistry
+	env["PROJECT_NAME"] = mmo.Config.Name
+
+	for service := range mmo.Config.Services {
+
+		log.Infoln("Building service:", service)
+		image, err := builder.BuildService(service)
+		if err != nil {
+			return err
+		}
+
+		log.Infoln("Pushing image:", image.GetFullname())
+		err = builder.PushService(image)
+		if err != nil {
+			return err
+		}
+
+		env["SERVICE"] = service
+		env["WERCKER_GIT_COMMIT"] = image.Tag
+
+		log.Debugln("Expanding templates for service:", service)
+		err = kubernetes.DeployService(kubeClient, env)
+		if err != nil {
+			return err
 		}
 	}
 
