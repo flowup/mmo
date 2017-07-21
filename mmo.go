@@ -274,15 +274,15 @@ func main() {
 							return utils.ErrNoProject
 						}
 
-						mmo.Config.Services = make(map[string]config.Service, len(mmo.Config.Services)+1)
-						//mmo.Config.Services[c.Args().First()] = service.Wizzar(c.Args().First())
 						mmo.Config.Services[c.Args().First()] = service.FromCliContext(c.Args().First(), c)
 
 						if err := config.SaveConfig(mmo.Config, config.FilenameConfig); err != nil {
 							log.Fatal(err)
 						}
 
-						if err := service.InitService(mmo.Config.Services[c.Args().First()]); err != nil {
+						template := service.Template{Project: mmo.Config.Name, Repo: mmo.Config.GoPackage,Service: mmo.Config.Services[c.Args().First()]}
+
+						if err := service.InitService(template); err != nil {
 							log.Fatal(err)
 						}
 						return nil

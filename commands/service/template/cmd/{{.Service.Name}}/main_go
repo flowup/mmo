@@ -6,14 +6,14 @@ import (
 	"sync"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
-	{{if .WebRPC}}
+	{{if .Service.WebRPC}}
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
     "net/http"
     {{end}}
 
     log "github.com/sirupsen/logrus"
 
-    {{if .Sentry}}
+    {{if .Service.Sentry}}
     "github.com/evalphobia/logrus_sentry"
     {{end}}
 )
@@ -25,7 +25,7 @@ func init() {
 
     log.SetLevel(log.DebugLevel)
 
-    {{if .Sentry}}
+    {{if .Service.Sentry}}
     // Init Logrus with Sentry
     sentryDsn, ok := os.LookupEnv("SENTRY_DSN")
     if ok {
@@ -54,13 +54,13 @@ func main(){
 	}
 
 	// create additional resources for the service
-	access := {{.Name}}.NewAccess()
+	access := {{.Service.Name}}.New{{.Service.Name | Title}}Access()
 
     // create the grpc server
 	s := grpc.NewServer()
 
 	// register the service
-	{{.Name}}.Register{{.Name | Title}}Server(s, {{.Name}}.NewService(access))
+	{{.Service.Name}}.Register{{.Service.Name | Title}}Server(s, {{.Service.Name}}.NewService(access))
 
 
 	// Register reflection service on gRPC server.
@@ -79,7 +79,7 @@ func main(){
 		wg.Done()
 	}()
 
-	{{if .WebRPC}}
+	{{if .Service.WebRPC}}
 
 	options := []grpcweb.Option{}
     // Wrap grpc server to grpc-web server

@@ -1,0 +1,7 @@
+name: {{.Project}}-{{.Service.Name}}
+description: Chart of the service {{.Service.Name}} of project {{.Project}}
+version: 0.1.0
+home: https://{{.Repo}}
+sources:
+  - https://{{.Repo}}
+appVersion: 3.3

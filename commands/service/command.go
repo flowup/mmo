@@ -13,8 +13,14 @@ import (
 	"strings"
 )
 
+type Template struct {
+	Project string
+	Repo    string
+	Service config.Service
+}
+
 // InitService is cli function to generate service with given name
-func InitService(configService config.Service) error {
+func InitService(configService Template) error {
 	// go through assets and generate them
 	for name, assetGetter := range _bindata {
 
@@ -25,7 +31,7 @@ func InitService(configService config.Service) error {
 
 		log.Debugln("Restoring file:", name)
 		err = cookiecutter.Restore(
-			configService.Name,
+			configService.Service.Name,
 			strings.Replace(name, "_go", ".go", 1),
 			string(asset.bytes),
 			configService,
@@ -41,7 +47,7 @@ func InitService(configService config.Service) error {
 		return errors.Wrap(err, "Failed to run import manager")
 	}
 
-	if err := commands.GenerateProto(commands.Go, configService.Name); err != nil {
+	if err := commands.GenerateProto(commands.Go, configService.Service.Name); err != nil {
 		return errors.Wrap(err, "Failed to generate API servers and stubs from proto")
 	}
 
