@@ -4,8 +4,8 @@ metadata:
   name: {{ "{{ template \"fullname\" . }}" }}
   labels:
     app: {{ "{{ template \"fullname\" . }}" }}
-    chart: {{ "\"{{ .Chart.Service.Name }}-{{ .Chart.Version }}\"" }}
-    release: {{ "\"{{ .Release.Service.Name }}\"" }}
+    chart: {{ "\"{{ .Chart.Name }}-{{ .Chart.Version }}\"" }}
+    release: {{ "\"{{ .Release.Name }}\"" }}
     heritage: {{ "\"{{ .Release.Service }}\"" }}
 spec:
   replicas: 1
