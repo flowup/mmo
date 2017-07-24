@@ -235,7 +235,7 @@ func (mmo *Mmo) SetContext(services []string) error {
 }
 
 // ProtoGen is cli function to generate API clients and server stubs of specified service or services
-func (mmo *Mmo) ProtoGen(services []string) error {
+func (mmo *Mmo) ProtoGen(services []string, lang string) error {
 
 	for _, serviceName := range services {
 		log.Infoln("Generating protobuf for:", serviceName)
@@ -245,14 +245,16 @@ func (mmo *Mmo) ProtoGen(services []string) error {
 			continue
 		}
 
-		if _, err := os.Stat(serviceName + "/sdk"); os.IsNotExist(err) {
-			err := os.Mkdir(serviceName+"/sdk", os.ModePerm)
-			if err != nil {
-				return err
+		if mmo.Config.Services[serviceName].WebRPC {
+			if _, err := os.Stat(serviceName + "/sdk"); os.IsNotExist(err) {
+				err := os.Mkdir(serviceName+"/sdk", os.ModePerm)
+				if err != nil {
+					return err
+				}
 			}
 		}
 
-		err := commands.GenerateProto(mmo.Config.Lang, serviceName)
+		err := commands.GenerateProto(lang, serviceName)
 		if err != nil {
 			return err
 		}
