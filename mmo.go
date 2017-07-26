@@ -236,6 +236,29 @@ func main() {
 						}
 						return nil
 					},
+				}, {
+					Name:  "gateway",
+					Usage: "generates GRPC gateways from proto definition for all services targeted by the context",
+					Action: func(c *cli.Context) error {
+						bootstrap(c)
+
+						mmo, err := project.GetMmo()
+
+						if err != nil {
+							return utils.ErrNoProject
+						}
+
+						services := mmo.Context.Services
+						if len(services) == 0 {
+							log.Warnln("No context set, using global")
+							services = mmo.Config.ServiceNames()
+						}
+
+						if err := mmo.ProtoGen(services, "gw"); err != nil {
+							log.Fatal(err)
+						}
+						return nil
+					},
 				},
 			},
 		},
