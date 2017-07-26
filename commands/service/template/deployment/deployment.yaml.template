@@ -9,7 +9,7 @@ spec:
     - name: grpc
       protocol: TCP
       port: 50051
-    {{if .WebRPC}}- name: grpc-web
+    {{if .Service.WebRPC}}- name: grpc-web
       protocol: TCP
       port: 50060{{end}}
 ---
@@ -37,6 +37,6 @@ spec:
         - name: grpc
           containerPort: 50051
           protocol: TCP
-        {{if .WebRPC}}- name: grpc-web
+        {{if .Service.WebRPC}}- name: grpc-web
           containerPort: 50060
           protocol: TCP{{end}}

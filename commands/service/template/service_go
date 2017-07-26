@@ -1,29 +1,29 @@
-package {{.Name}}
+package {{.Service.Name}}
 
 import (
     "golang.org/x/net/context"
     google_protobuf "github.com/golang/protobuf/ptypes/empty"
 )
 
-// I{{.Name | Title}}Access represents an interface that needs to be satisfied
+// I{{.Service.Name | Title}}Access represents an interface that needs to be satisfied
 // for any data access used by the Service
-type IAccess interface {
+type I{{.Service.Name | Title}}Access interface {
 
 }
 
-// {{.Name | Title}} represents an implementation of the service interface
-type Service struct {
-    access IAccess
+// {{.Service.Name | Title}} represents an implementation of the service interface
+type {{.Service.Service.Name | Title}} struct {
+    access I{{.Service.Service.Name | Title}}Access
 }
 
-// New{{.Name | Title}} creates a new service object
-func NewService(access IAccess) *Service {
-    return &Service{
+// New{{.Service.Name | Title}} creates a new service object
+func New{{.Service.Name | Title}}(access I{{.Service.Name | Title}}Access) *Service {
+    return &{{.Service.Name | Title}}{
         access: access,
     }
 }
 
-func (s *Service) GetVersion(ctx context.Context, in *google_protobuf.Empty) (*Version, error) {
+func (s *{{.Service.Name | Title}}) GetVersion(ctx context.Context, in *google_protobuf.Empty) (*Version, error) {
     return &Version{
         Name: "1.0.0",
         Stability: "new",

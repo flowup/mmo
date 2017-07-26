@@ -1,0 +1,32 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ "{{ template \"fullname\" . }}" }}
+  labels:
+    app: {{ "{{ template \"fullname\" . }}" }}
+    chart: {{ "\"{{ .Chart.Name }}-{{ .Chart.Version }}\"" }}
+    release: {{ "\"{{ .Release.Name }}\"" }}
+    heritage: {{ "\"{{ .Release.Service }}\"" }}
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: {{ "{{ template \"fullname\" . }}" }}
+    spec:
+      containers:
+      - name: {{ "{{ template \"fullname\" . }}" }}
+        image: {{ "\"{{ .Values.image }}\"" }}
+        env:
+        - name: DB_HOST
+          value: {{ "{{ template \"postgresql.fullname\" . }}" }}
+        - name: DB_PORT
+          value: "5432"
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ "{{ template \"postgresql.fullname\" . }}" }}
+              key: postgres-password
+        ports:
+        - name: grpc
+          containerPort: 80

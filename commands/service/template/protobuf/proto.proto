@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-package {{.Name}};
+package {{.Service.Name}};
 
 import "google/protobuf/empty.proto";
 
-service {{.Name}} {
+service {{.Service.Name}} {
     rpc GetVersion (google.protobuf.Empty) returns (Version) {}
 }
 
