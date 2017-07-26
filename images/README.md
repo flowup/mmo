@@ -8,7 +8,7 @@ to development and deployment.
 Golang
 - [ ] golang build image (flowup/mmo-go-build)
 - [ ] golang testing image(flowup/mmo-go-test)
-- [ ] golang protobuf gRPC image with gogoprotobuf (flowup/mmo-go-grpc)
+- [X] golang protobuf gRPC image with gogoprotobuf (flowup/mmo-go-grpc)
 
 Python
 - [ ] python build image (flowup/mmo-py-build)

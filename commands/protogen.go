@@ -13,9 +13,10 @@ import (
 
 // Supported languages
 const (
-	Go         = "go"
-	Python     = "python"
-	TypeScript = "ts"
+	Go          = "go"
+	Python      = "python"
+	TypeScript  = "ts"
+	GRPCGateway = "gw"
 )
 
 // GenerateProto generates proto files in a given language for
@@ -36,20 +37,22 @@ func GenerateProto(lang string, serviceName string) error {
 	var image string
 
 	inputMount = pwd + "/" + serviceName + "/protobuf"
+	outputMount = pwd + "/" + serviceName
 
 	switch lang {
 	case Go:
-		outputMount = pwd + "/" + serviceName
 		cmd = dockercmd.GoGen
 		image = dockercmd.ImageGo
 	case Python:
-		outputMount = pwd + "/" + serviceName
 		cmd = dockercmd.PyGen
 		image = dockercmd.ImagePy
 	case TypeScript:
 		outputMount = pwd + "/" + serviceName + "/sdk"
 		cmd = dockercmd.TsGen
 		image = dockercmd.ImageTs
+	case GRPCGateway:
+		cmd = dockercmd.GGwGen
+		image = dockercmd.ImageGo
 	}
 
 	cli, err := client.NewEnvClient()

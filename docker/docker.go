@@ -83,13 +83,13 @@ func (b *Builder) buildBinary(service string) error {
 
 	cmd := "go build -a -o " + service + "/bin/main ./" + service + "/cmd/" + service
 
-	err = utils.PullImage(b.cli, dockercmd.Golang)
+	err = utils.PullImage(b.cli, dockercmd.GolangImage)
 	if err != nil {
 		return err
 	}
 
 	cont, err := b.cli.ContainerCreate(context.Background(), &container.Config{
-		Image:      dockercmd.Golang,
+		Image:      dockercmd.GolangImage,
 		Cmd:        []string{"bash", "-c", cmd},
 		WorkingDir: "/go/src/" + b.repository,
 		Env: []string{
