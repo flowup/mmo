@@ -219,13 +219,19 @@ func main() {
 							return utils.ErrNoProject
 						}
 
+						lang := mmo.Config.Lang
+
+						if c.NArg() == 1 {
+							lang = c.Args().Get(0)
+						}
+
 						services := mmo.Context.Services
 						if len(services) == 0 {
 							log.Warnln("No context set, using global")
 							services = mmo.Config.ServiceNames()
 						}
 
-						if err := mmo.ProtoGen(services); err != nil {
+						if err := mmo.ProtoGen(services, lang); err != nil {
 							log.Fatal(err)
 						}
 						return nil
