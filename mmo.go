@@ -303,7 +303,6 @@ func main() {
 							return utils.ErrNoProject
 						}
 
-						mmo.Config.Services = make(map[string]config.Service, len(mmo.Config.Services)+1)
 						//mmo.Config.Services[c.Args().First()] = service.Wizzar(c.Args().First())
 						mmo.Config.Services[c.Args().First()] = service.FromCliContext(c.Args().First(), c)
 
