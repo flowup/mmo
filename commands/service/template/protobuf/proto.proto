@@ -4,7 +4,7 @@ package {{.Name}};
 
 import "google/protobuf/empty.proto";
 
-service {{.Name}} {
+service {{.Name | Title}}Service {
     rpc GetVersion (google.protobuf.Empty) returns (Version) {}
 }
 
