@@ -72,3 +72,21 @@ Deploy process:
 Each of the services has own Helm chart that is used for deploying service. Helm chart can contains dependencies that services need such as database. Helm configuration file `values.yml` is created to provide needed informations to service - e.g. hostnames of the dependencies, usernames, passwords. Then, Helm chart of the each of the services is deployed to local cluster.
 
 When services are deployed, we have to make them accessible using reverse proxy server in case running services are http servers. For example we can use Nginx http server configured as reverse proxy that will be dynamically configured when services will be deployed to the cluster.
+
+## Plugin system
+MMO plugin is Docker image with multiple binaries that act as an action hooks. MMO plugin extends basic functionality of the MMO.
+
+### Action hooks
+Are run at different stages of the project development. Hooks are stored in plugin's image in folder `/hooks`. Each of the hooks is binary file that has variable number of arguments that are services for which is plugin run (MMO context). 
+List of hooks:
+* Init hook (/hooks/init)
+* Pre-build hook (/hooks/prebuild)
+* Post-build hook (/hooks/postbuild)
+* Pre-deploy hook (/hooks/predeploy)
+* Post-deploy hook (/hooks/postbuild)
+
+### Access to source code
+Application's source code is mounted to `/source` of the plugin's image
+
+### Plugin lifecycle
+Docker image of the plugin is run as container and corresponding hook is run. When container exits its status code is returned to MMO
