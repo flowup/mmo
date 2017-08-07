@@ -7,6 +7,7 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/flowup/mmo/utils"
 	"github.com/flowup/mmo/utils/dockercmd"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"os"
 )
@@ -53,6 +54,8 @@ func GenerateProto(lang string, serviceName string) error {
 	case GRPCGateway:
 		cmd = dockercmd.GGwGen
 		image = dockercmd.ImageGo
+	default:
+		return errors.New("Invalid generation language: " + lang)
 	}
 
 	cli, err := client.NewEnvClient()
@@ -62,7 +65,7 @@ func GenerateProto(lang string, serviceName string) error {
 
 	err = utils.PullImage(cli, image)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "Failed to pull image "+image)
 	}
 
 	cont, err := cli.ContainerCreate(context.Background(), &container.Config{
@@ -84,9 +87,9 @@ func GenerateProto(lang string, serviceName string) error {
 	}, nil, "")
 
 	if err != nil {
-		return err
+		return errors.Wrap(err, "Failed to create container from image "+image)
 	}
 
 	err = utils.ContainerRunStdout(cli, cont.ID)
-	return err
+	return errors.Wrap(err, "Failed to run container from image "+image)
 }
