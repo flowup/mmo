@@ -32,7 +32,7 @@ spec:
     spec:
       containers:
       - name: ${SERVICE}
-        image: ${DOCKER_REGISTRY}/${PROJECT_NAME}-${SERVICE}:${WERCKER_GIT_COMMIT}
+        image: ${DOCKER_REGISTRY}/${PROJECT_NAME}-${SERVICE}:${WERCKER_GIT_BRANCH}-${WERCKER_GIT_COMMIT}
         ports:
         - name: grpc
           containerPort: 50051

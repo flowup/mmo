@@ -28,7 +28,7 @@ schedule-deploy:
     - internal/docker-push:
       username: _json_key
       password: $GCLOUD_CERT
-      repository: gcr.io/$GCR_PROJECT_NAME/dashly-gf-$SERVICE
+      repository: $DOCKER_REGISTRY/$PROJECT_NAME-$SERVICE
       tag: $WERCKER_GIT_BRANCH-$WERCKER_GIT_COMMIT
       entrypoint: ./main
       working-dir: $WERCKER_ROOT
