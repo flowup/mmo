@@ -17,6 +17,7 @@ type Config struct {
 	Lang       string             `yaml:"lang"`
 	DepManager string             `yaml:"dependencyManager"`
 	GoPackage  string             `yaml:"goPackage"`
+	Generators []string           `yaml:"generators"`
 	Services   map[string]Service `yaml:"services"`
 }
 

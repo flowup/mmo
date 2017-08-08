@@ -259,6 +259,13 @@ func (mmo *Mmo) ProtoGen(services []string, lang string) error {
 			return err
 		}
 
+		for _, generator := range mmo.Config.Generators {
+			err := commands.GenerateProto(generator, serviceName)
+			if err != nil {
+				return err
+			}
+		}
+
 		if mmo.Config.Services[serviceName].WebRPC {
 			err = commands.GenerateProto(commands.TypeScript, serviceName)
 			if err != nil {
