@@ -18,6 +18,7 @@ const (
 	Python      = "python"
 	TypeScript  = "ts"
 	GRPCGateway = "gw"
+	GRPCSwagger = "swagger"
 )
 
 // GenerateProto generates proto files in a given language for
@@ -53,6 +54,9 @@ func GenerateProto(lang string, serviceName string) error {
 		image = dockercmd.ImageTs
 	case GRPCGateway:
 		cmd = dockercmd.GGwGen
+		image = dockercmd.ImageGo
+	case GRPCSwagger:
+		cmd = dockercmd.SwaggerGen
 		image = dockercmd.ImageGo
 	default:
 		return errors.New("Invalid generation language: " + lang)
