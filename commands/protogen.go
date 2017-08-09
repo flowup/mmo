@@ -57,7 +57,7 @@ func GenerateProto(lang string, serviceName string) error {
 		image = dockercmd.ImageGo
 	case GRPCSwagger:
 		cmd = dockercmd.SwaggerGen
-		image = dockercmd.ImageGo
+		image = dockercmd.ImageSwagger
 	default:
 		return errors.New("Invalid generation language: " + lang)
 	}
