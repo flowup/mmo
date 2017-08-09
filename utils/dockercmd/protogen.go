@@ -1,5 +1,7 @@
 package dockercmd
 
+import "github.com/flowup/mmo/environment"
+
 // These constants are commands that are used to generated code from the
 // proto files of services
 const (
@@ -7,9 +9,10 @@ const (
 	ProtoInclude = "-I/usr/local/include -I. -I/googleapis -I${GOPATH}/src "
 	ProtoDefName = "proto.proto"
 
-	ImageGo = "flowup/mmo-go-grpc"
-	ImageTs = "flowup/mmo-webrpc"
-	ImagePy = "flowup/mmo-py-grpc"
+	ImageGo      = "flowup/mmo-go-grpc:" + environment.Ver
+	ImageTs      = "flowup/mmo-webrpc:" + environment.Ver
+	ImagePy      = "flowup/mmo-py-grpc:" + environment.Ver
+	ImageSwagger = "flowup/mmo-py-grpc:" + environment.Ver
 
 	GoGen      = ProtocBin + ProtoInclude + "--gogo_out=plugins=grpc:/out " + ProtoDefName
 	GGwGen     = ProtocBin + ProtoInclude + "--grpc-gateway_out=logtostderr=true:/out " + ProtoDefName
