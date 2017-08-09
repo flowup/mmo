@@ -76,14 +76,26 @@ When services are deployed, we have to make them accessible using reverse proxy 
 ## Plugin system
 MMO plugin is Docker image with multiple binaries that act as an action hooks. MMO plugin extends basic functionality of the MMO.
 
+### Plugin definition
+Plugin definition is in `/plugin/mmo-plugin.yaml`. Plugin definition example:
+```
+name: Example
+global: true
+hooks:
+  gen: generator.sh
+  pre-build: prebuild
+  post-build: postbuild.sh
+```
+where `name` is name of the plugin, `global` determines plugin is run for all services in default, `hooks` is map of the enabled hooks in plugin and name of the hook's binaries
+
 ### Action hooks
 Are run at different stages of the project development. Hooks are stored in plugin's image in folder `/hooks`. Each of the hooks is binary file that has variable number of arguments that are services for which is plugin run (MMO context). 
-List of hooks:
-* Init hook (/hooks/init)
-* Pre-build hook (/hooks/prebuild)
-* Post-build hook (/hooks/postbuild)
-* Pre-deploy hook (/hooks/predeploy)
-* Post-deploy hook (/hooks/postbuild)
+List of hooks (name in mmo-plugin.yaml):
+* Generation hook (gen)
+* Pre-build hook (pre-build)
+* Post-build hook (post-build)
+* Pre-deploy hook (pre-deploy)
+* Post-deploy hook (post-build)
 
 ### Access to source code
 Application's source code is mounted to `/source` of the plugin's image
