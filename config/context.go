@@ -1,9 +1,10 @@
 package config
 
 import (
-	"os"
 	"encoding/json"
 	"io/ioutil"
+	"os"
+	"sort"
 )
 
 const (
@@ -13,6 +14,11 @@ const (
 // Context represents a cached configuration for the project
 type Context struct {
 	Services []string
+}
+
+func (c *Context) GetServices() []string {
+	sort.Strings(c.Services)
+	return c.Services
 }
 
 // IsGlobal returns true if current context is global (for all services)

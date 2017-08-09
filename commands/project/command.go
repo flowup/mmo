@@ -24,6 +24,7 @@ import (
 type Mmo struct {
 	Config  *config.Config
 	Context *config.Context
+	Plugins *config.Plugins
 }
 
 // GetMmo Load context and config from config files
@@ -32,6 +33,7 @@ func GetMmo() (*Mmo, error) {
 	mmo := &Mmo{
 		&config.Config{},
 		&config.Context{},
+		&config.Plugins{},
 	}
 
 	mmoContext, err := config.LoadContext()
@@ -41,9 +43,17 @@ func GetMmo() (*Mmo, error) {
 
 	mmoConfig, err := config.LoadConfig(config.FilenameConfig)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "Failed to load mmo config")
 	}
+
 	mmo.Config = mmoConfig
+
+	mmoPlugins, err := config.NewPlugins(mmoConfig.Plugins)
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed to init mmo plugins")
+	}
+
+	mmo.Plugins = &mmoPlugins
 
 	return mmo, nil
 }
