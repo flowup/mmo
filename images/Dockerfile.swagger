@@ -9,6 +9,7 @@ RUN mkdir proto && cd proto && \
     chmod +x bin/protoc
 
 RUN go get -u github.com/golang/protobuf/protoc-gen-go
+RUN go get -u github.com/gogo/protobuf/...
 RUN go get -u github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
 RUN git clone https://github.com/googleapis/googleapis.git /googleapis
 
