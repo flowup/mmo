@@ -85,6 +85,7 @@ func (p *Plugins) Load() error {
 		content.Close()
 	}
 
+	p.Loaded = true
 	return nil
 }
 
