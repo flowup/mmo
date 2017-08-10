@@ -22,6 +22,6 @@ ADD mmo-plugin.yaml /plugin/mmo-plugin.yaml
 ENV PROTO_PATH /go/proto/include
 ENV PATH $PATH:/go/proto/bin
 
-WORKDIR /in
+WORKDIR /source
 
 CMD ["make"]
