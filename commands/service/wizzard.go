@@ -39,5 +39,6 @@ func FromCliContext(serviceName string, ctx *cli.Context) config.Service {
 		Description: ctx.String("description"),
 		WebRPC:      ctx.Bool("webrpc"),
 		Sentry:      ctx.Bool("sentry"),
+		Gateway:     ctx.Bool("gateway"),
 	}
 }

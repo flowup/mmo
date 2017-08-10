@@ -42,6 +42,7 @@ type Service struct {
 	WebRPC       bool         `yaml:"webRPC"`
 	Dependencies []Dependency `yaml:"dependencies"`
 	Sentry       bool         `yaml:"sentry"`
+	Gateway      bool         `yaml:"gateway"`
 }
 
 // Dependency represents service dependency configuration from Config

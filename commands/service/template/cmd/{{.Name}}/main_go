@@ -16,6 +16,12 @@ import (
     {{if .Sentry}}
     "github.com/evalphobia/logrus_sentry"
     {{end}}
+
+    {{if .Gateway}}
+    "net/http"
+    "context"
+    "github.com/grpc-ecosystem/grpc-gateway/runtime"
+    {{end}}
 )
 
 func init() {
@@ -48,7 +54,7 @@ func init() {
 
 
 func main(){
-	lis, err := net.Listen("tcp", "")
+	lis, err := net.Listen("tcp", "50051")
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
@@ -60,7 +66,7 @@ func main(){
 	s := grpc.NewServer()
 
 	// register the service
-	{{.Name}}.Register{{.Name | Title}}Server(s, {{.Name}}.NewService(access))
+	{{.Name}}.Register{{.Name | Title}}ServiceServer(s, {{.Name}}.NewService(access))
 
 
 	// Register reflection service on gRPC server.
@@ -71,7 +77,7 @@ func main(){
 	wg.Add(1)
 
 	go func() {
-		log.Infoln("Starting gRPC server on", "")
+		log.Infoln("Starting gRPC server on", "50051")
 		if err := s.Serve(lis); err != nil {
 			log.Fatalf("grpc: failed to serve: %v", err)
 		}
@@ -90,7 +96,7 @@ func main(){
     }
 
     httpServer := http.Server{
-        Addr:    "",
+        Addr:    ":50060",
         Handler: http.HandlerFunc(handler),
     }
 
@@ -102,6 +108,24 @@ func main(){
 
 		wg.Done()
 	}()
+	{{end}}
+
+	{{if .Gateway}}
+	go func() {
+        ctx := context.Background()
+        ctx, cancel := context.WithCancel(ctx)
+        defer cancel()
+
+        mux := runtime.NewServeMux()
+        opts := []grpc.DialOption{grpc.WithInsecure()}
+        err := {{ .Name }}.Register{{ .Name | Title }}ServiceHandlerFromEndpoint(ctx, mux, ":50051", opts)
+        if err != nil {
+            log.Fatalf("gw: failed to register: %v", err)
+        }
+
+        log.Infoln("Starting gateway server on", ":80")
+        log.Fatalf("gw: failed to server: %v", http.ListenAndServe(":80", mux))
+    }()
 	{{end}}
 
 	wg.Wait()

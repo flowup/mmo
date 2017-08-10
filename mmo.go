@@ -311,6 +311,10 @@ func main() {
 							Name:  "sentry",
 							Usage: "allows Sentry integration",
 						},
+						cli.BoolFlag{
+							Name:  "gateway",
+							Usage: "enabled grpc gateway",
+						},
 					},
 
 					Action: func(c *cli.Context) error {
@@ -323,6 +327,10 @@ func main() {
 						mmo, err := project.GetMmo()
 						if err != nil {
 							return utils.ErrNoProject
+						}
+
+						if mmo.Config.Services == nil {
+							mmo.Config.Services = make(map[string]config.Service)
 						}
 
 						//mmo.Config.Services[c.Args().First()] = service.Wizzar(c.Args().First())

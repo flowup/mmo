@@ -282,6 +282,13 @@ func (mmo *Mmo) ProtoGen(services []string, lang string) error {
 				return err
 			}
 		}
+
+		if mmo.Config.Services[serviceName].Gateway {
+			err = commands.GenerateProto(commands.GRPCGateway, serviceName)
+			if err != nil {
+				return err
+			}
+		}
 	}
 
 	return nil
