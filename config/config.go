@@ -4,6 +4,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
+	"sort"
 )
 
 const (
@@ -17,6 +18,7 @@ type Config struct {
 	Lang       string             `yaml:"lang"`
 	DepManager string             `yaml:"dependencyManager"`
 	GoPackage  string             `yaml:"goPackage"`
+	Plugins    []string           `yaml:"plugins"`
 	Generators []string           `yaml:"generators"`
 	Services   map[string]Service `yaml:"services"`
 }
@@ -27,6 +29,8 @@ func (c *Config) ServiceNames() []string {
 	for key := range c.Services {
 		names = append(names, key)
 	}
+
+	sort.Strings(names)
 
 	return names
 }

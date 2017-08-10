@@ -261,6 +261,28 @@ func main() {
 					},
 				},
 			},
+			Action: func(c *cli.Context) error {
+				bootstrap(c)
+
+				mmo, err := project.GetMmo()
+
+				if err != nil {
+					return utils.ErrNoProject
+				}
+
+				services := mmo.Context.Services
+				if len(services) == 0 {
+					log.Warnln("No context set, using global")
+					services = mmo.Config.ServiceNames()
+				}
+
+				err = mmo.Plugins.RunHook("gen", mmo.Config.ServiceNames(), mmo.Context.GetServices())
+				if err != nil {
+					log.Error(err)
+				}
+
+				return nil
+			},
 		},
 		{
 			Name:  "add",
