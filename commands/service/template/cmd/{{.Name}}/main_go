@@ -5,23 +5,14 @@ import (
 	"net"
 	"sync"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
-	{{if .WebRPC}}
+	"google.golang.org/grpc/reflection"	{{if .WebRPC}}
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
-    "net/http"
-    {{end}}
-
-    log "github.com/sirupsen/logrus"
-
-    {{if .Sentry}}
-    "github.com/evalphobia/logrus_sentry"
-    {{end}}
-
-    {{if .Gateway}}
+    "net/http"{{end}}
+    log "github.com/sirupsen/logrus"{{if .Sentry}}
+    "github.com/evalphobia/logrus_sentry"{{end}}{{if .Gateway}}
     "net/http"
     "context"
-    "github.com/grpc-ecosystem/grpc-gateway/runtime"
-    {{end}}
+    "github.com/grpc-ecosystem/grpc-gateway/runtime"{{end}}
 )
 
 func init() {
@@ -29,9 +20,8 @@ func init() {
 
     log.SetOutput(os.Stdout)
 
-    log.SetLevel(log.DebugLevel)
+    log.SetLevel(log.DebugLevel){{if .Sentry}}
 
-    {{if .Sentry}}
     // Init Logrus with Sentry
     sentryDsn, ok := os.LookupEnv("SENTRY_DSN")
     if ok {
@@ -48,10 +38,8 @@ func init() {
         }
     } else {
         log.Warnln("No SENTRY_DSN was found, sentry reporting won't work")
-    }
-    {{end}}
+    }{{end}}
 }
-
 
 func main(){
 	lis, err := net.Listen("tcp", ":50051")
@@ -83,9 +71,7 @@ func main(){
 		}
 
 		wg.Done()
-	}()
-
-	{{if .WebRPC}}
+	}(){{if .WebRPC}}
 
 	options := []grpcweb.Option{}
     // Wrap grpc server to grpc-web server
@@ -107,10 +93,8 @@ func main(){
 		}
 
 		wg.Done()
-	}()
-	{{end}}
+	}()	{{end}}	{{if .Gateway}}
 
-	{{if .Gateway}}
 	go func() {
         ctx := context.Background()
         ctx, cancel := context.WithCancel(ctx)
@@ -125,8 +109,7 @@ func main(){
 
         log.Infoln("Starting gateway server on", ":80")
         log.Fatalf("gw: failed to server: %v", http.ListenAndServe(":80", mux))
-    }()
-	{{end}}
+    }(){{end}}
 
 	wg.Wait()
 }
