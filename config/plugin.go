@@ -27,6 +27,7 @@ type Plugin struct {
 	Global bool              `yaml:"global"`
 }
 
+// NewPlugins is function to get instance of the plugin system
 func NewPlugins(pluginNames []string) (Plugins, error) {
 	cli, err := client.NewEnvClient()
 	if err != nil {
@@ -41,6 +42,8 @@ func NewPlugins(pluginNames []string) (Plugins, error) {
 	return Plugins{Client: cli, Plugins: plugins, Loaded: false}, nil
 
 }
+
+// Load is method to initialize all plugins
 func (p *Plugins) Load() error {
 	for i, plugin := range p.Plugins {
 
@@ -89,6 +92,7 @@ func (p *Plugins) Load() error {
 	return nil
 }
 
+// GetByHook is function to return all plugins that have specified hook
 func (p *Plugins) GetByHook() ([]Plugin, error) {
 	if !p.Loaded {
 		err := p.Load()
@@ -99,6 +103,7 @@ func (p *Plugins) GetByHook() ([]Plugin, error) {
 	return nil, nil
 }
 
+// RunHook is method to run all plugins that have specified hook
 func (p *Plugins) RunHook(hook string, projectServices []string, contextServices []string) error {
 	if !p.Loaded {
 		err := p.Load()
