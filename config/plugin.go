@@ -108,9 +108,8 @@ func (p *Plugins) RunHook(hook string, projectServices []string, contextServices
 	}
 
 	for _, plugin := range p.Plugins {
-		logrus.Debugf("Running plugin %v and hook %s", plugin, hook)
 		if val, ok := plugin.Hooks[hook]; ok {
-			logrus.Debugf("Inside")
+			logrus.Debugf("Running plugin %s and hook %s", plugin.Name, hook)
 			pwd, err := os.Getwd()
 			if err != nil {
 				return err
@@ -142,7 +141,9 @@ func (p *Plugins) RunHook(hook string, projectServices []string, contextServices
 			}
 
 			err = utils.ContainerRunStdout(p.Client, cont.ID)
-			return errors.Wrap(err, "Failed to run container from image "+plugin.Image)
+			if err != nil {
+				return errors.Wrap(err, "Failed to run container from image "+plugin.Image)
+			}
 		}
 	}
 
