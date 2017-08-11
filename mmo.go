@@ -113,7 +113,7 @@ func main() {
 			Usage:   "sets context to the service(s) given by the argument(s)",
 			Flags: []cli.Flag{
 				cli.BoolFlag{
-					Name: "reset",
+					Name: "reset, r",
 					Usage: "reset context back to global",
 				},
 			},
