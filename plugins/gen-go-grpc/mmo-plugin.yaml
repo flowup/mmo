@@ -1,0 +1,4 @@
+name: Go gRPC generator
+global: false
+hooks:
+  gen: gen.sh
