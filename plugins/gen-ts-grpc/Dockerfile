@@ -10,14 +10,18 @@ RUN mkdir proto && cd proto && \
 
 RUN go get -u github.com/golang/protobuf/protoc-gen-go
 RUN go get -u github.com/gogo/protobuf/...
-RUN go get -u github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
 RUN git clone https://github.com/googleapis/googleapis.git /googleapis
 
-RUN npm install -g swagger-merger
+RUN npm install -g ts-protoc-gen
+
+RUN curl https://glide.sh/get | sh
+
+ADD templates/ /templates/
 
 ENV PROTO_PATH /go/proto/include
 ENV PATH $PATH:/go/proto/bin
 
-WORKDIR /in
+ADD hooks/* /hooks/
+ADD mmo-plugin.yaml /plugin/mmo-plugin.yaml
+ADD templates/ /templates/
 
-CMD ["make"]

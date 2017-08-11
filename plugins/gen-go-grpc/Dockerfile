@@ -7,6 +7,8 @@ RUN mkdir proto && cd proto && \
     unzip protoc-3.3.0-linux-x86_64.zip && \
     chmod +x bin/protoc
 
+RUN git clone https://github.com/googleapis/googleapis.git /googleapis
+
 RUN curl https://glide.sh/get | sh
 
 ENV PROTO_PATH /go/proto/include
@@ -15,8 +17,6 @@ ENV PATH $PATH:/go/proto/bin
 RUN go get -u github.com/golang/protobuf/protoc-gen-go
 RUN go get -u github.com/gogo/protobuf/...
 RUN go get -u github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
-RUN git clone https://github.com/googleapis/googleapis.git /googleapis
 
-WORKDIR /in
-
-CMD ["make"]
+ADD hooks/* /hooks/
+ADD mmo-plugin.yaml /plugin/mmo-plugin.yaml

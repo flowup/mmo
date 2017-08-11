@@ -114,7 +114,7 @@ func (p *Plugins) RunHook(hook string, projectServices []string, contextServices
 
 	for _, plugin := range p.Plugins {
 		if val, ok := plugin.Hooks[hook]; ok {
-			logrus.Debugf("Running plugin %s and hook %s", plugin.Name, hook)
+			logrus.Infof("Running hook '%s' of plugin %s", hook, plugin.Name)
 			pwd, err := os.Getwd()
 			if err != nil {
 				return err

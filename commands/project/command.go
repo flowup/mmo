@@ -6,7 +6,6 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/client"
-	"github.com/flowup/mmo/commands"
 	"github.com/flowup/mmo/config"
 	"github.com/flowup/mmo/docker"
 	"github.com/flowup/mmo/kubernetes"
@@ -248,56 +247,6 @@ func (mmo *Mmo) SetContext(services []string) error {
 func (mmo *Mmo) ResetContext() error {
 	log.Debugln("Resetting context")
 	return mmo.SetContext(mmo.Config.ServiceNames())
-}
-
-// ProtoGen is cli function to generate API clients and server stubs of specified service or services
-func (mmo *Mmo) ProtoGen(services []string, lang string) error {
-
-	for _, serviceName := range services {
-		log.Infoln("Generating protobuf for:", serviceName)
-
-		if _, err := os.Stat(serviceName + "/protobuf"); os.IsNotExist(err) {
-			log.Warnln("No protobuf files found for service:", serviceName, " -> Skipping")
-			continue
-		}
-
-		if mmo.Config.Services[serviceName].WebRPC {
-			if _, err := os.Stat(serviceName + "/sdk"); os.IsNotExist(err) {
-				err := os.Mkdir(serviceName+"/sdk", os.ModePerm)
-				if err != nil {
-					return err
-				}
-			}
-		}
-
-		err := commands.GenerateProto(lang, serviceName)
-		if err != nil {
-			return err
-		}
-
-		for _, generator := range mmo.Config.Generators {
-			err := commands.GenerateProto(generator, serviceName)
-			if err != nil {
-				return err
-			}
-		}
-
-		if mmo.Config.Services[serviceName].WebRPC {
-			err = commands.GenerateProto(commands.TypeScript, serviceName)
-			if err != nil {
-				return err
-			}
-		}
-
-		if mmo.Config.Services[serviceName].Gateway {
-			err = commands.GenerateProto(commands.GRPCGateway, serviceName)
-			if err != nil {
-				return err
-			}
-		}
-	}
-
-	return nil
 }
 
 // Run is command to run all services in cluster (minikube) - all services are built as docker images and deployed to cluster
