@@ -1,0 +1,4 @@
+name: gRPC gateway generator
+global: false
+hooks:
+  gen: gen.sh
