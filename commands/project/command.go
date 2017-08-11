@@ -165,7 +165,7 @@ func (mmo *Mmo) ClearDependencyManager() error {
 	log.Debugln("Clearning dep. manager:", mmo.Config.DepManager)
 	switch mmo.Config.DepManager {
 	case "glide":
-		// remove mail glide file
+		// remove main glide file
 		os.Remove("glide.yaml")
 		// cache removal
 		os.RemoveAll(".glide/")
@@ -224,7 +224,7 @@ func (mmo *Mmo) RunTests() error {
 
 // SetContext is cli function to set context of mmo to specified service or services
 func (mmo *Mmo) SetContext(services []string) error {
-	log.Debugln("Trying to set context for services:", services)
+	log.Debugln("Setting context for services:", services)
 	for _, service := range services {
 		if _, ok := mmo.Config.Services[service]; !ok {
 			return utils.ErrServiceNotExists
@@ -242,6 +242,12 @@ func (mmo *Mmo) SetContext(services []string) error {
 	err := config.SaveContext(serviceContext)
 
 	return err
+}
+
+// ResetContext
+func (mmo *Mmo) ResetContext() error {
+	log.Debugln("Resetting context")
+	return mmo.SetContext(mmo.Config.ServiceNames())
 }
 
 // ProtoGen is cli function to generate API clients and server stubs of specified service or services

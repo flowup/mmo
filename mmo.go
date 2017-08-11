@@ -111,12 +111,25 @@ func main() {
 			Name:    "context",
 			Aliases: []string{"ctx"},
 			Usage:   "sets context to the service(s) given by the argument(s)",
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name: "reset, r",
+					Usage: "reset context back to global",
+				},
+			},
 			Action: func(c *cli.Context) error {
 				bootstrap(c)
 
 				mmo, err := project.GetMmo()
 				if err != nil {
 					return utils.ErrNoProject
+				}
+
+				if c.IsSet("reset") {
+					if err := mmo.ResetContext(); err != nil {
+						log.Fatal(err)
+					}
+					return nil
 				}
 
 				if c.NArg() == 0 {
