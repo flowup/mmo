@@ -4,6 +4,17 @@
 
 > Tested on Go > 1.8
 
+## Installing from source
+
+MMO supports only installation from source, as there is no support for vendor locked `go get`.
+
+```
+git clone https://github.com/flowup/mmo.git # clone the repository to your tree
+cd mmo
+glide i # you need to have glide installed curl https://glide.sh/get | sh
+go install . # install actual mmo binary
+```
+
 ## Commands
 
 ### Help
