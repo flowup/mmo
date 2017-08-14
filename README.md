@@ -36,23 +36,33 @@ Every project is by default created with Wercker CI configuration, Kubernetes de
 
 ### Service creation
 
-Microservice creation is handled by `mmo add service` command. This automatically creates a new folder for the service, registers it to the project and creates proto files, main, infrastructure and deployment configs. Each service also has `docs` folder which is supported by `Godeler - tool for ER -> code transformations`
+Microservice creation is handled by `mmo add service` command. This automatically creates a new folder for the service, registers it to the project and creates proto files, main, infrastructure and deployment configs.
 
 ```
 mmo add service myservice
 ```
-
-### Adding plugins
-
-mmo has native support for so called `plugins`. Plugin is an image with deployment configuration that should be deployed every time with the service (a.k.a. dependency). See the [list of available plugins](https://github.com/flowup/mmo/wiki/Plugins) on what you can install.
-
+### Plugins
+MMO supports plugin system. Each plugin is single purpose. There are only generation plugins for now and they can be run using command `mmo gen`. Used plugins can be defined in mmo.yaml in plugins section:
 ```
-mmo add plugin postgres
+...
+plugins:
+ - some-plugin:latest
+ - another-plugin:0.1
+...
 ```
 
-## Development
+#### Supported plugins
 
-Each generator command is using `go-bindata` tool to embed the templates within the code. To install it, run:
-```
-go get -u github.com/jteeuwen/go-bindata/...
-```
+* `flowup/mmo-gen-go-grpc` - Plugin generates gRPC Go API stub and server from protofile `/service/protobuf/proto.proto`, output is saved to /service/proto.pb.go
+* `flowup/mmo-gen-grpc-gateway` - Plugin generates rest API gateway from protofile `/service/protobuf/proto.proto`, output is saved to /service/proto.pb.gw.go
+* `flowup/mmo-gen-swagger` - Plugin generates swagger definition from protofile `/service/protobuf/proto.proto`, output is saved to /service/swagger.json
+* `flowup/mmo-plugin-godeler`
+
+## Example usage
+* Init project using `mmo init myproject`, then `cd myproject`
+* Create service with grpc gateway using `mmo add service --gateway exampleservice`
+* Add plugins `flowup/mmo-gen-go-grpc` and `flowup/mmo-gen-grpc-gateway` to `mmo.yaml` manifest
+* Implement `exampleservice/protobuf/proto.proto`
+* Init glide using `glide up` - later use only `glide install` and `glide get`
+* Run `mmo gen` to generate API stubs, servers and gateway
+* Implement `exampleservice/service.go` according to new generated API server
