@@ -80,14 +80,14 @@ func LoadConfig(filenameConfig string) (*Config, error) {
 }
 
 // SaveConfig saves given config to  the given directory
-func SaveConfig(cfg *Config, filenameConfig string) error {
+func SaveConfig(cfg *Config) error {
 	b, err := yaml.Marshal(cfg)
 
 	if err != nil {
 		return nil
 	}
 
-	f, err := os.Create(filenameConfig)
+	f, err := os.Create(FilenameConfig)
 	_, err = f.Write(b)
 
 	return err

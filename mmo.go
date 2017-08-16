@@ -308,7 +308,7 @@ func main() {
 						//mmo.Config.Services[c.Args().First()] = service.Wizzar(c.Args().First())
 						mmo.Config.Services[c.Args().First()] = service.FromCliContext(c.Args().First(), c)
 
-						if err := config.SaveConfig(mmo.Config, config.FilenameConfig); err != nil {
+						if err := config.SaveConfig(mmo.Config); err != nil {
 							log.Fatal(err)
 						}
 
@@ -324,7 +324,22 @@ func main() {
 					Action: func(c *cli.Context) error {
 						bootstrap(c)
 
-						return utils.ErrNotImplemented
+						if c.NArg() == 0 {
+							return utils.ErrNoArg
+						}
+
+						mmo, err := project.GetMmo()
+						if err != nil {
+							return utils.ErrNoProject
+						}
+
+						mmo.Config.AddPlugin(c.Args().First())
+						err = config.SaveConfig(mmo.Config)
+						if err != nil {
+							log.Error(err)
+						}
+
+						return nil
 					},
 				},
 			},
