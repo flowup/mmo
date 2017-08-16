@@ -35,6 +35,16 @@ func (c *Config) ServiceNames() []string {
 	return names
 }
 
+func (c *Config) AddPlugin(name string) {
+	for _, plugin := range c.Plugins {
+		if plugin == name {
+			return
+		}
+	}
+
+	c.Plugins = append(c.Plugins, name)
+}
+
 // Service represents service configuration from Config
 type Service struct {
 	Name         string       `yaml:"-"`

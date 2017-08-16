@@ -6,6 +6,7 @@ import (
 	"github.com/flowup/mmo/commands/project"
 	"github.com/flowup/mmo/commands/service"
 	"github.com/flowup/mmo/config"
+	"github.com/flowup/mmo/plugins"
 	"github.com/flowup/mmo/utils"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -289,6 +290,19 @@ func main() {
 
 						if mmo.Config.Services == nil {
 							mmo.Config.Services = make(map[string]config.Service)
+						}
+
+						if mmo.Config.Lang == "go" {
+							mmo.Config.AddPlugin(plugins.Grpc_go)
+						}
+
+						if c.Bool("webrpc") {
+							mmo.Config.AddPlugin(plugins.Grpc_ts)
+						}
+
+						if c.Bool("gateway") {
+							mmo.Config.AddPlugin(plugins.Grpc_gw)
+							mmo.Config.AddPlugin(plugins.Grpc_swagger)
 						}
 
 						//mmo.Config.Services[c.Args().First()] = service.Wizzar(c.Args().First())
