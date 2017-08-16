@@ -235,7 +235,13 @@ func main() {
 					services = mmo.Config.ServiceNames()
 				}
 
-				err = mmo.Plugins.RunHook("gen", mmo.Config.ServiceNames(), mmo.Context.GetServices())
+				context := mmo.Context.GetServices()
+
+				if mmo.Context.IsGlobal() {
+					context = mmo.Config.ServiceNames()
+				}
+
+				err = mmo.Plugins.RunHook("gen", mmo.Config.ServiceNames(), context)
 				if err != nil {
 					log.Error(err)
 				}
