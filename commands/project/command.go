@@ -161,7 +161,7 @@ func (mmo *Mmo) InitializeDependencyManager() error {
 
 // ClearDependencyManager clears contents of the content manager
 func (mmo *Mmo) ClearDependencyManager() error {
-	log.Debugln("Clearning dep. manager:", mmo.Config.DepManager)
+	log.Debugln("Clearing dep. manager:", mmo.Config.DepManager)
 	switch mmo.Config.DepManager {
 	case "glide":
 		// remove main glide file
@@ -246,7 +246,7 @@ func (mmo *Mmo) SetContext(services []string) error {
 // ResetContext
 func (mmo *Mmo) ResetContext() error {
 	log.Debugln("Resetting context")
-	return mmo.SetContext(mmo.Config.ServiceNames())
+	return mmo.SetContext([]string{})
 }
 
 // Run is command to run all services in cluster (minikube) - all services are built as docker images and deployed to cluster
