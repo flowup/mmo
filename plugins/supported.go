@@ -7,4 +7,5 @@ const (
 	Grpc_gw      = "flowup/mmo-gen-grpc-gateway:" + environment.Ver
 	Grpc_swagger = "flowup/mmo-gen-swagger:" + environment.Ver
 	Grpc_ts      = "flowup/mmo-gen-ts-grpc:" + environment.Ver
+	Grpc_intfc   = "flowup/mmo-gen-intfc-grpc:" + environment.Ver
 )
