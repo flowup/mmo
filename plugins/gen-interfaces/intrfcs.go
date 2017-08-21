@@ -2,28 +2,27 @@ package main
 
 import (
 	"io/ioutil"
+	"log"
+	"os"
 	"regexp"
 	"strings"
-	"os"
-	log "github.com/sirupsen/logrus"
-	"flag"
 )
 
 func main() {
-	service := flag.String("service", "", "a name of service")
+	services := os.Args[1:]
 
-	log.Info("Add service interfaces to " + *service)
-
-	if err := Parse(*service+"/proto.pb.go", *service+"/service.go"); err != nil {
-		log.Fatal(err)
+	for _, service := range services {
+		log.Println("Generating service of " + service + " from interface")
+		if err := Parse("/source/"+service+"/proto.pb.go", "/source/"+service+"/service.go"); err != nil {
+			log.Fatal(err)
+		}
 	}
-
 }
 
 var regInterfaces = regexp.MustCompile(`type .[^\s]*Client interface {(\s*.[^\n]*\s*[^\}]*)}`)
 var regFunc = regexp.MustCompile(`\s*(.[^\(]*)\s*\(\s*((\S*)\s*(\S*))\s*,\s*((\S*)\s*(\S*))\s*,\s*((\S*)\s*(\S*))\s*\)\s*\(((\S*)\s*,\s*(\S*))\s*\)\s*`)
 
-func Parse(inputPath, outputPath string) (error) {
+func Parse(inputPath, outputPath string) error {
 	// load content of proto.pb.go file
 	protoContent, err := ioutil.ReadFile(inputPath)
 	if err != nil {
@@ -63,7 +62,7 @@ func Parse(inputPath, outputPath string) (error) {
 				regexp.QuoteMeta(result[13])).
 				MatchString(string(serviceContent)) {
 
-				log.Info("Adding " + result[1] + "interface to service")
+				log.Println("Adding " + result[1] + "interface to service")
 
 				// open file to append interfaces
 				var file, err = os.OpenFile(outputPath, os.O_APPEND|os.O_WRONLY, 0600)
