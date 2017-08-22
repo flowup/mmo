@@ -20,7 +20,6 @@ func main() {
 }
 
 var regInterfaces = regexp.MustCompile(`type .[^\s]*Client interface {(\s*.[^\n]*\s*[^\}]*)}`)
-var regFunc = regexp.MustCompile(`\s*(.[^\(]*)\s*\(\s*((\S*)\s*(\S*))\s*,\s*((\S*)\s*(\S*))\s*,\s*((\S*)\s*(\S*))\s*\)\s*\(((\S*)\s*,\s*(\S*))\s*\)\s*`)
 
 func Parse(inputPath, outputPath string) error {
 	// load content of proto.pb.go file
@@ -36,33 +35,35 @@ func Parse(inputPath, outputPath string) error {
 	}
 
 	// this regexp find all interfaces
-	for _, match := range regInterfaces.FindAllString(string(protoContent), -1) {
+	for _, match := range regInterfaces.FindAllStringSubmatch(string(protoContent), -1) {
 
 		// parse line by line
-		for _, lines := range strings.Split(match, "\n") {
-			result := regFunc.FindStringSubmatch(lines)
+		for _, lines := range strings.Split(match[1], "\n") {
+			result := strings.FieldsFunc(lines, func(r rune) bool {
+				return r == '(' || r == ')' || r == ',' || r == '\b' || r == ' ' || r == '\t'
+			})
 
-			if len(result) <= 0 {
+			if len(result) < 9 {
 				continue
 			}
 
 			// check if is interface already at service file
-			if !regexp.MustCompile(`\s*` + regexp.QuoteMeta(result[1]) +
+			if !regexp.MustCompile(`\s*` + regexp.QuoteMeta(result[0]) +
 				`\s*\(\s*` +
+				regexp.QuoteMeta(result[1]) +
+				`\s*` +
+				regexp.QuoteMeta(result[2]) +
+				`\s*\,\s*` +
 				regexp.QuoteMeta(result[3]) +
 				`\s*` +
 				regexp.QuoteMeta(result[4]) +
-				`\s*\,\s*` +
-				regexp.QuoteMeta(result[6]) +
-				`\s*` +
-				regexp.QuoteMeta(result[7]) +
 				`\s*\)\s*\(\s*` +
-				regexp.QuoteMeta(result[12]) +
+				regexp.QuoteMeta(result[7]) +
 				`\s*\,\s*` +
-				regexp.QuoteMeta(result[13])).
+				regexp.QuoteMeta(result[8])).
 				MatchString(string(serviceContent)) {
 
-				log.Println("Adding " + result[1] + "interface to service")
+				log.Println("Adding " + result[0] + "interface to service")
 
 				// open file to append interfaces
 				var file, err = os.OpenFile(outputPath, os.O_APPEND|os.O_WRONLY, 0600)
@@ -73,16 +74,22 @@ func Parse(inputPath, outputPath string) error {
 
 				// added to file new interfaces
 				if _, err := file.WriteString("\nfunc (s *Service) " +
-					result[1] +
+					result[0] +
 					"(" +
+					result[1] +
+					" " +
 					result[2] +
 					", " +
-					result[5] +
+					result[3] +
+					" " +
+					result[4] +
 					") (" +
-					result[11] +
+					result[7] +
+					", " +
+					result[8] +
 					") {\n" +
 					"\n" +
-					"\treturn &" + result[12][1:] + "{}, nil\n" +
+					"\treturn &" + result[7][1:] + "{}, nil\n" +
 					"}\n"); err != nil {
 					return err
 				}
