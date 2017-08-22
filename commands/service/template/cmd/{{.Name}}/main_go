@@ -11,7 +11,10 @@ import (
     log "github.com/sirupsen/logrus"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/spf13/viper"
-    {{if .Sentry}}"github.com/evalphobia/logrus_sentry"{{end}}
+    {{if .Sentry}}"github.com/evalphobia/logrus_sentry"{{end}}{{if .Gateway}}
+    "net/http"
+    "context"
+    "github.com/grpc-ecosystem/grpc-gateway/runtime"{{end}}
 )
 
 func init() {
@@ -19,9 +22,8 @@ func init() {
 
     log.SetOutput(os.Stdout)
 
-    log.SetLevel(log.DebugLevel)
+    log.SetLevel(log.DebugLevel){{if .Sentry}}
 
-    {{if .Sentry}}
     // Init Logrus with Sentry
     sentryDsn, ok := os.LookupEnv("SENTRY_DSN")
     if ok {
@@ -38,21 +40,19 @@ func init() {
         }
     } else {
         log.Warnln("No SENTRY_DSN was found, sentry reporting won't work")
-    }
-    {{end}}
+    }{{end}}
 }
 
-
 func main(){
+	lis, err := net.Listen("tcp", ":50051")
+    if err != nil {
+        log.Fatalf("failed to listen: %v", err)
+    }
     viper.SetDefault("db.conn", "host=db-svc user=goo dbname=goo sslmode=disable password=goo")
 	viper.SetDefault("server.binds.grpc", ":50051")
 	{{if .WebRPC}}viper.SetDefault("server.binds.gw", ":50060")
 	viper.SetDefault("cors.enabled", false){{end}}
 
-	lis, err := net.Listen("tcp", viper.GetString("server.binds.grpc"))
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
-	}
 
 	db, err := gorm.Open("postgres", viper.GetString("db.conn"))
 
@@ -63,7 +63,7 @@ func main(){
 	s := grpc.NewServer()
 
 	// register the service
-	{{.Name}}.Register{{.Name | Title}}Server(s, {{.Name}}.NewService(access))
+	{{.Name}}.Register{{.Name | Title}}ServiceServer(s, {{.Name}}.NewService(access))
 
 	// Register reflection service on gRPC server.
 	reflection.Register(s)
@@ -79,8 +79,8 @@ func main(){
 		}
 
 		wg.Done()
-	}()
-	{{if .WebRPC}}
+	}(){{if .WebRPC}}
+
 	options := []grpcweb.Option{}
 
     // Wrap grpc server to grpc-web server
@@ -91,7 +91,7 @@ func main(){
     }
 
     httpServer := http.Server{
-        Addr:    "",
+        Addr:    ":50060",
         Handler: http.HandlerFunc(handler),
     }
 
@@ -102,8 +102,23 @@ func main(){
 		}
 
 		wg.Done()
-	}()
-	{{end}}
+	}()	{{end}}	{{if .Gateway}}
+
+	go func() {
+        ctx := context.Background()
+        ctx, cancel := context.WithCancel(ctx)
+        defer cancel()
+
+        mux := runtime.NewServeMux()
+        opts := []grpc.DialOption{grpc.WithInsecure()}
+        err := {{ .Name }}.Register{{ .Name | Title }}ServiceHandlerFromEndpoint(ctx, mux, ":50051", opts)
+        if err != nil {
+            log.Fatalf("gw: failed to register: %v", err)
+        }
+
+        log.Infoln("Starting gateway server on", ":80")
+        log.Fatalf("gw: failed to server: %v", http.ListenAndServe(":80", mux))
+    }(){{end}}
 
 	wg.Wait()
 }

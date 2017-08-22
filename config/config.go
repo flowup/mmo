@@ -4,6 +4,7 @@ import (
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
+	"sort"
 )
 
 const (
@@ -17,6 +18,8 @@ type Config struct {
 	Lang       string             `yaml:"lang"`
 	DepManager string             `yaml:"dependencyManager"`
 	GoPackage  string             `yaml:"goPackage"`
+	Plugins    []string           `yaml:"plugins"`
+	Generators []string           `yaml:"generators"`
 	Services   map[string]Service `yaml:"services"`
 }
 
@@ -27,7 +30,19 @@ func (c *Config) ServiceNames() []string {
 		names = append(names, key)
 	}
 
+	sort.Strings(names)
+
 	return names
+}
+
+func (c *Config) AddPlugin(name string) {
+	for _, plugin := range c.Plugins {
+		if plugin == name {
+			return
+		}
+	}
+
+	c.Plugins = append(c.Plugins, name)
 }
 
 // Service represents service configuration from Config
@@ -37,6 +52,7 @@ type Service struct {
 	WebRPC       bool         `yaml:"webRPC"`
 	Dependencies []Dependency `yaml:"dependencies"`
 	Sentry       bool         `yaml:"sentry"`
+	Gateway      bool         `yaml:"gateway"`
 }
 
 // Dependency represents service dependency configuration from Config
@@ -64,14 +80,14 @@ func LoadConfig(filenameConfig string) (*Config, error) {
 }
 
 // SaveConfig saves given config to  the given directory
-func SaveConfig(cfg *Config, filenameConfig string) error {
+func SaveConfig(cfg *Config) error {
 	b, err := yaml.Marshal(cfg)
 
 	if err != nil {
 		return nil
 	}
 
-	f, err := os.Create(filenameConfig)
+	f, err := os.Create(FilenameConfig)
 	_, err = f.Write(b)
 
 	return err

@@ -6,7 +6,6 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/client"
-	"github.com/flowup/mmo/commands"
 	"github.com/flowup/mmo/config"
 	"github.com/flowup/mmo/docker"
 	"github.com/flowup/mmo/kubernetes"
@@ -24,6 +23,7 @@ import (
 type Mmo struct {
 	Config  *config.Config
 	Context *config.Context
+	Plugins *config.Plugins
 }
 
 // GetMmo Load context and config from config files
@@ -32,6 +32,7 @@ func GetMmo() (*Mmo, error) {
 	mmo := &Mmo{
 		&config.Config{},
 		&config.Context{},
+		&config.Plugins{},
 	}
 
 	mmoContext, err := config.LoadContext()
@@ -41,9 +42,17 @@ func GetMmo() (*Mmo, error) {
 
 	mmoConfig, err := config.LoadConfig(config.FilenameConfig)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "Failed to load mmo config")
 	}
+
 	mmo.Config = mmoConfig
+
+	mmoPlugins, err := config.NewPlugins(mmoConfig.Plugins)
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed to init mmo plugins")
+	}
+
+	mmo.Plugins = &mmoPlugins
 
 	return mmo, nil
 }
@@ -152,10 +161,10 @@ func (mmo *Mmo) InitializeDependencyManager() error {
 
 // ClearDependencyManager clears contents of the content manager
 func (mmo *Mmo) ClearDependencyManager() error {
-	log.Debugln("Clearning dep. manager:", mmo.Config.DepManager)
+	log.Debugln("Clearing dep. manager:", mmo.Config.DepManager)
 	switch mmo.Config.DepManager {
 	case "glide":
-		// remove mail glide file
+		// remove main glide file
 		os.Remove("glide.yaml")
 		// cache removal
 		os.RemoveAll(".glide/")
@@ -214,7 +223,7 @@ func (mmo *Mmo) RunTests() error {
 
 // SetContext is cli function to set context of mmo to specified service or services
 func (mmo *Mmo) SetContext(services []string) error {
-	log.Debugln("Trying to set context for services:", services)
+	log.Debugln("Setting context for services:", services)
 	for _, service := range services {
 		if _, ok := mmo.Config.Services[service]; !ok {
 			return utils.ErrServiceNotExists
@@ -234,40 +243,10 @@ func (mmo *Mmo) SetContext(services []string) error {
 	return err
 }
 
-// ProtoGen is cli function to generate API clients and server stubs of specified service or services
-func (mmo *Mmo) ProtoGen(services []string, lang string) error {
-
-	for _, serviceName := range services {
-		log.Infoln("Generating protobuf for:", serviceName)
-
-		if _, err := os.Stat(serviceName + "/protobuf"); os.IsNotExist(err) {
-			log.Warnln("No protobuf files found for service:", serviceName, " -> Skipping")
-			continue
-		}
-
-		if mmo.Config.Services[serviceName].WebRPC {
-			if _, err := os.Stat(serviceName + "/sdk"); os.IsNotExist(err) {
-				err := os.Mkdir(serviceName+"/sdk", os.ModePerm)
-				if err != nil {
-					return err
-				}
-			}
-		}
-
-		err := commands.GenerateProto(lang, serviceName)
-		if err != nil {
-			return err
-		}
-
-		if mmo.Config.Services[serviceName].WebRPC {
-			err = commands.GenerateProto(commands.TypeScript, serviceName)
-			if err != nil {
-				return err
-			}
-		}
-	}
-
-	return nil
+// ResetContext
+func (mmo *Mmo) ResetContext() error {
+	log.Debugln("Resetting context")
+	return mmo.SetContext([]string{})
 }
 
 // Run is command to run all services in cluster (minikube) - all services are built as docker images and deployed to cluster

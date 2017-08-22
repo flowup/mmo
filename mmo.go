@@ -6,6 +6,7 @@ import (
 	"github.com/flowup/mmo/commands/project"
 	"github.com/flowup/mmo/commands/service"
 	"github.com/flowup/mmo/config"
+	"github.com/flowup/mmo/plugins"
 	"github.com/flowup/mmo/utils"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -111,12 +112,25 @@ func main() {
 			Name:    "context",
 			Aliases: []string{"ctx"},
 			Usage:   "sets context to the service(s) given by the argument(s)",
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "reset, r",
+					Usage: "reset context back to global",
+				},
+			},
 			Action: func(c *cli.Context) error {
 				bootstrap(c)
 
 				mmo, err := project.GetMmo()
 				if err != nil {
 					return utils.ErrNoProject
+				}
+
+				if c.IsSet("reset") {
+					if err := mmo.ResetContext(); err != nil {
+						log.Fatal(err)
+					}
+					return nil
 				}
 
 				if c.NArg() == 0 {
@@ -206,60 +220,33 @@ func main() {
 		{
 			Name:  "gen",
 			Usage: "generates third party resources such as proto stubs or serializers",
-			Subcommands: []cli.Command{
-				{
-					Name:  "proto",
-					Usage: "generates API clients and server stubs from proto definition for all services targeted by the context",
-					Action: func(c *cli.Context) error {
-						bootstrap(c)
+			Action: func(c *cli.Context) error {
+				bootstrap(c)
 
-						mmo, err := project.GetMmo()
+				mmo, err := project.GetMmo()
 
-						if err != nil {
-							return utils.ErrNoProject
-						}
+				if err != nil {
+					return utils.ErrNoProject
+				}
 
-						lang := mmo.Config.Lang
+				services := mmo.Context.Services
+				if len(services) == 0 {
+					log.Warnln("No context set, using global")
+					services = mmo.Config.ServiceNames()
+				}
 
-						if c.NArg() == 1 {
-							lang = c.Args().Get(0)
-						}
+				context := mmo.Context.GetServices()
 
-						services := mmo.Context.Services
-						if len(services) == 0 {
-							log.Warnln("No context set, using global")
-							services = mmo.Config.ServiceNames()
-						}
+				if mmo.Context.IsGlobal() {
+					context = mmo.Config.ServiceNames()
+				}
 
-						if err := mmo.ProtoGen(services, lang); err != nil {
-							log.Fatal(err)
-						}
-						return nil
-					},
-				}, {
-					Name:  "gateway",
-					Usage: "generates GRPC gateways from proto definition for all services targeted by the context",
-					Action: func(c *cli.Context) error {
-						bootstrap(c)
+				err = mmo.Plugins.RunHook("gen", mmo.Config.ServiceNames(), context)
+				if err != nil {
+					log.Error(err)
+				}
 
-						mmo, err := project.GetMmo()
-
-						if err != nil {
-							return utils.ErrNoProject
-						}
-
-						services := mmo.Context.Services
-						if len(services) == 0 {
-							log.Warnln("No context set, using global")
-							services = mmo.Config.ServiceNames()
-						}
-
-						if err := mmo.ProtoGen(services, "gw"); err != nil {
-							log.Fatal(err)
-						}
-						return nil
-					},
-				},
+				return nil
 			},
 		},
 		{
@@ -289,6 +276,10 @@ func main() {
 							Name:  "sentry",
 							Usage: "allows Sentry integration",
 						},
+						cli.BoolFlag{
+							Name:  "gateway",
+							Usage: "enabled grpc gateway",
+						},
 					},
 
 					Action: func(c *cli.Context) error {
@@ -303,10 +294,27 @@ func main() {
 							return utils.ErrNoProject
 						}
 
+						if mmo.Config.Services == nil {
+							mmo.Config.Services = make(map[string]config.Service)
+						}
+
+						if mmo.Config.Lang == "go" {
+							mmo.Config.AddPlugin(plugins.Grpc_go)
+						}
+
+						if c.Bool("webrpc") {
+							mmo.Config.AddPlugin(plugins.Grpc_ts)
+						}
+
+						if c.Bool("gateway") {
+							mmo.Config.AddPlugin(plugins.Grpc_gw)
+							mmo.Config.AddPlugin(plugins.Grpc_swagger)
+						}
+
 						//mmo.Config.Services[c.Args().First()] = service.Wizzar(c.Args().First())
 						mmo.Config.Services[c.Args().First()] = service.FromCliContext(c.Args().First(), c)
 
-						if err := config.SaveConfig(mmo.Config, config.FilenameConfig); err != nil {
+						if err := config.SaveConfig(mmo.Config); err != nil {
 							log.Fatal(err)
 						}
 
@@ -322,7 +330,22 @@ func main() {
 					Action: func(c *cli.Context) error {
 						bootstrap(c)
 
-						return utils.ErrNotImplemented
+						if c.NArg() == 0 {
+							return utils.ErrNoArg
+						}
+
+						mmo, err := project.GetMmo()
+						if err != nil {
+							return utils.ErrNoProject
+						}
+
+						mmo.Config.AddPlugin(c.Args().First())
+						err = config.SaveConfig(mmo.Config)
+						if err != nil {
+							log.Error(err)
+						}
+
+						return nil
 					},
 				},
 			},

@@ -1,0 +1,4 @@
+name: TypeScript gRPC (webRPC) generator
+global: false
+hooks:
+  gen: gen.sh

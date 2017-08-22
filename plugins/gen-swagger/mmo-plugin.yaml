@@ -1,0 +1,4 @@
+name: Swagger generator
+global: true
+hooks:
+  gen: gen.sh

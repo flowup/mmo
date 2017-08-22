@@ -12,6 +12,9 @@ spec:
     {{if .WebRPC}}- name: grpc-web
       protocol: TCP
       port: 50060{{end}}
+    {{if .Gateway}}- name: http
+      protocol: TCP
+      port: 80{{end}}
 ---
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -39,4 +42,7 @@ spec:
           protocol: TCP
         {{if .WebRPC}}- name: grpc-web
           containerPort: 50060
+          protocol: TCP{{end}}
+        {{if .Gateway}}- name: http
+          containerPort: 80
           protocol: TCP{{end}}

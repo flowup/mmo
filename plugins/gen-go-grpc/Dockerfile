@@ -1,4 +1,4 @@
-FROM node:8.2
+FROM golang:1.8
 
 RUN apt-get update && apt-get install -y --no-install-recommends unzip && rm -rf /var/lib/apt/lists/*
 
@@ -9,12 +9,14 @@ RUN mkdir proto && cd proto && \
 
 RUN git clone https://github.com/googleapis/googleapis.git /googleapis
 
-RUN npm install -g ts-protoc-gen
+RUN curl https://glide.sh/get | sh
 
-ADD webrpc/ /scripts/
+ENV PROTO_PATH /go/proto/include
+ENV PATH $PATH:/go/proto/bin
 
-ENV PATH $PATH:/scripts
+RUN go get -u github.com/golang/protobuf/protoc-gen-go
+RUN go get -u github.com/gogo/protobuf/...
+RUN go get -u github.com/grpc-ecosystem/grpc-gateway/protoc-gen-grpc-gateway
 
-WORKDIR /in
-
-CMD ["make"]
+ADD hooks/* /hooks/
+ADD mmo-plugin.yaml /plugin/mmo-plugin.yaml
