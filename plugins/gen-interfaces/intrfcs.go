@@ -53,9 +53,7 @@ func Parse(inputPath, outputPath string) error {
 				regexp.QuoteMeta(result[1]) +
 				`\s*` +
 				regexp.QuoteMeta(result[2]) +
-				`\s*\,\s*` +
-				regexp.QuoteMeta(result[3]) +
-				`\s*` +
+				`\s*\,\s*\S*\s*` +
 				regexp.QuoteMeta(result[4]) +
 				`\s*\)\s*\(\s*` +
 				regexp.QuoteMeta(result[7]) +
