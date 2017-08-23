@@ -1,0 +1,4 @@
+name: Interface to service
+global: false
+hooks:
+  gen: intrfc

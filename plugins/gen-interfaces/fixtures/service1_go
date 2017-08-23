@@ -1,0 +1,134 @@
+package service
+
+import (
+	"golang.org/x/net/context"
+	google_protobuf "github.com/golang/protobuf/ptypes/empty"
+)
+
+// IBlaAccess represents an interface that needs to be satisfied
+// for any data access used by the Service
+type IAccess interface {
+
+}
+
+// Bla represents an implementation of the service interface
+type Service struct {
+	access IAccess
+}
+
+// NewBla creates a new service object
+func NewService(access IAccess) *Service {
+	return &Service{
+		access: access,
+	}
+}
+
+func (s *Service) GetVersion(ctx context.Context, in *google_protobuf.Empty) (*Version, error) {
+
+	return &Version{}, nil
+}
+
+func (s *Service) ListHorses(ctx context.Context, in *google_protobuf.Empty) (*HorseList, error) {
+
+	return &HorseList{}, nil
+}
+
+func (s *Service) GetTrainingData(ctx context.Context, in *GraphIDMessage) (*TrainingDataList, error) {
+
+	return &TrainingDataList{}, nil
+}
+
+func (s *Service) GetTrainingByID(ctx context.Context, in *IDMessage) (*Training, error) {
+
+	return &Training{}, nil
+}
+
+func (s *Service) ListTrainings(ctx context.Context, in *Paging) (*TrainingList, error) {
+
+	return &TrainingList{}, nil
+}
+
+func (s *Service) GetTrainingsByHorseID(ctx context.Context, in *IDMessage) (*TrainingList, error) {
+
+	return &TrainingList{}, nil
+}
+
+func (s *Service) GetHorse(ctx context.Context, in *IDMessage) (*Horse, error) {
+
+	return &Horse{}, nil
+}
+
+func (s *Service) GetHorseFromFEI(ctx context.Context, in *IDMessage) (*Horse, error) {
+
+	return &Horse{}, nil
+}
+
+func (s *Service) CreateTraining(ctx context.Context, in *Training) (*Training, error) {
+
+	return &Training{}, nil
+}
+
+func (s *Service) CreateHorse(ctx context.Context, in *Horse) (*Horse, error) {
+
+	return &Horse{}, nil
+}
+
+func (s *Service) UpdateHorse(ctx context.Context, in *Horse) (*Horse, error) {
+
+	return &Horse{}, nil
+}
+
+func (s *Service) DeleteTraining(ctx context.Context, in *IDMessage) (*google_protobuf.Empty, error) {
+
+	return &google_protobuf.Empty{}, nil
+}
+
+func (s *Service) DeleteHorse(ctx context.Context, in *IDMessage) (*google_protobuf.Empty, error) {
+
+	return &google_protobuf.Empty{}, nil
+}
+
+func (s *Service) CreateActivity(ctx context.Context, in *Activity) (*Activity, error) {
+
+	return &Activity{}, nil
+}
+
+func (s *Service) ReadActivity(ctx context.Context, in *Activity) (*Activity, error) {
+
+	return &Activity{}, nil
+}
+
+func (s *Service) ReadActivities(ctx context.Context, in *Activity) (*ActivityList, error) {
+
+	return &ActivityList{}, nil
+}
+
+func (s *Service) UpdateActivity(ctx context.Context, in *Activity) (*Activity, error) {
+
+	return &Activity{}, nil
+}
+
+func (s *Service) DeleteActivity(ctx context.Context, in *Activity) (*google_protobuf.Empty, error) {
+
+	return &google_protobuf.Empty{}, nil
+}
+
+func (s *Service) CreateHorseSharing(ctx context.Context, in *HorseSharing) (*HorseSharing, error) {
+
+	return &HorseSharing{}, nil
+}
+
+func (s *Service) ReadHorseSharingByHorseID(ctx context.Context, in *HorseSharing) (*HorseSharingList, error) {
+
+	return &HorseSharingList{}, nil
+}
+
+func (s *Service) ReadHorseSharingByUserID(ctx context.Context, in *HorseSharing) (*HorseSharingList, error) {
+
+	return &HorseSharingList{}, nil
+}
+
+func (s *Service) DeleteHorseSharing(ctx context.Context, in *IDMessage) (*google_protobuf.Empty, error) {
+
+	return &google_protobuf.Empty{}, nil
+}
