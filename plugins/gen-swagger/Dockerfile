@@ -13,10 +13,10 @@ RUN go get -u github.com/gogo/protobuf/...
 RUN go get -u github.com/grpc-ecosystem/grpc-gateway/protoc-gen-swagger
 RUN git clone https://github.com/googleapis/googleapis.git /googleapis
 
-RUN npm install -g swagger-merger
+RUN mkdir /scripts && cd /scripts && npm install swagger-merge && npm install -g json2yaml
 
 ADD hooks/* /hooks/
-ADD templates /plugin/templates
+ADD scripts/* /scripts/
 ADD mmo-plugin.yaml /plugin/mmo-plugin.yaml
 
 ENV PROTO_PATH /go/proto/include
