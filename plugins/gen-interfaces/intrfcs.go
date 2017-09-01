@@ -6,6 +6,9 @@ import (
 	"os"
 	"regexp"
 	"strings"
+	"github.com/flowup/gogen"
+	"path/filepath"
+	"os/exec"
 )
 
 func main() {
@@ -15,7 +18,7 @@ func main() {
 		outputPath := "/source/" + service + "/service.go"
 
 		log.Println("Generating service of " + service + " from interface")
-		newInterfaces, err := Parse("/source/"+service+"/proto.pb.go", outputPath)
+		newInterfaces, err := Parse("/source/"+service+"/proto.pb.go", outputPath, true)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -23,13 +26,29 @@ func main() {
 		if err != nil {
 			log.Fatal(err)
 		}
+
+		if err := gofmt(outputPath); err != nil {
+			log.Fatal(err)
+		}
 	}
 }
 
 var regInterfaces = regexp.MustCompile(`type .[^\s]*Client interface {(\s*.[^\n]*\s*[^\}]*)}`)
+var types = map[string]string{
+	"string": "\"mock\"",
+	"uint32": "1",
+	"uint64": "1",
+	"int64":  "1",
+	"int32":  "1",
+	"bool":   "true",
+}
 
-func Parse(inputPath, outputPath string) ([]string, error) {
+func Parse(inputPath, outputPath string, mockGeneration bool) ([]string, error) {
 	newInterfaces := []string{}
+
+	// gogen parse all structs
+	build, _ := gogen.ParseFile(inputPath)
+	file := build.File(filepath.Base(inputPath))
 
 	// load content of proto.pb.go file
 	protoContent, err := ioutil.ReadFile(inputPath)
@@ -70,6 +89,19 @@ func Parse(inputPath, outputPath string) ([]string, error) {
 				regexp.QuoteMeta(result[8])).
 				MatchString(string(serviceContent)) {
 
+				// get struct for creating mock
+				mock := ""
+				if mockGeneration {
+					mockStruct := file.Struct(result[7][1:])
+					if mockStruct != nil {
+						mock = "\n"
+						for _, fids := range mockStruct.Fields() {
+							key, _ := fids.Type()
+							mock += "\t" + fids.Name() + ":" + types[key] + "\n"
+						}
+					}
+				}
+
 				log.Println("Adding " + result[0] + "interface to service")
 				// open file to append interfaces
 				newInterfaces = append(newInterfaces, "\nfunc (s *Service) "+
@@ -88,8 +120,8 @@ func Parse(inputPath, outputPath string) ([]string, error) {
 					result[8]+
 					") {\n"+
 					"\n"+
-					"\treturn &"+ result[7][1:]+ "{}, nil\n"+
-					"}\n", outputPath)
+					"\treturn &"+ result[7][1:]+ "{"+ mock+ "}, nil\n"+
+					"}\n")
 			}
 		}
 	}
@@ -114,5 +146,23 @@ func writeToFile(newInterfaces []string, outputPath string) error {
 	if err := file.Sync(); err != nil {
 		return err
 	}
+	return nil
+}
+
+func gofmt(output string) error {
+	var file, err = os.OpenFile(output, os.O_RDWR, 0777)
+	if err != nil {
+		return err
+	}
+
+	out, err := exec.Command("gofmt", output).Output()
+	if err != nil {
+		return err
+	}
+
+	if _, err := file.Write(out); err != nil {
+		return err
+	}
+
 	return nil
 }

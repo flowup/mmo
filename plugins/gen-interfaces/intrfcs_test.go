@@ -48,7 +48,7 @@ func (s *IntrfcsAccessSuite) TestParse() {
 		output, err := ioutil.ReadFile(candidate.Output)
 		s.Nil(err)
 
-		newInterfaces, err := Parse(candidate.Input, candidate.Output)
+		newInterfaces, err := Parse(candidate.Input, candidate.Output, false)
 		s.Nil(err)
 
 		for _, newInterface := range newInterfaces {
@@ -57,7 +57,7 @@ func (s *IntrfcsAccessSuite) TestParse() {
 
 		expected, err := ioutil.ReadFile(candidate.Expected)
 		s.Nil(err)
-		bytes.Equal(output, expected)
+		s.True(bytes.Equal(output, expected))
 	}
 }
 
