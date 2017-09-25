@@ -3,7 +3,8 @@ package main
 import (
 	"github.com/stretchr/testify/suite"
 	"testing"
-	"github.com/flowup/mmo/utils/filecompare"
+	"io/ioutil"
+	"bytes"
 )
 
 type IntrfcsAccessSuite struct {
@@ -44,8 +45,19 @@ func (s *IntrfcsAccessSuite) TestParse() {
 	}
 
 	for _, candidate := range candidates {
-		s.Nil(Parse(candidate.Input, candidate.Output))
-		s.Nil(filecompare.CompareFiles(candidate.Output, candidate.Expected))
+		output, err := ioutil.ReadFile(candidate.Output)
+		s.Nil(err)
+
+		newInterfaces, err := Parse(candidate.Input, candidate.Output, false)
+		s.Nil(err)
+
+		for _, newInterface := range newInterfaces {
+			output = append(output, []byte(newInterface)...)
+		}
+
+		expected, err := ioutil.ReadFile(candidate.Expected)
+		s.Nil(err)
+		s.True(bytes.Equal(output, expected))
 	}
 }
 
