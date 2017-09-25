@@ -5,11 +5,13 @@ import (
 	"net"
 	"sync"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"	{{if .WebRPC}}
-	"github.com/improbable-eng/grpc-web/go/grpcweb"
+	"google.golang.org/grpc/reflection"
+	{{if .WebRPC}}"github.com/improbable-eng/grpc-web/go/grpcweb"
     "net/http"{{end}}
-    log "github.com/sirupsen/logrus"{{if .Sentry}}
-    "github.com/evalphobia/logrus_sentry"{{end}}{{if .Gateway}}
+    log "github.com/sirupsen/logrus"
+	_ "github.com/jinzhu/gorm/dialects/postgres"
+	"github.com/spf13/viper"
+    {{if .Sentry}}"github.com/evalphobia/logrus_sentry"{{end}}{{if .Gateway}}
     "net/http"
     "context"
     "github.com/grpc-ecosystem/grpc-gateway/runtime"{{end}}
@@ -43,19 +45,25 @@ func init() {
 
 func main(){
 	lis, err := net.Listen("tcp", ":50051")
-	if err != nil {
-		log.Fatalf("failed to listen: %v", err)
-	}
+    if err != nil {
+        log.Fatalf("failed to listen: %v", err)
+    }
+    viper.SetDefault("db.conn", "host=db-svc user=goo dbname=goo sslmode=disable password=goo")
+	viper.SetDefault("server.binds.grpc", ":50051")
+	{{if .WebRPC}}viper.SetDefault("server.binds.gw", ":50060")
+	viper.SetDefault("cors.enabled", false){{end}}
+
+
+	db, err := gorm.Open("postgres", viper.GetString("db.conn"))
 
 	// create additional resources for the service
-	access := {{.Name}}.NewAccess()
+	access := {{.Name}}.NewAccess(db)
 
     // create the grpc server
 	s := grpc.NewServer()
 
 	// register the service
 	{{.Name}}.Register{{.Name | Title}}ServiceServer(s, {{.Name}}.NewService(access))
-
 
 	// Register reflection service on gRPC server.
 	reflection.Register(s)
@@ -65,7 +73,7 @@ func main(){
 	wg.Add(1)
 
 	go func() {
-		log.Infoln("Starting gRPC server on", "50051")
+		log.Infoln("Starting gRPC server on", viper.GetString("server.binds.grpc"))
 		if err := s.Serve(lis); err != nil {
 			log.Fatalf("grpc: failed to serve: %v", err)
 		}
@@ -74,6 +82,7 @@ func main(){
 	}(){{if .WebRPC}}
 
 	options := []grpcweb.Option{}
+
     // Wrap grpc server to grpc-web server
     wrappedServer := grpcweb.WrapServer(s, options...)
 
@@ -87,7 +96,7 @@ func main(){
     }
 
 	go func() {
-		log.Infoln("starting gRPC Web server on", "")
+		log.Infoln("starting gRPC Web server on", viper.GetString("server.binds.grpc"))
 		if err := httpServer.ListenAndServe(); err != nil {
 			log.Fatalf("grpc-web: failed to serve: %v", err)
 		}
