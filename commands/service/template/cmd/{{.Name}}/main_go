@@ -5,6 +5,7 @@ import (
 	"net"
 	"sync"
 	"google.golang.org/grpc"
+	"github.com/spf13/viper"
 	"google.golang.org/grpc/reflection"	{{if .WebRPC}}
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
     "net/http"{{end}}
@@ -42,7 +43,13 @@ func init() {
 }
 
 func main(){
-	lis, err := net.Listen("tcp", ":50051")
+
+    viper.SetDefault("db.conn", "host=db-svc user=goo dbname=goo sslmode=disable password=goo")
+	viper.SetDefault("server.binds.grpc", ":50051"){{if .WebRPC}}
+	viper.SetDefault("server.binds.webrpc", ":50060"){{end}}{{if .Gateway}}
+	viper.SetDefault("server.binds.gw", ":80"){{end}}
+
+	lis, err := net.Listen("tcp", viper.GetString("server.binds.grpc"))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
@@ -65,7 +72,7 @@ func main(){
 	wg.Add(1)
 
 	go func() {
-		log.Infoln("Starting gRPC server on", "50051")
+		log.Infoln("Starting gRPC server on", viper.GetString("server.binds.grpc"))
 		if err := s.Serve(lis); err != nil {
 			log.Fatalf("grpc: failed to serve: %v", err)
 		}
@@ -82,12 +89,12 @@ func main(){
     }
 
     httpServer := http.Server{
-        Addr:    ":50060",
+        Addr:    viper.GetString("server.binds.webrpc"),
         Handler: http.HandlerFunc(handler),
     }
 
 	go func() {
-		log.Infoln("starting gRPC Web server on", "")
+		log.Infoln("starting gRPC Web server on", viper.GetString("server.binds.webrpc"))
 		if err := httpServer.ListenAndServe(); err != nil {
 			log.Fatalf("grpc-web: failed to serve: %v", err)
 		}
@@ -102,13 +109,13 @@ func main(){
 
         mux := runtime.NewServeMux()
         opts := []grpc.DialOption{grpc.WithInsecure()}
-        err := {{ .Name }}.Register{{ .Name | Title }}ServiceHandlerFromEndpoint(ctx, mux, ":50051", opts)
+        err := {{ .Name }}.Register{{ .Name | Title }}ServiceHandlerFromEndpoint(ctx, mux, viper.GetString("server.binds.grpc"), opts)
         if err != nil {
             log.Fatalf("gw: failed to register: %v", err)
         }
 
-        log.Infoln("Starting gateway server on", ":80")
-        log.Fatalf("gw: failed to server: %v", http.ListenAndServe(":80", mux))
+        log.Infoln("Starting gateway server on", viper.GetString("server.binds.gw"))
+        log.Fatalf("gw: failed to server: %v", http.ListenAndServe(viper.GetString("server.binds.gw"), mux))
     }(){{end}}
 
 	wg.Wait()
