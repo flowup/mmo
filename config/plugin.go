@@ -3,9 +3,6 @@ package config
 import (
 	"archive/tar"
 	"context"
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/mount"
-	"github.com/docker/docker/client"
 	"github.com/flowup/mmo/utils"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -17,7 +14,7 @@ import (
 type Plugins struct {
 	Loaded  bool
 	Plugins []Plugin
-	Client  *client.Client
+	Client  *client.Client // TODO: will be client to the host cli
 }
 
 type Plugin struct {

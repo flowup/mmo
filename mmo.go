@@ -4,9 +4,7 @@ import (
 	"bufio"
 	"github.com/evalphobia/logrus_sentry"
 	"github.com/flowup/mmo/commands/project"
-	"github.com/flowup/mmo/commands/service"
 	"github.com/flowup/mmo/config"
-	"github.com/flowup/mmo/plugins"
 	"github.com/flowup/mmo/utils"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -77,8 +75,6 @@ func main() {
 				mmo.Config = &config.Config{}
 
 				mmo.Config.Name = c.Args().First()
-				mmo.Config.Lang = "go"
-				mmo.Config.DepManager = "glide"
 
 				// if we can't stat the folder, we'll just create new
 				if _, err := os.Stat(mmo.Config.Name); err != nil {
@@ -298,29 +294,8 @@ func main() {
 							mmo.Config.Services = make(map[string]config.Service)
 						}
 
-						if mmo.Config.Lang == "go" {
-							mmo.Config.AddPlugin(plugins.Grpc_go)
-						}
+						// TODO: run service gen plugin from default or from argument
 
-						if c.Bool("webrpc") {
-							mmo.Config.AddPlugin(plugins.Grpc_ts)
-						}
-
-						if c.Bool("gateway") {
-							mmo.Config.AddPlugin(plugins.Grpc_gw)
-							mmo.Config.AddPlugin(plugins.Grpc_swagger)
-						}
-
-						//mmo.Config.Services[c.Args().First()] = service.Wizzar(c.Args().First())
-						mmo.Config.Services[c.Args().First()] = service.FromCliContext(c.Args().First(), c)
-
-						if err := config.SaveConfig(mmo.Config); err != nil {
-							log.Fatal(err)
-						}
-
-						if err := service.InitService(mmo.Config.Services[c.Args().First()]); err != nil {
-							log.Fatal(err)
-						}
 						return nil
 					},
 				},

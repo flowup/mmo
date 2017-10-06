@@ -3,20 +3,16 @@ package project
 import (
 	"bufio"
 	"context"
-	"github.com/docker/docker/api/types/container"
-	"github.com/docker/docker/api/types/mount"
-	"github.com/docker/docker/client"
 	"github.com/flowup/mmo/config"
 	"github.com/flowup/mmo/docker"
-	"github.com/flowup/mmo/kubernetes"
 	"github.com/flowup/mmo/utils"
 	"github.com/flowup/mmo/utils/cookiecutter"
-	"github.com/flowup/mmo/utils/dockercmd"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"os"
 	"os/exec"
 	"strings"
+	"github.com/flowup/calchas/scheduler/kubernetes"
 )
 
 // Mmo represents config and context

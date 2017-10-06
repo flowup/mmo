@@ -15,9 +15,6 @@ const (
 // Config represents projects configuration
 type Config struct {
 	Name       string             `yaml:"name"`
-	Lang       string             `yaml:"lang"`
-	DepManager string             `yaml:"dependencyManager"`
-	GoPackage  string             `yaml:"goPackage"`
 	Plugins    []string           `yaml:"plugins"`
 	Generators []string           `yaml:"generators"`
 	Services   map[string]Service `yaml:"services"`
