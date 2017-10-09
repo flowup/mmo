@@ -2,17 +2,13 @@ package project
 
 import (
 	"bufio"
-	"context"
 	"github.com/flowup/mmo/config"
-	"github.com/flowup/mmo/docker"
 	"github.com/flowup/mmo/utils"
 	"github.com/flowup/mmo/utils/cookiecutter"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"os"
-	"os/exec"
 	"strings"
-	"github.com/flowup/calchas/scheduler/kubernetes"
 )
 
 // Mmo represents config and context
@@ -109,109 +105,9 @@ func (mmo *Mmo) InitProject() error {
 		return errors.Wrap(err, "chdir failed with an error")
 	}
 
-	err = mmo.ClearDependencyManager()
-	if err != nil {
-		return err
-	}
-
-	err = mmo.InitializeDependencyManager()
-	if err != nil {
-		return errors.Wrap(err, "dependency manager initialization failed")
-	}
-
 	err = os.Chdir("..")
 	if err != nil {
 		return errors.Wrap(err, "chdir back failed with an error")
-	}
-
-	return nil
-}
-
-// InitializeDependencyManager initializes given dependency manager
-// within the current project.
-// It will also automatically update the dependency manager
-func (mmo *Mmo) InitializeDependencyManager() error {
-	log.Debugln("Initializing dep. manager:", mmo.Config.DepManager)
-	switch mmo.Config.DepManager {
-	case "glide":
-		glideInstallCmd := exec.Command("go", "get", "github.com/Masterminds/glide")
-		glideInstallCmd.Stdout = os.Stdout
-		glideInstallCmd.Stderr = os.Stdout
-		if err := glideInstallCmd.Run(); err != nil {
-			return errors.Wrap(err, "glide installation failed")
-		}
-
-		glideInitCmd := exec.Command("glide", "init", "--non-interactive")
-		glideInitCmd.Stdout = os.Stdout
-		glideInitCmd.Stderr = os.Stdout
-		if err := glideInitCmd.Run(); err != nil {
-			return errors.Wrap(err, "glide initialization failed")
-		}
-
-	default:
-		return errors.New("Unrecognized dependency manager: " + mmo.Config.DepManager)
-	}
-
-	return nil
-}
-
-// ClearDependencyManager clears contents of the content manager
-func (mmo *Mmo) ClearDependencyManager() error {
-	log.Debugln("Clearing dep. manager:", mmo.Config.DepManager)
-	switch mmo.Config.DepManager {
-	case "glide":
-		// remove main glide file
-		os.Remove("glide.yaml")
-		// cache removal
-		os.RemoveAll(".glide/")
-
-	default:
-		return errors.New("Unrecognized dependency manager: " + mmo.Config.DepManager)
-	}
-
-	return nil
-}
-
-// RunTests is cli function to run tests of application in docker
-func (mmo *Mmo) RunTests() error {
-
-	cli, err := client.NewEnvClient()
-	if err != nil {
-		return err
-	}
-
-	pwd, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-
-	for _, serviceName := range mmo.Context.Services {
-
-		log.Infoln("Running tests for service \"" + serviceName + "\":")
-
-		testContainer, err := cli.ContainerCreate(context.Background(), &container.Config{
-			Image:      "flowup/mmo-webrpc",
-			Cmd:        []string{"bash", "-c", "go test $(glide novendor)"},
-			WorkingDir: "/go/src/" + mmo.Config.GoPackage + "/" + serviceName,
-		}, &container.HostConfig{
-			AutoRemove: true,
-			Mounts: []mount.Mount{
-				{
-					Type:   mount.TypeBind,
-					Source: pwd,
-					Target: "/go/src/" + mmo.Config.GoPackage,
-				},
-			},
-		}, nil, "")
-
-		if err != nil {
-			return err
-		}
-
-		err = utils.ContainerRunStdout(cli, testContainer.ID)
-		if err != nil {
-			return err
-		}
 	}
 
 	return nil
@@ -243,77 +139,4 @@ func (mmo *Mmo) SetContext(services []string) error {
 func (mmo *Mmo) ResetContext() error {
 	log.Debugln("Resetting context")
 	return mmo.SetContext([]string{})
-}
-
-// Run is command to run all services in cluster (minikube) - all services are built as docker images and deployed to cluster
-func (mmo *Mmo) Run() error {
-
-	log.Infoln("Connecting to the kubernetes cluster")
-	kubeClient, err := kubernetes.ConnectToCluster()
-	if err != nil {
-		return err
-	}
-
-	log.Debugln("Checking container registry status")
-	err = kubernetes.IsRegistryRunning(kubeClient)
-	if err != nil {
-		log.Infoln("Registry not running, deploying now")
-		err = kubernetes.DeployDockerRegistry(kubeClient)
-		if err != nil {
-			return err
-		}
-	}
-
-	log.Infoln("Forwarding registry port to localhost")
-	portFwdCmd, err := kubernetes.ForwardRegistryPort()
-	defer func() {
-		log.Debugln("Cleaning port forwarding for docker registry")
-		err := portFwdCmd.Process.Kill()
-		if err != nil {
-			log.Errorln(err)
-		}
-	}()
-
-	log.Debugln("Getting builder for the repository:", mmo.Config.Name)
-	builder, err := docker.GetBuilder(mmo.Config.Name)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		log.Debugln("Cleaning docker builder images")
-		err := builder.Clean()
-		if err != nil {
-			log.Errorln(err)
-		}
-	}()
-
-	var env = make(kubernetes.DeployEnvironment)
-	env["DOCKER_REGISTRY"] = dockercmd.MinikubeRegistry
-	env["PROJECT_NAME"] = mmo.Config.Name
-
-	for service := range mmo.Config.Services {
-
-		log.Infoln("Building service:", service)
-		image, err := builder.BuildService(service)
-		if err != nil {
-			return err
-		}
-
-		log.Infoln("Pushing image:", image.GetFullname())
-		err = builder.PushService(image)
-		if err != nil {
-			return err
-		}
-
-		env["SERVICE"] = service
-		env["WERCKER_GIT_COMMIT"] = image.Tag
-
-		log.Debugln("Expanding templates for service:", service)
-		err = kubernetes.DeployService(kubeClient, env)
-		if err != nil {
-			return err
-		}
-	}
-
-	return nil
 }

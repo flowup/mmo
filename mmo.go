@@ -160,17 +160,13 @@ func main() {
 			Action: func(c *cli.Context) error {
 				bootstrap(c)
 
-				mmo, err := project.GetMmo()
+				_, err := project.GetMmo()
 
 				if err != nil {
 					return utils.ErrNoProject
 				}
 
-				if err := mmo.Run(); err != nil {
-					log.Fatal(err)
-				}
-
-				return nil
+				return utils.ErrNotImplemented
 			},
 		},
 		{
@@ -207,10 +203,7 @@ func main() {
 					return utils.ErrContextNotSet
 				}
 
-				if err := mmo.RunTests(); err != nil {
-					log.Fatal(err)
-				}
-				return nil
+				return utils.ErrNotImplemented
 			},
 		},
 		{
@@ -237,7 +230,7 @@ func main() {
 					context = mmo.Config.ServiceNames()
 				}
 
-				err = mmo.Plugins.RunHook("gen", mmo.Config.ServiceNames(), context)
+				err = mmo.Plugins.RunGen(context)
 				if err != nil {
 					log.Error(err)
 				}

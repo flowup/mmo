@@ -6,11 +6,12 @@ type RunOptions struct {
 	Volumes       []string
 	PortPublishes []string
 	Args          []string
+	AutoRemove	  bool
 	Environment   map[string]string
 }
 
-func CreateRunOptions(image string) *RunOptions {
-	return &RunOptions{Image: image}
+func CreateRunOptions(image string, command string) *RunOptions {
+	return &RunOptions{Image: image, Command: command}
 }
 
 func (o *RunOptions) AddDockerVolume(name string) {
@@ -29,9 +30,9 @@ func (o *RunOptions) AddEnvVariable(name string, value string) {
 	o.Environment[name] = value
 }
 
-func (o *RunOptions) ToArgs(command string) []string {
+func (o *RunOptions) ToArgs() []string {
 	args := make([]string, 0)
-	args = append(args, command)
+	args = append(args, o.Command)
 	for _, volume := range o.Volumes {
 		args = append(args, "-v")
 		args = append(args, volume)
@@ -47,7 +48,13 @@ func (o *RunOptions) ToArgs(command string) []string {
 		args = append(args, key+"="+value)
 	}
 
-	args = append(args, o.Image)
+	if o.AutoRemove {
+		args = append(args, "--rm")
+	}
+
+	if o.Image != "" {
+		args = append(args, o.Image)
+	}
 	args = append(args, o.Args...)
 	return args
 }
