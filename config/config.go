@@ -44,12 +44,8 @@ func (c *Config) AddPlugin(name string) {
 
 // Service represents service configuration from Config
 type Service struct {
-	Name         string       `yaml:"-"`
-	Description  string       `yaml:"description"`
-	WebRPC       bool         `yaml:"webRPC"`
-	Dependencies []Dependency `yaml:"dependencies"`
-	Sentry       bool         `yaml:"sentry"`
-	Gateway      bool         `yaml:"gateway"`
+	Name        string `yaml:"-"`
+	Description string `yaml:"description"`
 }
 
 // Dependency represents service dependency configuration from Config

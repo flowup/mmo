@@ -5,6 +5,7 @@ import (
 	"github.com/evalphobia/logrus_sentry"
 	"github.com/flowup/mmo/commands/project"
 	"github.com/flowup/mmo/config"
+	"github.com/flowup/mmo/generator/service"
 	"github.com/flowup/mmo/utils"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -254,20 +255,12 @@ func main() {
 					Usage: "creates new service within the project",
 					Flags: []cli.Flag{
 						cli.StringFlag{
+							Name:  "template, t",
+							Usage: "template folder for service generation",
+						},
+						cli.StringFlag{
 							Name:  "description, d",
-							Usage: "set service description",
-						},
-						cli.BoolFlag{
-							Name:  "webrpc",
-							Usage: "automatically generates webrpc integration",
-						},
-						cli.BoolFlag{
-							Name:  "sentry",
-							Usage: "allows Sentry integration",
-						},
-						cli.BoolFlag{
-							Name:  "gateway",
-							Usage: "enabled grpc gateway",
+							Usage: "description of the service",
 						},
 					},
 
@@ -285,6 +278,25 @@ func main() {
 
 						if mmo.Config.Services == nil {
 							mmo.Config.Services = make(map[string]config.Service)
+						}
+
+						mmo.Config.Services[c.Args().First()] = config.Service{
+							Name:        c.Args().First(),
+							Description: c.String("d"),
+						}
+
+						err = service.Generate(service.Service{
+							Name:    c.Args().First(),
+							Project: mmo.Config.Name,
+						}, c.String("t"), ".")
+
+						if err != nil {
+							log.Fatal(err)
+							return nil
+						}
+
+						if err := config.SaveConfig(mmo.Config); err != nil {
+							log.Fatal(err)
 						}
 
 						// TODO: run service gen plugin from default or from argument
