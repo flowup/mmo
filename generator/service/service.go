@@ -48,8 +48,16 @@ func Generate(service Service, opts []string, tmpl string, out string) error {
 		out += "/"
 	}
 
+	skipFiles := make(map[string]bool)
+
 	err = filepath.Walk(tmpl, func(path string, info os.FileInfo, err error) error {
 		filename := path[len(tmpl):]
+
+		for key := range skipFiles {
+			if strings.HasPrefix(filename, key) {
+				return nil
+			}
+		}
 
 		pathBytes := &bytes.Buffer{}
 		fileBytes := &bytes.Buffer{}
@@ -58,6 +66,10 @@ func Generate(service Service, opts []string, tmpl string, out string) error {
 
 		pathTemplated := filepath.Join(*output, service.Name, pathBytes.String())
 		if info.IsDir() {
+			if pathBytes.Len() == 0 {
+				skipFiles[filename+"/"] = true
+				return nil
+			}
 			os.Mkdir(pathTemplated, 0755)
 			return nil
 		}

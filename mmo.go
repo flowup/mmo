@@ -277,7 +277,8 @@ func main() {
 
 						mmo, err := project.GetMmo()
 						if err != nil {
-							return utils.ErrNoProject
+							log.Fatal(err)
+							return nil
 						}
 
 						if mmo.Config.Services == nil {
