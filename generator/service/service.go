@@ -2,11 +2,13 @@ package service
 
 import (
 	"bytes"
+	"errors"
 	"flag"
-	"fmt"
+	"github.com/flowup/mmo/utils"
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"strings"
 	"text/template"
 )
 
@@ -17,9 +19,26 @@ type Service struct {
 	Name    string
 	Package string
 	Project string
+	Opts    map[string]string
 }
 
-func Generate(service Service, tmpl string, out string) error {
+func Generate(service Service, opts []string, tmpl string, out string) error {
+
+	if tmpl == "" {
+		gopath := os.Getenv("GOPATH")
+		if gopath == "" {
+			return errors.New("error: set your $GOPATH or explicitly define template with -t option")
+		}
+
+		tmpl = filepath.Join(gopath, "src/github.com/flowup/mmo/templates/go-service")
+	}
+
+	options, err := ParseOptions(opts)
+	if err != nil {
+		return err
+	}
+
+	service.Opts = options
 
 	if (tmpl)[len(tmpl)-1] != '/' {
 		tmpl += "/"
@@ -29,8 +48,8 @@ func Generate(service Service, tmpl string, out string) error {
 		out += "/"
 	}
 
-	err := filepath.Walk(tmpl, func(path string, info os.FileInfo, err error) error {
-		filename := path[len(*templateSource):]
+	err = filepath.Walk(tmpl, func(path string, info os.FileInfo, err error) error {
+		filename := path[len(tmpl):]
 
 		pathBytes := &bytes.Buffer{}
 		fileBytes := &bytes.Buffer{}
@@ -40,7 +59,6 @@ func Generate(service Service, tmpl string, out string) error {
 		pathTemplated := filepath.Join(*output, service.Name, pathBytes.String())
 		if info.IsDir() {
 			os.Mkdir(pathTemplated, 0755)
-			fmt.Println(filepath.Join(*output, service.Name, pathBytes.String()))
 			return nil
 		}
 
@@ -49,7 +67,11 @@ func Generate(service Service, tmpl string, out string) error {
 			return err
 		}
 
-		template.Must(template.New("").Parse(string(fileTemplate))).Execute(fileBytes, &service)
+		template.Must(
+			template.New("").
+				Funcs(utils.DefaultFuncMap).
+				Parse(string(fileTemplate)),
+		).Execute(fileBytes, &service)
 
 		err = ioutil.WriteFile(pathTemplated, fileBytes.Bytes(), 0755)
 
@@ -59,6 +81,16 @@ func Generate(service Service, tmpl string, out string) error {
 	return err
 }
 
-func main() {
-	flag.Parse()
+func ParseOptions(opts []string) (map[string]string, error) {
+	out := make(map[string]string)
+	for _, opt := range opts {
+		keyval := strings.Split(opt, "=")
+		if len(keyval) == 1 {
+			return nil, errors.New("additional option " + opt + " is not key value pair")
+		}
+
+		out[keyval[0]] = keyval[1]
+	}
+
+	return out, nil
 }

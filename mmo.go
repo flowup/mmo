@@ -262,6 +262,10 @@ func main() {
 							Name:  "description, d",
 							Usage: "description of the service",
 						},
+						cli.StringSliceFlag{
+							Name:  "option, x",
+							Usage: "additional options passed to template engine (-x name=value)",
+						},
 					},
 
 					Action: func(c *cli.Context) error {
@@ -288,7 +292,11 @@ func main() {
 						err = service.Generate(service.Service{
 							Name:    c.Args().First(),
 							Project: mmo.Config.Name,
-						}, c.String("t"), ".")
+						},
+							c.StringSlice("x"),
+							c.String("t"),
+							".",
+						)
 
 						if err != nil {
 							log.Fatal(err)
@@ -298,8 +306,6 @@ func main() {
 						if err := config.SaveConfig(mmo.Config); err != nil {
 							log.Fatal(err)
 						}
-
-						// TODO: run service gen plugin from default or from argument
 
 						return nil
 					},
