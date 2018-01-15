@@ -6,8 +6,9 @@ type RunOptions struct {
 	Volumes       []string
 	PortPublishes []string
 	Args          []string
-	AutoRemove	  bool
+	AutoRemove    bool
 	Environment   map[string]string
+	WorkingDir    string
 }
 
 func CreateRunOptions(image string, command string) *RunOptions {
@@ -52,9 +53,15 @@ func (o *RunOptions) ToArgs() []string {
 		args = append(args, "--rm")
 	}
 
+	if o.WorkingDir != "" {
+		args = append(args, "-w")
+		args = append(args, o.WorkingDir)
+	}
+
 	if o.Image != "" {
 		args = append(args, o.Image)
 	}
+
 	args = append(args, o.Args...)
 	return args
 }

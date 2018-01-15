@@ -233,19 +233,25 @@ func main() {
 					return utils.ErrNoProject
 				}
 
-				services := m.Context.Services
-				if len(services) == 0 {
-					log.Warnln("No context set, using global")
-					services = m.Config.ServiceNames()
-				}
-
-				context := m.Context.GetServices()
+				var services []string
 
 				if m.Context.IsGlobal() {
-					context = m.Config.ServiceNames()
+					services = m.Config.ServiceNames()
+					log.Debug("Global context")
+				} else {
+					log.Debug("Not global context")
+					services = m.Context.GetServices()
 				}
 
-				err = m.Plugins.RunGen(context)
+				for _, service := range services {
+					log.Debug("Running service " + service)
+					err = m.Plugins.RunGen([]string{service}, m.Config.Services[service].Plugins)
+					if err != nil {
+						log.Error(err)
+					}
+				}
+
+				err = m.Plugins.RunGen(m.Config.ServiceNames(), m.Config.Plugins)
 				if err != nil {
 					log.Error(err)
 				}
