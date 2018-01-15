@@ -31,6 +31,7 @@ func (c *Config) ServiceNames() []string {
 	return names
 }
 
+// AddPlugin is method for adding global plugin
 func (c *Config) AddPlugin(name string) {
 	for _, plugin := range c.Plugins {
 		if plugin == name {

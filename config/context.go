@@ -16,6 +16,7 @@ type Context struct {
 	Services []string
 }
 
+// GetServices returns list of services set in context sorted
 func (c *Context) GetServices() []string {
 	sort.Strings(c.Services)
 	return c.Services

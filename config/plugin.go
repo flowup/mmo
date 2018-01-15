@@ -7,12 +7,9 @@ import (
 	"os"
 )
 
+// Plugins is structure that represents plugin system of the MMO
 type Plugins struct {
 	Client *docker.Client
-}
-
-type Plugin struct {
-	Image string `yaml:"-"`
 }
 
 // NewPlugins is function to get instance of the plugin system
@@ -26,7 +23,7 @@ func NewPlugins() (Plugins, error) {
 
 }
 
-// RunHook is method to run all plugins that have specified hook
+// RunGen is method to run all plugins that have specified hook
 func (p *Plugins) RunGen(contextServices []string, plugins []string) error {
 
 	for _, plugin := range plugins {

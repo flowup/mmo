@@ -14,16 +14,19 @@ import (
 
 var output = flag.String("output", ".", "Defines output path")
 
+// Service represents data needed for service generation
 type Service struct {
 	Name    string
 	Package string
 	Project string
 }
 
+// Project represents data needed for project initialization
 type Project struct {
 	Name string
 }
 
+// GenerateProject is function to initialize project from template
 func GenerateProject(project Project, opts []string, tmpl string, out string) error {
 	options, err := ParseOptions(opts)
 	if err != nil {
@@ -35,6 +38,7 @@ func GenerateProject(project Project, opts []string, tmpl string, out string) er
 	return Generate(options, tmpl, out)
 }
 
+// GenerateService is function for service generation from template
 func GenerateService(service Service, opts []string, tmpl string, out string) error {
 	options, err := ParseOptions(opts)
 	if err != nil {
@@ -48,6 +52,7 @@ func GenerateService(service Service, opts []string, tmpl string, out string) er
 	return Generate(options, tmpl, out)
 }
 
+// Generate is function for general generation of files from template (cookiecutter)
 func Generate(options map[string]string, tmpl string, out string) error {
 
 	var err error
@@ -113,6 +118,7 @@ func Generate(options map[string]string, tmpl string, out string) error {
 	return err
 }
 
+// ParseOptions takes slice of options in format key=value and creates map of these options
 func ParseOptions(opts []string) (map[string]string, error) {
 	out := make(map[string]string)
 	for _, opt := range opts {
