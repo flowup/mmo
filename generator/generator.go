@@ -10,8 +10,12 @@ import (
 	"path/filepath"
 	"strings"
 	"text/template"
+	"google.golang.org/api/option"
+	"cloud.google.com/go/storage"
+	"context"
 )
 
+const bucketOutFolder = "/tmp/bucket/"
 var output = flag.String("output", ".", "Defines output path")
 
 type Service struct {
@@ -51,7 +55,24 @@ func GenerateService(service Service, opts []string, tmpl string, out string) er
 func Generate(options map[string]string, tmpl string, out string) error {
 
 	var err error
+	// Download template from google cloud storage
+	if strings.HasPrefix(tmpl, "gs://") {
+		client, err := storage.NewClient(context.Background(), option.WithCredentialsFile(os.Getenv("HOME") + "/cloudkey.json"))
+		if err != nil {
+			return err
+		}
+		splitted := strings.SplitN(strings.TrimPrefix(tmpl,"gs://"), "/", 2)
+		if len(splitted) != 2 {
+			return errors.New("invalid gs uri, should be gs://<bucket_name>/<path>")
+		}
+		err = utils.RecursiveCopy(client, splitted[0], splitted[1], bucketOutFolder)
+		if err != nil {
+			return err
+		}
+		// Modify template path to newly extracted
+		tmpl = bucketOutFolder
 
+	}
 	if (tmpl)[len(tmpl)-1] != '/' {
 		tmpl += "/"
 	}

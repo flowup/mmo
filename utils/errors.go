@@ -13,6 +13,4 @@ var (
 	ErrServiceNotExists = errors.New("Following service doesn't exist: ")
 
 	ErrContextNotSet = errors.New("Context not set. Please set context using sub-command \"set-context\"")
-
-	ErrInvalidGSUri = errors.New("invalid gs uri, should be gs://<bucket_name>/<path>")
 )
