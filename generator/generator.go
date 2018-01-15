@@ -13,6 +13,7 @@ import (
 	"google.golang.org/api/option"
 	"cloud.google.com/go/storage"
 	"context"
+	"log"
 )
 
 const bucketOutFolder = "/tmp/bucket/"
@@ -55,6 +56,7 @@ func GenerateService(service Service, opts []string, tmpl string, out string) er
 func Generate(options map[string]string, tmpl string, out string) error {
 
 	var err error
+	templateFromGS := false
 	// Download template from google cloud storage
 	if strings.HasPrefix(tmpl, "gs://") {
 		client, err := storage.NewClient(context.Background(), option.WithCredentialsFile(os.Getenv("HOME") + "/cloudkey.json"))
@@ -71,6 +73,7 @@ func Generate(options map[string]string, tmpl string, out string) error {
 		}
 		// Modify template path to newly extracted
 		tmpl = bucketOutFolder
+		templateFromGS = true
 
 	}
 	if (tmpl)[len(tmpl)-1] != '/' {
@@ -130,8 +133,17 @@ func Generate(options map[string]string, tmpl string, out string) error {
 
 		return err
 	})
-
-	return err
+	if err != nil {
+		return err
+	}
+	// Remove temporary folder used for template
+	if templateFromGS {
+		err = os.RemoveAll(bucketOutFolder)
+		if err != nil {
+			log.Println(err)
+		}
+	}
+	return nil
 }
 
 func ParseOptions(opts []string) (map[string]string, error) {
