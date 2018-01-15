@@ -2,21 +2,22 @@ package generator
 
 import (
 	"bytes"
+	"cloud.google.com/go/storage"
+	"context"
 	"errors"
 	"flag"
 	"github.com/flowup/mmo/utils"
+	"google.golang.org/api/option"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
 	"text/template"
-	"google.golang.org/api/option"
-	"cloud.google.com/go/storage"
-	"context"
-	"log"
 )
 
 const bucketOutFolder = "/tmp/bucket/"
+
 var output = flag.String("output", ".", "Defines output path")
 
 // Service represents data needed for service generation
@@ -64,11 +65,11 @@ func Generate(options map[string]string, tmpl string, out string) error {
 	templateFromGS := false
 	// Download template from google cloud storage
 	if strings.HasPrefix(tmpl, "gs://") {
-		client, err := storage.NewClient(context.Background(), option.WithCredentialsFile(os.Getenv("HOME") + "/cloudkey.json"))
+		client, err := storage.NewClient(context.Background(), option.WithCredentialsFile(os.Getenv("HOME")+"/cloudkey.json"))
 		if err != nil {
 			return err
 		}
-		splitted := strings.SplitN(strings.TrimPrefix(tmpl,"gs://"), "/", 2)
+		splitted := strings.SplitN(strings.TrimPrefix(tmpl, "gs://"), "/", 2)
 		if len(splitted) != 2 {
 			return errors.New("invalid gs uri, should be gs://<bucket_name>/<path>")
 		}
@@ -94,6 +95,7 @@ func Generate(options map[string]string, tmpl string, out string) error {
 	}
 
 	skipFiles := make(map[string]bool)
+	skipFiles["__help.txt"] = true
 
 	err = filepath.Walk(tmpl, func(path string, info os.FileInfo, err error) error {
 

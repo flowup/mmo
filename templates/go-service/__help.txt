@@ -1,0 +1,5 @@
+Options:
+
+-x Gateway=true -- use gRPC gateway
+-x Sentry=true -- use sentry
+-x WebRPC=true -- use webRPC

@@ -258,6 +258,20 @@ func main() {
 
 				return nil
 			},
+		}, {
+			Name:  "template",
+			Usage: "shows information about template",
+			Action: func(c *cli.Context) error {
+				bootstrap(c)
+
+				if c.NArg() == 0 {
+					return utils.ErrNoArg
+				}
+
+				log.Info(utils.GetTemplateHelp(c.Args().First()))
+
+				return nil
+			},
 		},
 		{
 			Name:  "add",
@@ -288,7 +302,6 @@ func main() {
 							Usage: "additional options passed to template engine (-x name=value)",
 						},
 					},
-
 					Action: func(c *cli.Context) error {
 						bootstrap(c)
 
