@@ -1,4 +1,4 @@
-package service
+package generator
 
 import (
 	"bytes"
@@ -12,36 +12,52 @@ import (
 	"text/template"
 )
 
-var templateSource = flag.String("template", "template", "Defines path to directory with service templates")
 var output = flag.String("output", ".", "Defines output path")
 
 type Service struct {
 	Name    string
 	Package string
 	Project string
-	Opts    map[string]string
 }
 
-func Generate(service Service, opts []string, tmpl string, out string) error {
+type Project struct {
+	Name string
+}
 
-	if tmpl == "" {
-		gopath := os.Getenv("GOPATH")
-		if gopath == "" {
-			return errors.New("error: set your $GOPATH or explicitly define template with -t option")
-		}
-
-		tmpl = filepath.Join(gopath, "src/github.com/flowup/mmo/templates/go-service")
-	}
-
+func GenerateProject(project Project, opts []string, tmpl string, out string) error {
 	options, err := ParseOptions(opts)
 	if err != nil {
 		return err
 	}
 
-	service.Opts = options
+	options["Name"] = project.Name
+
+	return Generate(options, tmpl, out)
+}
+
+func GenerateService(service Service, opts []string, tmpl string, out string) error {
+	options, err := ParseOptions(opts)
+	if err != nil {
+		return err
+	}
+
+	options["Name"] = service.Name
+	options["Package"] = service.Package
+	options["Project"] = service.Project
+
+	return Generate(options, tmpl, out)
+}
+
+func Generate(options map[string]string, tmpl string, out string) error {
+
+	var err error
 
 	if (tmpl)[len(tmpl)-1] != '/' {
 		tmpl += "/"
+	}
+
+	if out == "" {
+		out = *output
 	}
 
 	if (out)[len(out)-1] != '/' {
@@ -51,6 +67,11 @@ func Generate(service Service, opts []string, tmpl string, out string) error {
 	skipFiles := make(map[string]bool)
 
 	err = filepath.Walk(tmpl, func(path string, info os.FileInfo, err error) error {
+
+		if err != nil {
+			return err
+		}
+
 		filename := path[len(tmpl):]
 
 		for key := range skipFiles {
@@ -62,16 +83,15 @@ func Generate(service Service, opts []string, tmpl string, out string) error {
 		pathBytes := &bytes.Buffer{}
 		fileBytes := &bytes.Buffer{}
 
-		template.Must(template.New("").Parse(filename)).Execute(pathBytes, &service)
+		template.Must(template.New("").Parse(filename)).Execute(pathBytes, options)
 
-		pathTemplated := filepath.Join(*output, service.Name, pathBytes.String())
+		pathTemplated := filepath.Join(*output, pathBytes.String())
 		if info.IsDir() {
 			if pathBytes.Len() == 0 {
 				skipFiles[filename+"/"] = true
 				return nil
 			}
-			os.Mkdir(pathTemplated, 0755)
-			return nil
+			return os.Mkdir(pathTemplated, 0755)
 		}
 
 		fileTemplate, err := ioutil.ReadFile(path)
@@ -83,7 +103,7 @@ func Generate(service Service, opts []string, tmpl string, out string) error {
 			template.New("").
 				Funcs(utils.DefaultFuncMap).
 				Parse(string(fileTemplate)),
-		).Execute(fileBytes, &service)
+		).Execute(fileBytes, options)
 
 		err = ioutil.WriteFile(pathTemplated, fileBytes.Bytes(), 0755)
 

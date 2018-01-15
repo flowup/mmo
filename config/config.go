@@ -14,10 +14,9 @@ const (
 
 // Config represents projects configuration
 type Config struct {
-	Name       string             `yaml:"name"`
-	Plugins    []string           `yaml:"plugins"`
-	Generators []string           `yaml:"generators"`
-	Services   map[string]Service `yaml:"services"`
+	Name     string             `yaml:"name"`
+	Plugins  []string           `yaml:"plugins"`
+	Services map[string]Service `yaml:"services"`
 }
 
 // ServiceNames returns an array of all services registered within the config
@@ -44,8 +43,9 @@ func (c *Config) AddPlugin(name string) {
 
 // Service represents service configuration from Config
 type Service struct {
-	Name        string `yaml:"-"`
-	Description string `yaml:"description"`
+	Name        string   `yaml:"-"`
+	Description string   `yaml:"description"`
+	Plugins     []string `yaml:"plugins"`
 }
 
 // Dependency represents service dependency configuration from Config

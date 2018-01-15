@@ -9,10 +9,10 @@ spec:
     - name: grpc
       protocol: TCP
       port: 50051
-    {{if .Opts.WebRPC}}- name: grpc-web
+    {{if .WebRPC}}- name: grpc-web
       protocol: TCP
       port: 50060{{end}}
-    {{if .Opts.Gateway}}- name: http
+    {{if .Gateway}}- name: http
       protocol: TCP
       port: 80{{end}}
 ---
@@ -40,9 +40,9 @@ spec:
         - name: grpc
           containerPort: 50051
           protocol: TCP
-        {{if .Opts.WebRPC}}- name: grpc-web
+        {{if .WebRPC}}- name: grpc-web
           containerPort: 50060
           protocol: TCP{{end}}
-        {{if .Opts.Gateway}}- name: http
+        {{if .Gateway}}- name: http
           containerPort: 80
           protocol: TCP{{end}}

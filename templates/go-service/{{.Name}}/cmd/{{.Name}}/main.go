@@ -6,11 +6,11 @@ import (
 	"sync"
 	"google.golang.org/grpc"
 	"github.com/spf13/viper"
-	"google.golang.org/grpc/reflection"	{{if .Opts.WebRPC}}
+	"google.golang.org/grpc/reflection"	{{if .WebRPC}}
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
     "net/http"{{end}}
-    log "github.com/sirupsen/logrus"{{if .Opts.Sentry}}
-    "github.com/evalphobia/logrus_sentry"{{end}}{{if .Opts.Gateway}}
+    log "github.com/sirupsen/logrus"{{if .Sentry}}
+    "github.com/evalphobia/logrus_sentry"{{end}}{{if .Gateway}}
     "net/http"
     "context"
     "github.com/grpc-ecosystem/grpc-gateway/runtime"{{end}}
@@ -21,7 +21,7 @@ func init() {
 
     log.SetOutput(os.Stdout)
 
-    log.SetLevel(log.DebugLevel){{if .Opts.Sentry}}
+    log.SetLevel(log.DebugLevel){{if .Sentry}}
 
     // Init Logrus with Sentry
     sentryDsn, ok := os.LookupEnv("SENTRY_DSN")
@@ -45,8 +45,8 @@ func init() {
 func main(){
 
     viper.SetDefault("db.conn", "host=db-svc user=goo dbname=goo sslmode=disable password=goo")
-	viper.SetDefault("server.binds.grpc", ":50051"){{if .Opts.WebRPC}}
-	viper.SetDefault("server.binds.webrpc", ":50060"){{end}}{{if .Opts.Gateway}}
+	viper.SetDefault("server.binds.grpc", ":50051"){{if .WebRPC}}
+	viper.SetDefault("server.binds.webrpc", ":50060"){{end}}{{if .Gateway}}
 	viper.SetDefault("server.binds.gw", ":80"){{end}}
 
 	lis, err := net.Listen("tcp", viper.GetString("server.binds.grpc"))
@@ -78,7 +78,7 @@ func main(){
 		}
 
 		wg.Done()
-	}(){{if .Opts.WebRPC}}
+	}(){{if .WebRPC}}
 
 	options := []grpcweb.Option{}
     // Wrap grpc server to grpc-web server
@@ -100,7 +100,7 @@ func main(){
 		}
 
 		wg.Done()
-	}()	{{end}}	{{if .Opts.Gateway}}
+	}()	{{end}}	{{if .Gateway}}
 
 	go func() {
         ctx := context.Background()

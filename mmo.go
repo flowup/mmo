@@ -3,13 +3,14 @@ package main
 import (
 	"bufio"
 	"github.com/evalphobia/logrus_sentry"
-	"github.com/flowup/mmo/commands/project"
 	"github.com/flowup/mmo/config"
-	"github.com/flowup/mmo/generator/service"
+	"github.com/flowup/mmo/generator"
+	"github.com/flowup/mmo/mmo"
 	"github.com/flowup/mmo/utils"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
+	"go/build"
 	"os"
 	"strings"
 	"time"
@@ -64,30 +65,36 @@ func main() {
 		{
 			Name:    "init",
 			Aliases: []string{},
-			Usage:   "creates new project with a given name",
+			Usage:   "creates new mmo with a given name",
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "template, t",
+					Usage: "template folder for mmo generation",
+					Value: build.Default.GOPATH + "/src/github.com/flowup/mmo/templates/go-project",
+				},
+				cli.StringSliceFlag{
+					Name:  "option, x",
+					Usage: "additional options passed to template engine (-x name=value)",
+				},
+			},
 			Action: func(c *cli.Context) error {
 				bootstrap(c)
 
 				if c.Args().First() == "" {
-					return errors.New("Missing project name argument")
+					return errors.New("Missing mmo name argument")
 				}
 
-				mmo := project.Mmo{}
-				mmo.Config = &config.Config{}
+				m := mmo.Mmo{}
+				m.Config = &config.Config{}
 
-				mmo.Config.Name = c.Args().First()
+				m.Config.Name = c.Args().First()
 
 				// if we can't stat the folder, we'll just create new
-				if _, err := os.Stat(mmo.Config.Name); err != nil {
-					// create project folder
-					err := os.Mkdir(mmo.Config.Name, os.ModePerm)
-					if err != nil {
-						return err
-					}
-				} else {
+				if _, err := os.Stat(m.Config.Name); err == nil {
+
 					reader := bufio.NewReader(os.Stdin)
 					answer := ""
-					log.Info("Initializing project in an existing folder. Do you want to proceed? [y/n]: ")
+					log.Info("Initializing mmo in an existing folder. Do you want to proceed? [y/n]: ")
 					for answer != "y" && answer != "n" {
 						answer, _ = reader.ReadString('\n')
 						answer = strings.Trim(answer, "\n")
@@ -98,8 +105,15 @@ func main() {
 					}
 				}
 
-				if err := mmo.InitProject(); err != nil {
-					log.Fatal(err.Error())
+				err := generator.GenerateProject(
+					generator.Project{Name: c.Args().First()},
+					c.StringSlice("x"),
+					c.String("t"),
+					".",
+				)
+
+				if err != nil {
+					log.Fatal(err)
 				}
 
 				return nil
@@ -118,20 +132,20 @@ func main() {
 			Action: func(c *cli.Context) error {
 				bootstrap(c)
 
-				mmo, err := project.GetMmo()
+				m, err := mmo.GetMmo()
 				if err != nil {
 					return utils.ErrNoProject
 				}
 
 				if c.IsSet("reset") {
-					if err := mmo.ResetContext(); err != nil {
+					if err := m.ResetContext(); err != nil {
 						log.Fatal(err)
 					}
 					return nil
 				}
 
 				if c.NArg() == 0 {
-					log.Infoln("Current context:", mmo.Context.Services)
+					log.Infoln("Current context:", m.Context.Services)
 					return nil
 				}
 
@@ -140,7 +154,7 @@ func main() {
 					services[i] = c.Args().Get(i)
 				}
 
-				if err := mmo.SetContext(services); err != nil {
+				if err := m.SetContext(services); err != nil {
 					log.Fatal(err)
 				}
 				return nil
@@ -161,7 +175,7 @@ func main() {
 			Action: func(c *cli.Context) error {
 				bootstrap(c)
 
-				_, err := project.GetMmo()
+				_, err := mmo.GetMmo()
 
 				if err != nil {
 					return utils.ErrNoProject
@@ -194,13 +208,13 @@ func main() {
 			Action: func(c *cli.Context) error {
 				bootstrap(c)
 
-				mmo, err := project.GetMmo()
+				m, err := mmo.GetMmo()
 
 				if err != nil {
 					return utils.ErrNoProject
 				}
 
-				if mmo.Context == nil {
+				if m.Context == nil {
 					return utils.ErrContextNotSet
 				}
 
@@ -213,25 +227,25 @@ func main() {
 			Action: func(c *cli.Context) error {
 				bootstrap(c)
 
-				mmo, err := project.GetMmo()
+				m, err := mmo.GetMmo()
 
 				if err != nil {
 					return utils.ErrNoProject
 				}
 
-				services := mmo.Context.Services
+				services := m.Context.Services
 				if len(services) == 0 {
 					log.Warnln("No context set, using global")
-					services = mmo.Config.ServiceNames()
+					services = m.Config.ServiceNames()
 				}
 
-				context := mmo.Context.GetServices()
+				context := m.Context.GetServices()
 
-				if mmo.Context.IsGlobal() {
-					context = mmo.Config.ServiceNames()
+				if m.Context.IsGlobal() {
+					context = m.Config.ServiceNames()
 				}
 
-				err = mmo.Plugins.RunGen(context)
+				err = m.Plugins.RunGen(context)
 				if err != nil {
 					log.Error(err)
 				}
@@ -241,7 +255,7 @@ func main() {
 		},
 		{
 			Name:  "add",
-			Usage: "scaffolds resources across the project such as services, models, etc.",
+			Usage: "scaffolds resources across the mmo such as services, models, etc.",
 			Subcommands: []cli.Command{
 				{
 					Name:  "model",
@@ -252,11 +266,12 @@ func main() {
 				},
 				{
 					Name:  "service",
-					Usage: "creates new service within the project",
+					Usage: "creates new service within the mmo",
 					Flags: []cli.Flag{
 						cli.StringFlag{
 							Name:  "template, t",
 							Usage: "template folder for service generation",
+							Value: build.Default.GOPATH + "/src/github.com/flowup/mmo/templates/go-service",
 						},
 						cli.StringFlag{
 							Name:  "description, d",
@@ -275,24 +290,24 @@ func main() {
 							return utils.ErrNoArg
 						}
 
-						mmo, err := project.GetMmo()
+						m, err := mmo.GetMmo()
 						if err != nil {
 							log.Fatal(err)
 							return nil
 						}
 
-						if mmo.Config.Services == nil {
-							mmo.Config.Services = make(map[string]config.Service)
+						if m.Config.Services == nil {
+							m.Config.Services = make(map[string]config.Service)
 						}
 
-						mmo.Config.Services[c.Args().First()] = config.Service{
+						m.Config.Services[c.Args().First()] = config.Service{
 							Name:        c.Args().First(),
 							Description: c.String("d"),
 						}
 
-						err = service.Generate(service.Service{
+						err = generator.GenerateService(generator.Service{
 							Name:    c.Args().First(),
-							Project: mmo.Config.Name,
+							Project: m.Config.Name,
 						},
 							c.StringSlice("x"),
 							c.String("t"),
@@ -304,7 +319,7 @@ func main() {
 							return nil
 						}
 
-						if err := config.SaveConfig(mmo.Config); err != nil {
+						if err := config.SaveConfig(m.Config); err != nil {
 							log.Fatal(err)
 						}
 
@@ -321,13 +336,13 @@ func main() {
 							return utils.ErrNoArg
 						}
 
-						mmo, err := project.GetMmo()
+						m, err := mmo.GetMmo()
 						if err != nil {
 							return utils.ErrNoProject
 						}
 
-						mmo.Config.AddPlugin(c.Args().First())
-						err = config.SaveConfig(mmo.Config)
+						m.Config.AddPlugin(c.Args().First())
+						err = config.SaveConfig(m.Config)
 						if err != nil {
 							log.Error(err)
 						}
