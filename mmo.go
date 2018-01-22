@@ -5,7 +5,6 @@ import (
 	"github.com/evalphobia/logrus_sentry"
 	"github.com/flowup/mmo/config"
 	"github.com/flowup/mmo/generator"
-	"github.com/flowup/mmo/mmo"
 	"github.com/flowup/mmo/utils"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -84,7 +83,7 @@ func main() {
 					return errors.New("Missing mmo name argument")
 				}
 
-				m := mmo.Mmo{}
+				m := Mmo{}
 				m.Config = &config.Config{}
 
 				m.Config.Name = c.Args().First()
@@ -132,7 +131,7 @@ func main() {
 			Action: func(c *cli.Context) error {
 				bootstrap(c)
 
-				m, err := mmo.GetMmo()
+				m, err := GetMmo()
 				if err != nil {
 					return utils.ErrNoProject
 				}
@@ -175,7 +174,7 @@ func main() {
 			Action: func(c *cli.Context) error {
 				bootstrap(c)
 
-				_, err := mmo.GetMmo()
+				_, err := GetMmo()
 
 				if err != nil {
 					return utils.ErrNoProject
@@ -208,7 +207,7 @@ func main() {
 			Action: func(c *cli.Context) error {
 				bootstrap(c)
 
-				m, err := mmo.GetMmo()
+				m, err := GetMmo()
 
 				if err != nil {
 					return utils.ErrNoProject
@@ -227,7 +226,7 @@ func main() {
 			Action: func(c *cli.Context) error {
 				bootstrap(c)
 
-				m, err := mmo.GetMmo()
+				m, err := GetMmo()
 
 				if err != nil {
 					return utils.ErrNoProject
@@ -309,7 +308,7 @@ func main() {
 							return utils.ErrNoArg
 						}
 
-						m, err := mmo.GetMmo()
+						m, err := GetMmo()
 						if err != nil {
 							log.Fatal(err)
 							return nil
@@ -355,7 +354,7 @@ func main() {
 							return utils.ErrNoArg
 						}
 
-						m, err := mmo.GetMmo()
+						m, err := GetMmo()
 						if err != nil {
 							return utils.ErrNoProject
 						}

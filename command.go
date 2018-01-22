@@ -1,4 +1,4 @@
-package mmo
+package main
 
 import (
 	"github.com/flowup/mmo/config"
