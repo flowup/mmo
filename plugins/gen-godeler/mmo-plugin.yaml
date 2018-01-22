@@ -1,4 +1,0 @@
-name: Godeler
-global: false
-hooks:
-  gen: gen.sh

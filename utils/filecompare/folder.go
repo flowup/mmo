@@ -1,8 +1,8 @@
 package filecompare
 
 import (
-	"path/filepath"
 	"os"
+	"path/filepath"
 	"strings"
 )
 
@@ -18,31 +18,19 @@ func CompareFolder(source, expected string) error {
 
 		sourcePath := strings.Replace(expectedPath, expected[2:], source, 1)
 
-		if err := CompareFiles(expectedPath, sourcePath); err != nil {
-			return err
-		}
+		return CompareFiles(expectedPath, sourcePath)
 
-		return nil
 	}); err != nil {
 		return err
 	}
 
-	if err := filepath.Walk(source, func(sourcePath string, info os.FileInfo, err error) error {
+	return filepath.Walk(source, func(sourcePath string, info os.FileInfo, err error) error {
 		if info.IsDir() {
 			return nil
 		}
 
 		expectedPath := strings.Replace(sourcePath, source[2:], expected, 1)
 
-		if err := CompareFiles(sourcePath, expectedPath); err != nil {
-			return err
-		}
-
-		return nil
-	}); err != nil {
-		return err
-	}
-
-	return nil
-
+		return CompareFiles(sourcePath, expectedPath)
+	})
 }
