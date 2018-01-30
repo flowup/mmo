@@ -9,12 +9,9 @@ type {{.Name | Title}}ServiceSuite struct {
 	suite.Suite
 
 	service *Service
-	access  *Access
 }
 
 func (s *{{.Name | Title}}ServiceSuite) SetupSuite() {
-	s.access = NewAccess()
-	s.service = NewService(s.access)
 }
 
 func (s *{{.Name | Title}}ServiceSuite) SetupTest() {

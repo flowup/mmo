@@ -11,5 +11,4 @@ service {{.Name | Title}}Service {
 
 message Version {
     string name = 1;
-    string stability = 2;
 }

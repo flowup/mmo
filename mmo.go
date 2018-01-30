@@ -2,6 +2,11 @@ package main
 
 import (
 	"bufio"
+	"go/build"
+	"os"
+	"strings"
+	"time"
+
 	"github.com/evalphobia/logrus_sentry"
 	"github.com/flowup/mmo/config"
 	"github.com/flowup/mmo/generator"
@@ -9,10 +14,6 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
-	"go/build"
-	"os"
-	"strings"
-	"time"
 )
 
 const (
