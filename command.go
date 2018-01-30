@@ -1,11 +1,12 @@
 package main
 
 import (
+	"os"
+
 	"github.com/flowup/mmo/config"
 	"github.com/flowup/mmo/utils"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
-	"os"
 )
 
 // Mmo represents config and context

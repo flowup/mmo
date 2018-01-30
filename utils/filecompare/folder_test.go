@@ -1,11 +1,11 @@
 package filecompare
 
 import (
-	"testing"
-	"github.com/stretchr/testify/suite"
 	"github.com/pkg/errors"
+	"github.com/stretchr/testify/suite"
 	"os"
 	"syscall"
+	"testing"
 )
 
 type FolderCompareSuite struct {

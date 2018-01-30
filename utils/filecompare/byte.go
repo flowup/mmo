@@ -1,10 +1,10 @@
 package filecompare
 
 import (
-	"io/ioutil"
-	"github.com/pkg/errors"
 	"fmt"
+	"github.com/pkg/errors"
 	"github.com/sergi/go-diff/diffmatchpatch"
+	"io/ioutil"
 )
 
 var (

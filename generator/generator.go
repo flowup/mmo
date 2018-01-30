@@ -2,18 +2,19 @@ package generator
 
 import (
 	"bytes"
-	"cloud.google.com/go/storage"
 	"context"
 	"errors"
 	"flag"
-	"github.com/flowup/mmo/utils"
-	"google.golang.org/api/option"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
 	"strings"
 	"text/template"
+
+	"cloud.google.com/go/storage"
+	"github.com/flowup/mmo/utils"
+	"google.golang.org/api/option"
 )
 
 const bucketOutFolder = "/tmp/bucket/"

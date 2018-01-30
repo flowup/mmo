@@ -1,9 +1,9 @@
 package filecompare
 
 import (
-	"testing"
-	"github.com/stretchr/testify/suite"
 	"github.com/pkg/errors"
+	"github.com/stretchr/testify/suite"
+	"testing"
 )
 
 type ByteCompareSuite struct {

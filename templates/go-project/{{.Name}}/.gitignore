@@ -14,3 +14,7 @@
 .glide/
 vendor/
 .idea/
+
+# vscode related gitignore
+*.code-workspace
+.vscode/
