@@ -16,3 +16,5 @@
 .glide/
 vendor/
 .idea/
+*.code-workspace
+.vscode/
