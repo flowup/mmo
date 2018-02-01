@@ -36,7 +36,7 @@ func GetMmo() (*Mmo, error) {
 
 	mmo.Config = mmoConfig
 
-	mmoPlugins, err := config.NewPlugins()
+	mmoPlugins, err := config.NewPlugins(mmoConfig)
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to init mmo plugins")
 	}
