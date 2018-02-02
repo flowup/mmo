@@ -16,6 +16,7 @@ const (
 type Config struct {
 	Name     string             `yaml:"name"`
 	Plugins  []string           `yaml:"plugins"`
+	Prefix   string             `yaml:prefix`
 	Services map[string]Service `yaml:"services"`
 }
 

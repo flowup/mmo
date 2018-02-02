@@ -78,6 +78,7 @@ Project:
 ## Example usage
 * Init project using `mmo init myproject`, then `cd myproject`
 * Create service with grpc gateway using `mmo add service -x Gateway=true myservice`
+    * All template options are available using `mmo template [template name]`
 * Add plugins `flowup/mmo-gen-go-grpc-desc:latest` and `flowup/mmo-gen-grpc-gateway:0.2` to `myservice` plugins scope of the `mmo.yaml` manifest
 * Implement `exampleservice/protobuf/proto.proto`
 * Lock and install dependencies using `dep ensure`

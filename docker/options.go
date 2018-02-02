@@ -14,7 +14,14 @@ type RunOptions struct {
 
 // CreateRunOptions creates minimal options that runs image with command and can be extended later
 func CreateRunOptions(image string, command string) *RunOptions {
-	return &RunOptions{Image: image, Command: command}
+	return &RunOptions{
+		Image:         image,
+		Command:       command,
+		Volumes:       make([]string, 0),
+		PortPublishes: make([]string, 0),
+		Args:          make([]string, 0),
+		Environment:   make(map[string]string),
+	}
 }
 
 // AddDockerVolume adds option to mount docker volume, "-v [volume]" in cli
