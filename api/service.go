@@ -5,6 +5,11 @@ import (
 	google_protobuf "github.com/golang/protobuf/ptypes/empty"
 	"github.com/pkg/errors"
 	"golang.org/x/net/context"
+	"io/ioutil"
+	"strings"
+	"github.com/flowup/mmo/kubernetes"
+	"github.com/flowup/mmo/generator"
+	"os"
 )
 
 // Api represents an implementation of the service interface
@@ -66,3 +71,67 @@ func (s *APIService) GetPlugins(ctx context.Context, in *Service) (*Plugins, err
 		Plugins: result,
 	}, nil
 }
+
+func (s *APIService) GetKubernetesConfigs(ctx context.Context, in *Service) (*KubernetesConfigs, error) {
+	services, err := ioutil.ReadDir("./infrastructure/services/")
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed to read kubernetes configs")
+	}
+
+	deployments, err := ioutil.ReadDir("./infrastructure/deployments/")
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed to read kubernetes configs")
+	}
+
+	result := make([]*KubernetesConfig, 0)
+
+	for _, file := range deployments {
+		if strings.HasPrefix(file.Name(), in.Name+"-") {
+			data, err := ioutil.ReadFile("./infrastructure/deployments/" + file.Name())
+			if err != nil {
+				return nil, errors.Wrap(err, "Failed to read kubernetes config")
+			}
+
+			result = append(result, &KubernetesConfig{Name: file.Name(), Data: string(data)})
+		}
+	}
+
+	for _, file := range services {
+		if strings.HasPrefix(file.Name(), in.Name+"-") {
+			data, err := ioutil.ReadFile("./infrastructure/services/" + file.Name())
+			if err != nil {
+				return nil, errors.Wrap(err, "Failed to read kubernetes config")
+			}
+
+			result = append(result, &KubernetesConfig{Name: file.Name(), Data: string(data)})
+		}
+	}
+
+	return &KubernetesConfigs{Configs: result}, nil
+}
+
+func (s *APIService) KubernetesConfigFromPlugins(ctx context.Context, in *Service) (*KubernetesConfigs, error) {
+
+	mmoService, ok := s.Config.Services[in.Name]
+	if !ok {
+		return nil, errors.New("Service doesn't exist")
+	}
+
+	options := make(map[string]interface{})
+	options["Name"] = in.Name
+	options["Project"] = s.Config.Name
+	options["k"] = kubernetes.FromPlugins(mmoService.Plugins)
+
+	err := generator.Generate(options, os.Getenv("GOPATH")+"/src/github.com/flowup/mmo/templates/kubernetes", ".")
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed to generate kubernetes configs")
+	}
+
+	return &KubernetesConfigs{}, nil
+}
+
+func (s *APIService) KubernetesConfigFromForm(ctx context.Context, in *KubernetesServiceForm) (*KubernetesConfigs, error) {
+	return nil, nil
+}
+
+//func (s *APIService) GetPlugins(ctx context.Context, in *Service) (*Plugins, error) {}

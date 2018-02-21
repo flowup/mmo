@@ -2,16 +2,18 @@ package main
 
 import (
 	"context"
-	"github.com/flowup/mmo/api"
-	"github.com/flowup/mmo/config"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	log "github.com/sirupsen/logrus"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/reflection"
 	"net"
 	"net/http"
 	"os"
 	"sync"
+
+	"github.com/flowup/mmo/api"
+	"github.com/flowup/mmo/config"
+	"github.com/golang/protobuf/proto"
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	log "github.com/sirupsen/logrus"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/reflection"
 )
 
 var (
@@ -64,7 +66,7 @@ func main() {
 		ctx, cancel := context.WithCancel(ctx)
 		defer cancel()
 
-		mux := runtime.NewServeMux()
+		mux := runtime.NewServeMux(runtime.WithForwardResponseOption(corsFilter))
 		opts := []grpc.DialOption{grpc.WithInsecure()}
 		err := api.RegisterApiServiceHandlerFromEndpoint(ctx, mux, grpcPort, opts)
 		if err != nil {
@@ -76,4 +78,9 @@ func main() {
 	}()
 
 	wg.Wait()
+}
+
+func corsFilter(ctx context.Context, w http.ResponseWriter, resp proto.Message) error {
+	w.Header().Set("Access-Control-Allow-Origin", "*")
+	return nil
 }

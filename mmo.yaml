@@ -5,7 +5,7 @@ plugins:
 prefix: github.com/flowup/mmo
 services:
   api:
-    description: ""
+    description: "API of the MMO"
     plugins:
     - flowup/mmo-gen-go-grpc:1.0.2
     - flowup/mmo-gen-grpc-gateway:1.0.1

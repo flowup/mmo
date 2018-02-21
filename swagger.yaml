@@ -4,17 +4,30 @@
     version: "0.0.1"
     title: "Swagger"
     description: "All services\n"
-  host: "host"
+  host: "{{HOST}}"
   basePath: "/"
   schemes: 
     - "http"
-    - "https"
   consumes: 
     - "application/json"
   produces: 
     - "application/json"
   tags: []
   definitions: 
+    apiKubernetesConfig: 
+      type: "object"
+      properties: 
+        name: 
+          type: "string"
+        data: 
+          type: "string"
+    apiKubernetesConfigs: 
+      type: "object"
+      properties: 
+        configs: 
+          type: "array"
+          items: 
+            $ref: "#/definitions/apiKubernetesConfig"
     apiPlugin: 
       type: "object"
       properties: 
@@ -67,6 +80,43 @@
               $ref: "#/definitions/apiServices"
         tags: 
           - "ApiService"
+    /services/{name}/kubernetes: 
+      get: 
+        operationId: "GetKubernetesConfigs"
+        responses: 
+          200: 
+            description: ""
+            schema: 
+              $ref: "#/definitions/apiKubernetesConfigs"
+        parameters: 
+          - 
+            name: "name"
+            in: "path"
+            required: true
+            type: "string"
+          - 
+            name: "description"
+            in: "query"
+            required: false
+            type: "string"
+        tags: 
+          - "ApiService"
+    /services/{name}/kubernetes/plugin: 
+      post: 
+        operationId: "KubernetesConfigFromPlugins"
+        responses: 
+          200: 
+            description: ""
+            schema: 
+              $ref: "#/definitions/apiKubernetesConfigs"
+        parameters: 
+          - 
+            name: "name"
+            in: "path"
+            required: true
+            type: "string"
+        tags: 
+          - "ApiService"
     /services/{name}/plugins: 
       get: 
         operationId: "GetPlugins"
@@ -85,6 +135,22 @@
             name: "description"
             in: "query"
             required: false
+            type: "string"
+        tags: 
+          - "ApiService"
+    /services/{serviceName}/kubernetes/form: 
+      post: 
+        operationId: "KubernetesConfigFromForm"
+        responses: 
+          200: 
+            description: ""
+            schema: 
+              $ref: "#/definitions/apiKubernetesConfigs"
+        parameters: 
+          - 
+            name: "serviceName"
+            in: "path"
+            required: true
             type: "string"
         tags: 
           - "ApiService"

@@ -30,6 +30,24 @@ service ApiService {
             get: "/services/{name}/plugins"
         };
     }
+
+    rpc GetKubernetesConfigs (Service) returns (KubernetesConfigs) {
+        option (google.api.http) = {
+            get: "/services/{name}/kubernetes"
+        };
+    }
+
+    rpc KubernetesConfigFromPlugins(Service) returns (KubernetesConfigs) {
+        option (google.api.http) = {
+            post: "/services/{name}/kubernetes/plugin"
+        };
+    }
+
+    rpc KubernetesConfigFromForm(KubernetesServiceForm) returns (KubernetesConfigs) {
+        option (google.api.http) = {
+            post: "/services/{serviceName}/kubernetes/form"
+        };
+    }
 }
 
 message Version {
@@ -51,4 +69,17 @@ message Plugins {
 
 message Plugin {
     string name = 1;
+}
+
+message KubernetesConfigs {
+    repeated KubernetesConfig configs = 1;
+}
+
+message KubernetesConfig {
+    string name = 1;
+    string data = 2;
+}
+
+message KubernetesServiceForm {
+    string serviceName = 1;
 }
