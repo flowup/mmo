@@ -14,15 +14,18 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { EffectsModule } from '@ngrx/effects';
 import { PluginEffect } from './store/effects/plugin.effect';
+import { ServiceEffect } from './store/effects/service.effect';
 import { StoreModule, ActionReducerMap } from '@ngrx/store';
 import { pluginReducer } from './store/reducers/plugin.reducer';
+import { serviceReducer } from './store/reducers/service.reducer';
 import { ApiClientService } from '../../api/api-client-service';
 import { HttpClientModule } from '@angular/common/http';
 import { AppStateModel } from './store/models/app-state.model';
 import { GlobalPluginsComponent } from './global-plugins/global-plugins.component';
 
 const reducerMap: ActionReducerMap<AppStateModel> = {
-  plugins: pluginReducer
+  plugins: pluginReducer,
+  services: serviceReducer,
 };
 
 @NgModule({
@@ -43,7 +46,8 @@ const reducerMap: ActionReducerMap<AppStateModel> = {
     MatTableModule,
     MatToolbarModule,
     EffectsModule.forRoot([
-      PluginEffect
+      PluginEffect,
+      ServiceEffect
     ]),
     StoreModule.forRoot(reducerMap)
   ], 

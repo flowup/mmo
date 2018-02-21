@@ -3,7 +3,8 @@
 }
 
 .navigation {
-    padding: 16px;
+    padding: 16px 0px;
+    width: 200px;
 }
 
 .content {
@@ -19,7 +20,12 @@
 }
 
 .nav-button {
+    width: 100%;
     &.active::before {
         content: '> ';
     }
+}
+
+ul {
+    list-style-type: none;
 }
