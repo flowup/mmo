@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package api;
+option go_package = "github.com/flowup/mmo/api";
+
+import "google/protobuf/empty.proto";
+import "google/api/annotations.proto";
+
+service ApiService {
+    rpc GetVersion (google.protobuf.Empty) returns (Version) {
+        option (google.api.http) = {
+            get: "/version"
+        };
+    }
+
+    rpc GetServices (google.protobuf.Empty) returns (Services) {
+        option (google.api.http) = {
+            get: "/services"
+        };
+    }
+
+    rpc GetGlobalPlugins (google.protobuf.Empty) returns (Plugins) {
+        option (google.api.http) = {
+            get: "/plugins"
+        };
+    }
+
+    rpc GetPlugins (Service) returns (Plugins) {
+        option (google.api.http) = {
+            get: "/services/{name}/plugins"
+        };
+    }
+}
+
+message Version {
+    string name = 1;
+}
+
+message Services {
+    repeated Service services = 1;
+}
+
+message Service {
+    string name = 1;
+    string description = 2;
+}
+
+message Plugins {
+    repeated Plugin plugins = 1;
+}
+
+message Plugin {
+    string name = 1;
+}

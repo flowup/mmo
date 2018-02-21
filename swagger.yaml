@@ -1,0 +1,101 @@
+---
+  swagger: "2.0"
+  info: 
+    version: "0.0.1"
+    title: "Swagger"
+    description: "All services\n"
+  host: "host"
+  basePath: "/"
+  schemes: 
+    - "http"
+    - "https"
+  consumes: 
+    - "application/json"
+  produces: 
+    - "application/json"
+  tags: []
+  definitions: 
+    apiPlugin: 
+      type: "object"
+      properties: 
+        name: 
+          type: "string"
+    apiPlugins: 
+      type: "object"
+      properties: 
+        plugins: 
+          type: "array"
+          items: 
+            $ref: "#/definitions/apiPlugin"
+    apiService: 
+      type: "object"
+      properties: 
+        name: 
+          type: "string"
+        description: 
+          type: "string"
+    apiServices: 
+      type: "object"
+      properties: 
+        services: 
+          type: "array"
+          items: 
+            $ref: "#/definitions/apiService"
+    apiVersion: 
+      type: "object"
+      properties: 
+        name: 
+          type: "string"
+  paths: 
+    /plugins: 
+      get: 
+        operationId: "GetGlobalPlugins"
+        responses: 
+          200: 
+            description: ""
+            schema: 
+              $ref: "#/definitions/apiPlugins"
+        tags: 
+          - "ApiService"
+    /services: 
+      get: 
+        operationId: "GetServices"
+        responses: 
+          200: 
+            description: ""
+            schema: 
+              $ref: "#/definitions/apiServices"
+        tags: 
+          - "ApiService"
+    /services/{name}/plugins: 
+      get: 
+        operationId: "GetPlugins"
+        responses: 
+          200: 
+            description: ""
+            schema: 
+              $ref: "#/definitions/apiPlugins"
+        parameters: 
+          - 
+            name: "name"
+            in: "path"
+            required: true
+            type: "string"
+          - 
+            name: "description"
+            in: "query"
+            required: false
+            type: "string"
+        tags: 
+          - "ApiService"
+    /version: 
+      get: 
+        operationId: "GetVersion"
+        responses: 
+          200: 
+            description: ""
+            schema: 
+              $ref: "#/definitions/apiVersion"
+        tags: 
+          - "ApiService"
+
