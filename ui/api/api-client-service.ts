@@ -5,9 +5,8 @@ import { Inject, Injectable, Optional } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
 import {
-  ApiPlugin,
+  ApiKubernetesConfigs,
   ApiPlugins,
-  ApiService,
   ApiServices,
   ApiVersion,
 } from '.';
@@ -26,7 +25,7 @@ interface HttpOptions {
 export class ApiClientService {
 
   readonly options: HttpOptions;
-  private domain = 'http://localhost:8080';
+  private domain = 'http://127.0.0.1:50080';
 
   constructor(private http: HttpClient,
               @Optional() @Inject('domain') domain: string,
@@ -55,6 +54,23 @@ export class ApiClientService {
     return this.sendRequest<ApiServices>('GET', path, options);
   }
 
+  getKubernetesConfigs(name: string, description: string, options?: HttpOptions): Observable<ApiKubernetesConfigs> {
+    const path = `/services/${name}/kubernetes`;
+    options = {...this.options, ...options};
+
+    if (description) {
+      options.params = options.params.set('description', String(description));
+    }
+    return this.sendRequest<ApiKubernetesConfigs>('GET', path, options);
+  }
+
+  kubernetesConfigFromPlugins(name: string, options?: HttpOptions): Observable<ApiKubernetesConfigs> {
+    const path = `/services/${name}/kubernetes/plugin`;
+    options = {...this.options, ...options};
+
+    return this.sendRequest<ApiKubernetesConfigs>('POST', path, options);
+  }
+
   getPlugins(name: string, description: string, options?: HttpOptions): Observable<ApiPlugins> {
     const path = `/services/${name}/plugins`;
     options = {...this.options, ...options};
@@ -63,6 +79,13 @@ export class ApiClientService {
       options.params = options.params.set('description', String(description));
     }
     return this.sendRequest<ApiPlugins>('GET', path, options);
+  }
+
+  kubernetesConfigFromForm(serviceName: string, options?: HttpOptions): Observable<ApiKubernetesConfigs> {
+    const path = `/services/${serviceName}/kubernetes/form`;
+    options = {...this.options, ...options};
+
+    return this.sendRequest<ApiKubernetesConfigs>('POST', path, options);
   }
 
   getVersion(options?: HttpOptions): Observable<ApiVersion> {
