@@ -1,5 +1,17 @@
 <mat-toolbar color="primary">
+  <button mat-icon-button class="sidenav-toggle" (click)="sidenav.toggle()">
+    <mat-icon aria-label="Toggle menu">menu</mat-icon>
+  </button>
   <span>My Application</span>
 </mat-toolbar>
 
-<router-outlet></router-outlet>
+<mat-sidenav-container class="container">
+  <mat-sidenav #sidenav mode="side" class="navigation">
+    <button class="nav-button" mat-button *ngFor="let item of navItems" [routerLink]="item.path" routerLinkActive="active">
+      {{item.label}}
+    </button>
+  </mat-sidenav>
+  <mat-sidenav-content class="content">
+      <router-outlet></router-outlet>
+  </mat-sidenav-content>
+</mat-sidenav-container>

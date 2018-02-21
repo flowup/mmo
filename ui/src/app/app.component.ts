@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { navItems } from './app-routing.module';
 
 @Component({
   selector: 'mmo-root',
@@ -7,4 +8,9 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'mmo';
+  navItems = navItems.filter(item => item.label != null);
+
+  constructor() {
+
+  }
 }

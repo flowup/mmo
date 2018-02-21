@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { AppStateModel } from '../../store/models/app-state.model';
+import { AppStateModel } from '../store/models/app-state.model';
 import { Observable } from 'rxjs/Observable';
-import { ApiPlugin } from '../../../../api/index';
+import { ApiPlugin } from '../../../api/index';
 import { Store } from '@ngrx/store';
-import { PluginActionType } from '../../store/reducers/plugin.reducer';
+import { PluginActionType } from '../store/reducers/plugin.reducer';
 
 @Component({
   selector: 'mmo-overview',

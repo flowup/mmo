@@ -1,29 +1,47 @@
 import { NgModule } from '@angular/core';
-import { Routes, RouterModule } from '@angular/router';
-import { OverviewComponent } from './app/overview/overview.component';
+import { RouterModule, Route } from '@angular/router';
+import { OverviewComponent } from './overview/overview.component';
+import { GlobalPluginsComponent } from './global-plugins/global-plugins.component';
 
-const routes: Routes = [{
-  path: '',
-  children: [
-    // {path: 'landing', component: LandingComponent},
-    // {
-    //   path: 'platform',
-    //   component: PlatformComponent,
-    //   canActivate: [ AuthGuardService ],
-    //   children: [
-    //     {path: 'services', component: ProjectsComponent},
-    //     {path: 'service/:id', component: ServiceDetailComponent},
-    //     {path: 'settings', component: SettingsComponent},
-    //     {path: '', redirectTo: 'services', pathMatch: 'full'},
-    //   ]
-    // },
-    // {path: '**', redirectTo: 'landing'},
-  ],
-  component: OverviewComponent
-}];
+interface NavigationItem extends Route {
+  label?: string;
+}
+
+export const navItems: NavigationItem[] = [
+  {
+    path: 'overview',
+    component: OverviewComponent,
+    label: 'Overview',
+    children: [
+      // {path: 'landing', component: LandingComponent},
+      // {
+      //   path: 'platform',
+      //   component: PlatformComponent,
+      //   canActivate: [ AuthGuardService ],
+      //   children: [
+      //     {path: 'services', component: ProjectsComponent},
+      //     {path: 'service/:id', component: ServiceDetailComponent},
+      //     {path: 'settings', component: SettingsComponent},
+      //     {path: '', redirectTo: 'services', pathMatch: 'full'},
+      //   ]
+      // },
+      // {path: '**', redirectTo: 'landing'},
+    ]
+  },
+  {
+    path: 'plugins',
+    component: GlobalPluginsComponent,
+    label: 'Plugins',
+  },
+  {
+    path: '',
+    redirectTo: 'overview',
+    pathMatch: 'full'
+  }
+];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(navItems)],
   exports: [RouterModule]
 })
 export class AppRoutingModule { }

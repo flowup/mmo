@@ -1,15 +1,17 @@
 package api
 
 import (
+	"io/ioutil"
+	"os"
+	"strings"
+
 	"github.com/flowup/mmo/config"
+	"github.com/flowup/mmo/docker"
+	"github.com/flowup/mmo/generator"
+	"github.com/flowup/mmo/kubernetes"
 	google_protobuf "github.com/golang/protobuf/ptypes/empty"
 	"github.com/pkg/errors"
 	"golang.org/x/net/context"
-	"io/ioutil"
-	"strings"
-	"github.com/flowup/mmo/kubernetes"
-	"github.com/flowup/mmo/generator"
-	"os"
 )
 
 // Api represents an implementation of the service interface
@@ -45,7 +47,8 @@ func (s *APIService) GetGlobalPlugins(ctx context.Context, in *google_protobuf.E
 	result := make([]*Plugin, len(s.Config.Plugins))
 	i := 0
 	for _, plugin := range s.Config.Plugins {
-		result[i] = &Plugin{Name: plugin}
+		image := docker.ImageFromString(plugin)
+		result[i] = &Plugin{Name: image.Registry + image.Name, Version: image.Tag}
 		i++
 	}
 
@@ -63,7 +66,8 @@ func (s *APIService) GetPlugins(ctx context.Context, in *Service) (*Plugins, err
 	result := make([]*Plugin, len(service.Plugins))
 	i := 0
 	for _, plugin := range service.Plugins {
-		result[i] = &Plugin{Name: plugin}
+		image := docker.ImageFromString(plugin)
+		result[i] = &Plugin{Name: image.Registry + image.Name, Version: image.Tag}
 		i++
 	}
 

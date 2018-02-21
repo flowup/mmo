@@ -69,6 +69,7 @@ message Plugins {
 
 message Plugin {
     string name = 1;
+    string version = 2;
 }
 
 message KubernetesConfigs {
