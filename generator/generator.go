@@ -60,7 +60,7 @@ func GenerateService(service Service, opts []string, tmpl string, out string) er
 }
 
 // Generate is function for general generation of files from template (cookiecutter)
-func Generate(options map[string]string, tmpl string, out string) error {
+func Generate(options map[string]interface{}, tmpl string, out string) error {
 
 	var err error
 	templateFromGS := false
@@ -117,7 +117,7 @@ func Generate(options map[string]string, tmpl string, out string) error {
 
 		template.Must(template.New("").Parse(filename)).Execute(pathBytes, options)
 
-		pathTemplated := filepath.Join(*output, pathBytes.String())
+		pathTemplated := filepath.Join(out, pathBytes.String())
 		if info.IsDir() {
 			if pathBytes.Len() == 0 {
 				skipFiles[filename+"/"] = true
@@ -155,8 +155,8 @@ func Generate(options map[string]string, tmpl string, out string) error {
 }
 
 // ParseOptions takes slice of options in format key=value and creates map of these options
-func ParseOptions(opts []string) (map[string]string, error) {
-	out := make(map[string]string)
+func ParseOptions(opts []string) (map[string]interface{}, error) {
+	out := make(map[string]interface{})
 	for _, opt := range opts {
 		keyval := strings.Split(opt, "=")
 		if len(keyval) == 1 {
