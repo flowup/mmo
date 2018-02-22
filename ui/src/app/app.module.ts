@@ -15,24 +15,29 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { EffectsModule } from '@ngrx/effects';
 import { PluginEffect } from './store/effects/plugin.effect';
 import { ServiceEffect } from './store/effects/service.effect';
+import { ServiceDetailEffect } from './store/effects/serviceDetail.effect';
 import { StoreModule, ActionReducerMap } from '@ngrx/store';
 import { pluginReducer } from './store/reducers/plugin.reducer';
 import { serviceReducer } from './store/reducers/service.reducer';
+import { serviceDetailReducer } from './store/reducers/serviceDetail.reducer';
 import { ApiClientService } from '../../api/api-client-service';
 import { HttpClientModule } from '@angular/common/http';
 import { AppStateModel } from './store/models/app-state.model';
 import { GlobalPluginsComponent } from './global-plugins/global-plugins.component';
+import { ServiceComponent } from './service/service.component';
 
 const reducerMap: ActionReducerMap<AppStateModel> = {
   plugins: pluginReducer,
   services: serviceReducer,
+  serviceDetails: serviceDetailReducer
 };
 
 @NgModule({
   declarations: [
     AppComponent,
     OverviewComponent,
-    GlobalPluginsComponent
+    GlobalPluginsComponent,
+    ServiceComponent
   ],
   imports: [
     HttpClientModule,
@@ -47,7 +52,8 @@ const reducerMap: ActionReducerMap<AppStateModel> = {
     MatToolbarModule,
     EffectsModule.forRoot([
       PluginEffect,
-      ServiceEffect
+      ServiceEffect,
+      ServiceDetailEffect
     ]),
     StoreModule.forRoot(reducerMap)
   ], 
