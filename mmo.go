@@ -26,7 +26,7 @@ func init() {
 	log.SetFormatter(&log.TextFormatter{})
 	log.SetOutput(os.Stdout)
 	// this should be override-able by some debug flag
-	log.SetLevel(log.DebugLevel)
+	log.SetLevel(log.InfoLevel)
 
 	levels := []log.Level{
 		log.PanicLevel,
@@ -78,23 +78,28 @@ func main() {
 				},
 			},
 			Action: func(c *cli.Context) error {
-				bootstrap(c)
+				debug(c, "Initialization process was started")
 
-				if c.Args().First() == "" {
+				arg := c.Args().First()
+
+				if arg == "" {
 					return errors.New("Missing mmo name argument")
 				}
 
-				m := Mmo{}
-				m.Config = &config.Config{}
-
-				m.Config.Name = c.Args().First()
+				m := &Mmo{
+					Config: &config.Config{
+						Name: arg,
+					},
+				}
 
 				// if we can't stat the folder, we'll just create new
 				if _, err := os.Stat(m.Config.Name); err == nil {
 
 					reader := bufio.NewReader(os.Stdin)
 					answer := ""
-					log.Info("Initializing mmo in an existing folder. Do you want to proceed? [y/n]: ")
+
+					log.Warnln("Initializing mmo in an existing folder. Do you want to proceed? [y/n]: ")
+
 					for answer != "y" && answer != "n" {
 						answer, _ = reader.ReadString('\n')
 						answer = strings.Trim(answer, "\n")
@@ -106,15 +111,17 @@ func main() {
 				}
 
 				err := generator.GenerateProject(
-					generator.Project{Name: c.Args().First()},
+					generator.Project{Name: arg},
 					c.StringSlice("x"),
 					c.String("t"),
 					".",
 				)
 
 				if err != nil {
-					log.Fatal(err)
+					return err
 				}
+
+				log.Infof("Project %s was created", arg)
 
 				return nil
 			},
@@ -130,7 +137,7 @@ func main() {
 				},
 			},
 			Action: func(c *cli.Context) error {
-				bootstrap(c)
+				debug(c, "Set context process was started")
 
 				m, err := GetMmo()
 				if err != nil {
@@ -139,7 +146,7 @@ func main() {
 
 				if c.IsSet("reset") {
 					if err := m.ResetContext(); err != nil {
-						log.Fatal(err)
+						return err
 					}
 					return nil
 				}
@@ -155,8 +162,11 @@ func main() {
 				}
 
 				if err := m.SetContext(services); err != nil {
-					log.Fatal(err)
+					return err
 				}
+
+				log.Infoln("Current context:", m.Context.Services)
+
 				return nil
 			},
 		},
@@ -164,7 +174,6 @@ func main() {
 			Name:  "dev",
 			Usage: "starts up development environment for all services targeted by the context",
 			Action: func(c *cli.Context) error {
-				bootstrap(c)
 
 				return utils.ErrNotImplemented
 			},
@@ -173,7 +182,6 @@ func main() {
 			Name:  "run",
 			Usage: "runs services and their dependencies using docker on your machine",
 			Action: func(c *cli.Context) error {
-				bootstrap(c)
 
 				_, err := GetMmo()
 
@@ -188,7 +196,6 @@ func main() {
 			Name:  "build",
 			Usage: "builds docker images for all services targeted by the context",
 			Action: func(c *cli.Context) error {
-				bootstrap(c)
 
 				return utils.ErrNotImplemented
 			},
@@ -197,7 +204,6 @@ func main() {
 			Name:  "integration",
 			Usage: "builds all the services, deploys them to the kubernetes development cluster and starts up the integration tests. ",
 			Action: func(c *cli.Context) error {
-				bootstrap(c)
 
 				return utils.ErrNotImplemented
 			},
@@ -206,8 +212,6 @@ func main() {
 			Name:  "test",
 			Usage: "runs tests for all services targeted by the context",
 			Action: func(c *cli.Context) error {
-				bootstrap(c)
-
 				m, err := GetMmo()
 
 				if err != nil {
@@ -225,7 +229,7 @@ func main() {
 			Name:  "gen",
 			Usage: "generates third party resources such as proto stubs or serializers",
 			Action: func(c *cli.Context) error {
-				bootstrap(c)
+				debug(c, "start generating MMO resources")
 
 				m, err := GetMmo()
 
@@ -237,14 +241,14 @@ func main() {
 
 				if m.Context.IsGlobal() {
 					services = m.Config.ServiceNames()
-					log.Debug("Global context")
+					log.Debugln("Global context")
 				} else {
-					log.Debug("Not global context")
+					log.Debugln("Not global context")
 					services = m.Context.GetServices()
 				}
 
 				for _, service := range services {
-					log.Debug("Running service " + service)
+					log.Debugln("Running service " + service)
 					err = m.Plugins.RunGen([]string{service}, m.Config.Services[service].Plugins)
 					if err != nil {
 						log.Error(err)
@@ -253,8 +257,10 @@ func main() {
 
 				err = m.Plugins.RunGen(m.Config.ServiceNames(), m.Config.Plugins)
 				if err != nil {
-					log.Error(err)
+					return err
 				}
+
+				log.Infoln("Generation was completed")
 
 				return nil
 			},
@@ -262,13 +268,11 @@ func main() {
 			Name:  "template",
 			Usage: "shows information about template",
 			Action: func(c *cli.Context) error {
-				bootstrap(c)
-
 				if c.NArg() == 0 {
 					return utils.ErrNoArg
 				}
 
-				log.Info(utils.GetTemplateHelp(c.Args().First()))
+				log.Infoln(utils.GetTemplateHelp(c.Args().First()))
 
 				return nil
 			},
@@ -303,7 +307,9 @@ func main() {
 						},
 					},
 					Action: func(c *cli.Context) error {
-						bootstrap(c)
+						debug(c, "Start creating new MMO service")
+
+						arg := c.Args().First()
 
 						if c.NArg() == 0 {
 							return utils.ErrNoArg
@@ -319,13 +325,13 @@ func main() {
 							m.Config.Services = make(map[string]config.Service)
 						}
 
-						m.Config.Services[c.Args().First()] = config.Service{
-							Name:        c.Args().First(),
+						m.Config.Services[arg] = config.Service{
+							Name:        arg,
 							Description: c.String("d"),
 						}
 
 						err = generator.GenerateService(generator.Service{
-							Name:    c.Args().First(),
+							Name:    arg,
 							Project: m.Config.Name,
 						},
 							c.StringSlice("x"),
@@ -334,13 +340,14 @@ func main() {
 						)
 
 						if err != nil {
-							log.Fatal(err)
-							return nil
+							return err
 						}
 
 						if err := config.SaveConfig(m.Config); err != nil {
-							log.Fatal(err)
+							return err
 						}
+
+						log.Infof("Service %s was created\n", arg)
 
 						return nil
 					},
@@ -349,7 +356,9 @@ func main() {
 					Name:  "plugin",
 					Usage: "adds plugin to the current service",
 					Action: func(c *cli.Context) error {
-						bootstrap(c)
+						debug(c, "Start adding new MMO plugin")
+
+						arg := c.Args().First()
 
 						if c.NArg() == 0 {
 							return utils.ErrNoArg
@@ -360,11 +369,13 @@ func main() {
 							return utils.ErrNoProject
 						}
 
-						m.Config.AddPlugin(c.Args().First())
+						m.Config.AddPlugin(arg)
 						err = config.SaveConfig(m.Config)
 						if err != nil {
-							log.Error(err)
+							return err
 						}
+
+						log.Infof("Plugin %s was created\n", arg)
 
 						return nil
 					},
@@ -373,14 +384,20 @@ func main() {
 		},
 	}
 
-	app.Run(os.Args)
+	if err := app.Run(os.Args); err != nil {
+		log.Error(err)
+	}
 }
 
-// bootstrap bootstraps the command to global flags
-func bootstrap(c *cli.Context) {
-	if c.Bool("debug") {
+// debug debugs the command to global flags
+func debug(c *cli.Context, message string) {
+	if c.GlobalBool("debug") {
 		log.SetLevel(log.DebugLevel)
 	}
 
-	log.Debugln("Bootstrap successful")
+	log.WithFields(log.Fields{
+		"arg":     c.Args(),
+		"flags":   c.GlobalFlagNames(),
+		"command": c.Command.Name,
+	}).Debugln(message)
 }
