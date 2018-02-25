@@ -127,10 +127,10 @@ func request_ApiService_GetKubernetesConfigs_0(ctx context.Context, marshaler ru
 }
 
 var (
-	filter_ApiService_KubernetesConfigFromPlugins_0 = &utilities.DoubleArray{Encoding: map[string]int{"name": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+	filter_ApiService_KubernetesFormFromPlugins_0 = &utilities.DoubleArray{Encoding: map[string]int{"name": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
 )
 
-func request_ApiService_KubernetesConfigFromPlugins_0(ctx context.Context, marshaler runtime.Marshaler, client ApiServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+func request_ApiService_KubernetesFormFromPlugins_0(ctx context.Context, marshaler runtime.Marshaler, client ApiServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq Service
 	var metadata runtime.ServerMetadata
 
@@ -152,14 +152,18 @@ func request_ApiService_KubernetesConfigFromPlugins_0(ctx context.Context, marsh
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "name", err)
 	}
 
-	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_ApiService_KubernetesConfigFromPlugins_0); err != nil {
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_ApiService_KubernetesFormFromPlugins_0); err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
-	msg, err := client.KubernetesConfigFromPlugins(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	msg, err := client.KubernetesFormFromPlugins(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
 
 }
+
+var (
+	filter_ApiService_KubernetesConfigFromForm_0 = &utilities.DoubleArray{Encoding: map[string]int{"serviceName": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
+)
 
 func request_ApiService_KubernetesConfigFromForm_0(ctx context.Context, marshaler runtime.Marshaler, client ApiServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq KubernetesServiceForm
@@ -181,6 +185,10 @@ func request_ApiService_KubernetesConfigFromForm_0(ctx context.Context, marshale
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "serviceName", err)
+	}
+
+	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_ApiService_KubernetesConfigFromForm_0); err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := client.KubernetesConfigFromForm(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -371,7 +379,7 @@ func RegisterApiServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux,
 
 	})
 
-	mux.Handle("POST", pattern_ApiService_KubernetesConfigFromPlugins_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+	mux.Handle("GET", pattern_ApiService_KubernetesFormFromPlugins_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
 		if cn, ok := w.(http.CloseNotifier); ok {
@@ -389,14 +397,14 @@ func RegisterApiServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux,
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
-		resp, md, err := request_ApiService_KubernetesConfigFromPlugins_0(rctx, inboundMarshaler, client, req, pathParams)
+		resp, md, err := request_ApiService_KubernetesFormFromPlugins_0(rctx, inboundMarshaler, client, req, pathParams)
 		ctx = runtime.NewServerMetadataContext(ctx, md)
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
 		}
 
-		forward_ApiService_KubernetesConfigFromPlugins_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+		forward_ApiService_KubernetesFormFromPlugins_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -443,7 +451,7 @@ var (
 
 	pattern_ApiService_GetKubernetesConfigs_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2}, []string{"services", "name", "kubernetes"}, ""))
 
-	pattern_ApiService_KubernetesConfigFromPlugins_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 2, 3}, []string{"services", "name", "kubernetes", "plugin"}, ""))
+	pattern_ApiService_KubernetesFormFromPlugins_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 2, 3}, []string{"services", "name", "kubernetes", "form"}, ""))
 
 	pattern_ApiService_KubernetesConfigFromForm_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 2, 3}, []string{"services", "serviceName", "kubernetes", "form"}, ""))
 )
@@ -459,7 +467,7 @@ var (
 
 	forward_ApiService_GetKubernetesConfigs_0 = runtime.ForwardResponseMessage
 
-	forward_ApiService_KubernetesConfigFromPlugins_0 = runtime.ForwardResponseMessage
+	forward_ApiService_KubernetesFormFromPlugins_0 = runtime.ForwardResponseMessage
 
 	forward_ApiService_KubernetesConfigFromForm_0 = runtime.ForwardResponseMessage
 )

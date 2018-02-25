@@ -9,6 +9,7 @@ import { OverviewComponent } from './overview/overview.component';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatTableModule } from '@angular/material/table';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatToolbarModule } from '@angular/material/toolbar';
@@ -17,6 +18,7 @@ import { PluginEffect } from './store/effects/plugin.effect';
 import { ServiceEffect } from './store/effects/service.effect';
 import { ServiceDetailEffect } from './store/effects/serviceDetail.effect';
 import { StoreModule, ActionReducerMap } from '@ngrx/store';
+import { kubernetesReducer } from './store/reducers/kubernetes.reducer';
 import { pluginReducer } from './store/reducers/plugin.reducer';
 import { serviceReducer } from './store/reducers/service.reducer';
 import { serviceDetailReducer } from './store/reducers/serviceDetail.reducer';
@@ -25,11 +27,19 @@ import { HttpClientModule } from '@angular/common/http';
 import { AppStateModel } from './store/models/app-state.model';
 import { GlobalPluginsComponent } from './global-plugins/global-plugins.component';
 import { ServiceComponent } from './service/service.component';
+import { KubernetesCreateDialog } from './service/kubernetes/kubernetesCreate.dialog';
+import { KubernetesFormComponent } from './service/kubernetes/kubernetes-form/kubernetes-form.component';
+import { ReactiveFormsModule } from '@angular/forms';
+import { KubernetesEffect } from './store/effects/kubernetes.effect';
+import { KubernetesEditorDialog } from './service/kubernetes/kubernetesEditor.dialog';
+import { AceEditorModule } from 'ng2-ace-editor';
+import { MatCheckboxModule } from '@angular/material';
 
 const reducerMap: ActionReducerMap<AppStateModel> = {
   plugins: pluginReducer,
   services: serviceReducer,
-  serviceDetails: serviceDetailReducer
+  serviceDetails: serviceDetailReducer,
+  kubernetesForm: kubernetesReducer,
 };
 
 @NgModule({
@@ -37,20 +47,28 @@ const reducerMap: ActionReducerMap<AppStateModel> = {
     AppComponent,
     OverviewComponent,
     GlobalPluginsComponent,
-    ServiceComponent
+    ServiceComponent,
+    KubernetesCreateDialog,
+    KubernetesEditorDialog,
+    KubernetesFormComponent
   ],
   imports: [
+    AceEditorModule,
     HttpClientModule,
     BrowserModule,
     AppRoutingModule,
     BrowserAnimationsModule,
     MatButtonModule,
+    MatCheckboxModule,
+    MatDialogModule,
     MatCardModule,
     MatIconModule,
     MatSidenavModule,
     MatTableModule,
     MatToolbarModule,
+    ReactiveFormsModule,
     EffectsModule.forRoot([
+      KubernetesEffect,
       PluginEffect,
       ServiceEffect,
       ServiceDetailEffect
@@ -58,8 +76,16 @@ const reducerMap: ActionReducerMap<AppStateModel> = {
     StoreModule.forRoot(reducerMap)
   ], 
   providers: [
-    ApiClientService
+    ApiClientService,
+    {
+      provide: 'domain',
+      useValue: 'http://localhost:50080'
+    },
   ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  entryComponents: [
+    KubernetesCreateDialog,
+    KubernetesEditorDialog
+  ]
 })
 export class AppModule { }

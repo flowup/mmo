@@ -20,6 +20,10 @@
       properties: 
         name: 
           type: "string"
+        type: 
+          type: "string"
+        path: 
+          type: "string"
         data: 
           type: "string"
     apiKubernetesConfigs: 
@@ -29,6 +33,51 @@
           type: "array"
           items: 
             $ref: "#/definitions/apiKubernetesConfig"
+    apiKubernetesEnvVar: 
+      type: "object"
+      properties: 
+        name: 
+          type: "string"
+        value: 
+          type: "string"
+    apiKubernetesPort: 
+      type: "object"
+      properties: 
+        name: 
+          type: "string"
+        port: 
+          type: "string"
+    apiKubernetesServiceForm: 
+      type: "object"
+      properties: 
+        serviceName: 
+          type: "string"
+        ports: 
+          type: "array"
+          items: 
+            $ref: "#/definitions/apiKubernetesPort"
+        volumes: 
+          type: "array"
+          items: 
+            $ref: "#/definitions/apiKubernetesVolume"
+        variables: 
+          type: "array"
+          items: 
+            $ref: "#/definitions/apiKubernetesEnvVar"
+    apiKubernetesVolume: 
+      type: "object"
+      properties: 
+        name: 
+          type: "string"
+        mountPath: 
+          type: "string"
+        pvcName: 
+          type: "string"
+        pvcSizeGB: 
+          type: "integer"
+          format: "int32"
+        gceDisk: 
+          type: "string"
     apiPlugin: 
       type: "object"
       properties: 
@@ -104,19 +153,24 @@
             type: "string"
         tags: 
           - "ApiService"
-    /services/{name}/kubernetes/plugin: 
-      post: 
-        operationId: "KubernetesConfigFromPlugins"
+    /services/{name}/kubernetes/form: 
+      get: 
+        operationId: "KubernetesFormFromPlugins"
         responses: 
           200: 
             description: ""
             schema: 
-              $ref: "#/definitions/apiKubernetesConfigs"
+              $ref: "#/definitions/apiKubernetesServiceForm"
         parameters: 
           - 
             name: "name"
             in: "path"
             required: true
+            type: "string"
+          - 
+            name: "description"
+            in: "query"
+            required: false
             type: "string"
         tags: 
           - "ApiService"

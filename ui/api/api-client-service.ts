@@ -6,6 +6,7 @@ import { Observable } from 'rxjs/Observable';
 
 import {
   ApiKubernetesConfigs,
+  ApiKubernetesServiceForm,
   ApiPlugins,
   ApiServices,
   ApiVersion,
@@ -25,7 +26,7 @@ interface HttpOptions {
 export class ApiClientService {
 
   readonly options: HttpOptions;
-  private domain = 'http://127.0.0.1:50080';
+  private domain = 'http://localhost:8080';
 
   constructor(private http: HttpClient,
               @Optional() @Inject('domain') domain: string,
@@ -64,11 +65,14 @@ export class ApiClientService {
     return this.sendRequest<ApiKubernetesConfigs>('GET', path, options);
   }
 
-  kubernetesConfigFromPlugins(name: string, options?: HttpOptions): Observable<ApiKubernetesConfigs> {
-    const path = `/services/${name}/kubernetes/plugin`;
+  kubernetesFormFromPlugins(name: string, description: string, options?: HttpOptions): Observable<ApiKubernetesServiceForm> {
+    const path = `/services/${name}/kubernetes/form`;
     options = {...this.options, ...options};
 
-    return this.sendRequest<ApiKubernetesConfigs>('POST', path, options);
+    if (description) {
+      options.params = options.params.set('description', String(description));
+    }
+    return this.sendRequest<ApiKubernetesServiceForm>('GET', path, options);
   }
 
   getPlugins(name: string, description: string, options?: HttpOptions): Observable<ApiPlugins> {

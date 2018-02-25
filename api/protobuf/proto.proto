@@ -37,9 +37,9 @@ service ApiService {
         };
     }
 
-    rpc KubernetesConfigFromPlugins(Service) returns (KubernetesConfigs) {
+    rpc KubernetesFormFromPlugins(Service) returns (KubernetesServiceForm) {
         option (google.api.http) = {
-            post: "/services/{name}/kubernetes/plugin"
+            get: "/services/{name}/kubernetes/form"
         };
     }
 
@@ -78,9 +78,32 @@ message KubernetesConfigs {
 
 message KubernetesConfig {
     string name = 1;
-    string data = 2;
+    string type = 2;
+    string path = 3;
+    string data = 4;
 }
 
 message KubernetesServiceForm {
     string serviceName = 1;
+    repeated KubernetesPort ports = 2;
+    repeated KubernetesVolume volumes = 3;
+    repeated KubernetesEnvVar variables = 4;
+}
+
+message KubernetesVolume {
+    string name = 1;
+    string mountPath = 2;
+    string pvcName = 3;
+    int32 pvcSizeGB = 4;
+    string gceDisk = 5;
+}
+
+message KubernetesPort {
+    string name = 1;
+    string port = 2;
+}
+
+message KubernetesEnvVar {
+    string name = 1;
+    string value = 2;
 }

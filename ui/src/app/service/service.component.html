@@ -9,18 +9,18 @@
   <mat-card-title>Plugins</mat-card-title>
   <mat-card-content>
       <mat-table #table [dataSource]="service.plugins">
-          <ng-container matColumnDef="name">
-              <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
-              <mat-cell *matCellDef="let plugin"> {{plugin.name}} </mat-cell>
-          </ng-container>
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+            <mat-cell *matCellDef="let plugin"> {{plugin.name}} </mat-cell>
+        </ng-container>
 
-          <ng-container matColumnDef="version">
-              <mat-header-cell *matHeaderCellDef> Version </mat-header-cell>
-              <mat-cell *matCellDef="let plugin"> {{plugin.version}} </mat-cell>
-          </ng-container>
+        <ng-container matColumnDef="version">
+            <mat-header-cell *matHeaderCellDef> Version </mat-header-cell>
+            <mat-cell *matCellDef="let plugin"> {{plugin.version}} </mat-cell>
+        </ng-container>
 
-          <mat-header-row *matHeaderRowDef="displayedColumnsPlugins"></mat-header-row>
-          <mat-row *matRowDef="let row; columns: displayedColumnsPlugins;"></mat-row>
+        <mat-header-row *matHeaderRowDef="displayedColumnsPlugins"></mat-header-row>
+        <mat-row *matRowDef="let row; columns: displayedColumnsPlugins;"></mat-row>
       </mat-table>
   </mat-card-content>
 </mat-card>
@@ -29,30 +29,49 @@
   <mat-card-title>Kubernetes</mat-card-title>
   <mat-card-content>
     <mat-table #table [dataSource]="service.kubernetes">
-      <ng-container matColumnDef="name">
-          <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
-          <mat-cell *matCellDef="let kube"> {{kube.name}} </mat-cell>
-      </ng-container>
+        <ng-container matColumnDef="select">
+            <mat-header-cell *matHeaderCellDef>
+                <mat-checkbox (change)="$event ? masterToggle() : null"
+                            [checked]="selection.hasValue() && isAllSelected()"
+                            [indeterminate]="selection.hasValue() && !isAllSelected()">
+                </mat-checkbox>
+            </mat-header-cell>
+            <mat-cell *matCellDef="let row">
+                <mat-checkbox (click)="$event.stopPropagation()"
+                            (change)="$event ? selection.toggle(row) : null"
+                            [checked]="selection.isSelected(row)">
+                </mat-checkbox>
+            </mat-cell>
+        </ng-container>
+                
+        <ng-container matColumnDef="name">
+            <mat-header-cell *matHeaderCellDef> Name </mat-header-cell>
+            <mat-cell *matCellDef="let kube"> {{kube.name}} </mat-cell>
+        </ng-container>
 
-      <ng-container matColumnDef="type">
-          <mat-header-cell *matHeaderCellDef> Type </mat-header-cell>
-          <mat-cell *matCellDef="let kube"> Type TBD </mat-cell>
-      </ng-container>
+        <ng-container matColumnDef="type">
+            <mat-header-cell *matHeaderCellDef> Type </mat-header-cell>
+            <mat-cell *matCellDef="let kube"> {{kube.type}} </mat-cell>
+        </ng-container>
 
-      <ng-container matColumnDef="actions">
-        <mat-header-cell *matHeaderCellDef> Actions </mat-header-cell>
-        <mat-cell *matCellDef="let kube">
-            <button mat-icon-button>
-                <mat-icon aria-label="Edit">edit</mat-icon>
-            </button>
-            <button mat-icon-button>
-                <mat-icon aria-label="Remove">delete</mat-icon>
-            </button>
-        </mat-cell>
-      </ng-container>
+        <ng-container matColumnDef="actions">
+            <mat-header-cell *matHeaderCellDef> Actions </mat-header-cell>
+            <mat-cell *matCellDef="let kube">
+                <button mat-icon-button>
+                    <mat-icon aria-label="Edit" (click)="editKubernetes(kube);">edit</mat-icon>
+                </button>
+                <button mat-icon-button>
+                    <mat-icon aria-label="Remove">delete</mat-icon>
+                </button>
+            </mat-cell>
+        </ng-container>
 
       <mat-header-row *matHeaderRowDef="displayedColumnsKubernetes"></mat-header-row>
       <mat-row *matRowDef="let row; columns: displayedColumnsKubernetes;"></mat-row>
   </mat-table>
   </mat-card-content>
+  <mat-card-actions>
+    <button mat-button color="primary" (click)="createKubernetesResource();">CREATE</button>
+    <button mat-button color="primary" (click)="deploySelected();">DEPLOY SELECTED</button>
+  </mat-card-actions>
 </mat-card>

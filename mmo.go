@@ -10,7 +10,6 @@ import (
 	"github.com/evalphobia/logrus_sentry"
 	"github.com/flowup/mmo/config"
 	"github.com/flowup/mmo/generator"
-	"github.com/flowup/mmo/kubernetes"
 	"github.com/flowup/mmo/utils"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -365,85 +364,6 @@ func main() {
 						err = config.SaveConfig(m.Config)
 						if err != nil {
 							log.Error(err)
-						}
-
-						return nil
-					},
-				},
-			},
-		},
-		{
-			Name:  "kube",
-			Usage: "manages Kubernetes resources",
-			Subcommands: []cli.Command{
-				{
-					Name:  "add",
-					Usage: "adds kubernetes resource for service",
-					Flags: []cli.Flag{
-						cli.BoolFlag{
-							Name:  "wizard, w",
-							Usage: "wizard for creating service",
-						},
-						cli.StringFlag{
-							Name:  "template, t",
-							Usage: "template folder for service generation",
-							Value: build.Default.GOPATH + "/src/github.com/flowup/mmo/templates/kubernetes",
-						},
-					},
-					Action: func(c *cli.Context) error {
-						bootstrap(c)
-
-						if c.NArg() == 0 {
-							return utils.ErrNoArg
-						}
-
-						m, err := GetMmo()
-						if err != nil {
-							return utils.ErrNoProject
-						}
-
-						service, ok := m.Config.Services[c.Args().First()]
-						if !ok {
-							log.Warnln("Service doesn't exist")
-							return nil
-						}
-
-						options := make(map[string]interface{})
-						options["Name"] = c.Args().First()
-						options["Project"] = m.Config.Name
-						options["k"] = kubernetes.FromPlugins(service.Plugins)
-
-						err = generator.Generate(options, c.String("t"), "./infrastructure/services")
-
-						if err != nil {
-							log.Warnln(err)
-							return nil
-						}
-
-						return nil
-					},
-				},
-				{
-					Name:  "extend",
-					Usage: "extends existing resource of the service",
-					Flags: []cli.Flag{
-						cli.StringFlag{
-							Name:  "template, t",
-							Usage: "template folder for service generation",
-							Value: build.Default.GOPATH + "/src/github.com/flowup/mmo/templates/go-service",
-						},
-					},
-					Action: func(c *cli.Context) error {
-						bootstrap(c)
-
-						if c.NArg() == 0 {
-							return utils.ErrNoArg
-						}
-
-						_, err := GetMmo()
-						if err != nil {
-							log.Fatal(err)
-							return nil
 						}
 
 						return nil
