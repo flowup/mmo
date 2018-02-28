@@ -9,6 +9,7 @@ import { KubernetesCreateDialog } from './kubernetes/kubernetesCreate.dialog';
 import { ApiKubernetesConfig } from '../../../api';
 import { KubernetesEditorDialog } from './kubernetes/kubernetesEditor.dialog';
 import { SelectionModel } from '@angular/cdk/collections';
+import { KubernetesDeployDialog } from './kubernetes/kubernetesDeploy.dialog';
 
 @Component({
   selector: 'mmo-service',
@@ -77,6 +78,18 @@ export class ServiceComponent implements OnInit {
     let dialogRef = this.dialog.open(KubernetesEditorDialog, {
       width: '750px',
       data: { config: config }
+    });
+
+    dialogRef.afterClosed().subscribe(() => {
+      console.log('The dialog was closed');
+    });
+  }
+
+  deploySelected() {
+
+    let dialogRef = this.dialog.open(KubernetesDeployDialog, {
+      width: '750px',
+      data: this.selection.selected
     });
 
     dialogRef.afterClosed().subscribe(() => {

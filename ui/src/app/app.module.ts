@@ -34,6 +34,7 @@ import { KubernetesEffect } from './store/effects/kubernetes.effect';
 import { KubernetesEditorDialog } from './service/kubernetes/kubernetesEditor.dialog';
 import { AceEditorModule } from 'ng2-ace-editor';
 import { MatCheckboxModule } from '@angular/material';
+import { KubernetesDeployDialog } from './service/kubernetes/kubernetesDeploy.dialog';
 
 const reducerMap: ActionReducerMap<AppStateModel> = {
   plugins: pluginReducer,
@@ -49,6 +50,7 @@ const reducerMap: ActionReducerMap<AppStateModel> = {
     GlobalPluginsComponent,
     ServiceComponent,
     KubernetesCreateDialog,
+    KubernetesDeployDialog,
     KubernetesEditorDialog,
     KubernetesFormComponent
   ],
@@ -85,7 +87,8 @@ const reducerMap: ActionReducerMap<AppStateModel> = {
   bootstrap: [AppComponent],
   entryComponents: [
     KubernetesCreateDialog,
-    KubernetesEditorDialog
+    KubernetesEditorDialog,
+    KubernetesDeployDialog
   ]
 })
 export class AppModule { }
