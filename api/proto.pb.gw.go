@@ -161,13 +161,15 @@ func request_ApiService_KubernetesFormFromPlugins_0(ctx context.Context, marshal
 
 }
 
-var (
-	filter_ApiService_KubernetesConfigFromForm_0 = &utilities.DoubleArray{Encoding: map[string]int{"serviceName": 0}, Base: []int{1, 1, 0}, Check: []int{0, 1, 2}}
-)
-
 func request_ApiService_KubernetesConfigFromForm_0(ctx context.Context, marshaler runtime.Marshaler, client ApiServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq KubernetesServiceForm
 	var metadata runtime.ServerMetadata
+
+	if req.ContentLength > 0 {
+		if err := marshaler.NewDecoder(req.Body).Decode(&protoReq); err != nil {
+			return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
+		}
+	}
 
 	var (
 		val string
@@ -185,10 +187,6 @@ func request_ApiService_KubernetesConfigFromForm_0(ctx context.Context, marshale
 
 	if err != nil {
 		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "serviceName", err)
-	}
-
-	if err := runtime.PopulateQueryParameters(&protoReq, req.URL.Query(), filter_ApiService_KubernetesConfigFromForm_0); err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "%v", err)
 	}
 
 	msg, err := client.KubernetesConfigFromForm(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))

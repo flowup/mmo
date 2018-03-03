@@ -37,7 +37,7 @@ export class KubernetesFormComponent implements OnInit {
    buildPort(name: string, value: string): FormGroup {
      return new FormGroup({
        'name': new FormControl(name, Validators.required),
-       'value': new FormControl(value, Validators.required)
+       'port': new FormControl(value, Validators.required)
      })
    }
 

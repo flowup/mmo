@@ -3,9 +3,11 @@ import { Observable } from 'rxjs/Observable';
 import { Injectable } from '@angular/core';
 import { ApiClientService } from '../../../../api';
 import { map, switchMap } from 'rxjs/operators';
+import 'rxjs/add/observable/of';
 import { combineLatest } from 'rxjs/observable/combineLatest';
 import { AppAction } from '../models/app-state.model';
 import { ServiceDetailActionType } from '../reducers/serviceDetail.reducer';
+import { KubernetesActionType } from '../reducers/kubernetes.reducer';
 
 @Injectable()
 export class ServiceDetailEffect {
@@ -30,6 +32,14 @@ export class ServiceDetailEffect {
                     )),
                 )
                 
+            })
+        )
+    @Effect() refreshServiceDetail$: Observable<AppAction> = this.actions$
+        .ofType(KubernetesActionType.CreateConfigSuccess)
+        .pipe(
+            switchMap((action: AppAction) => {
+                console.log(action.payload); 
+                return Observable.of({ type: ServiceDetailActionType.GetServiceDetail, payload: action.payload})
             })
         )
 }

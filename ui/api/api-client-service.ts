@@ -85,11 +85,14 @@ export class ApiClientService {
     return this.sendRequest<ApiPlugins>('GET', path, options);
   }
 
-  kubernetesConfigFromForm(serviceName: string, options?: HttpOptions): Observable<ApiKubernetesConfigs> {
+  kubernetesConfigFromForm(serviceName: string, body: ApiKubernetesServiceForm, options?: HttpOptions): Observable<ApiKubernetesConfigs> {
     const path = `/services/${serviceName}/kubernetes/create`;
     options = {...this.options, ...options};
 
-    return this.sendRequest<ApiKubernetesConfigs>('POST', path, options);
+    console.log(serviceName);
+    console.log(body);
+
+    return this.sendRequest<ApiKubernetesConfigs>('POST', path, options, JSON.stringify(body));
   }
 
   getVersion(options?: HttpOptions): Observable<ApiVersion> {

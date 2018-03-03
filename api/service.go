@@ -162,8 +162,8 @@ func (s *APIService) KubernetesFormFromPlugins(ctx context.Context, in *Service)
 }
 
 func (s *APIService) KubernetesConfigFromForm(ctx context.Context, in *KubernetesServiceForm) (*KubernetesConfigs, error) {
-	logrus.Debugln("Generating kubernetes configs... ", in)
-	return nil, nil
+	logrus.Debugln("Generating kubernetes configs... ")
+	return &KubernetesConfigs{}, nil
 }
 
 //func (s *APIService) GetPlugins(ctx context.Context, in *Service) (*Plugins, error) {}

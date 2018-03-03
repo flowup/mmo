@@ -18,11 +18,11 @@ export class KubernetesEffect {
             ))
         )
 
-    // @Effect() setKubernetes$: Observable<AppAction> = this.actions$
-    //     .ofType(KubernetesActionType.CreateConfig)
-    //     .pipe(
-    //         switchMap((action: AppAction) => this.apiClient.kubernetesConfigFromForm(action.payload, "").pipe(
-    //             map((response) => ({type: KubernetesActionType.GetDefaultsSuccess, payload: response}))
-    //         ))
-    //     )
+    @Effect() setKubernetes$: Observable<AppAction> = this.actions$
+        .ofType(KubernetesActionType.CreateConfig)
+        .pipe(
+            switchMap((action: AppAction) => this.apiClient.kubernetesConfigFromForm(action.payload.id, action.payload.form).pipe(
+                map(() => ({type: KubernetesActionType.CreateConfigSuccess, payload: action.payload.id}))
+            ))
+        )
 }

@@ -32,8 +32,8 @@
         <input matInput 
             type="text" 
             placeholder="Port number"
-            [attr.id]="'value'+i" 
-            formControlName="value" >
+            [attr.id]="'port'+i" 
+            formControlName="port">
     </mat-form-field>
     <button mat-icon-button type="button" (click)="kubernetesForm.get('ports').removeAt(i)">
         <mat-icon aria-label="Delete port">delete</mat-icon>
