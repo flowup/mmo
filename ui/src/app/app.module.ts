@@ -33,7 +33,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { KubernetesEffect } from './store/effects/kubernetes.effect';
 import { KubernetesEditorDialog } from './service/kubernetes/kubernetesEditor.dialog';
 import { AceEditorModule } from 'ng2-ace-editor';
-import { MatCheckboxModule } from '@angular/material';
+import { MatCheckboxModule, MatInputModule, MatDividerModule, MatTooltipModule } from '@angular/material';
 import { KubernetesDeployDialog } from './service/kubernetes/kubernetesDeploy.dialog';
 
 const reducerMap: ActionReducerMap<AppStateModel> = {
@@ -63,8 +63,11 @@ const reducerMap: ActionReducerMap<AppStateModel> = {
     MatButtonModule,
     MatCheckboxModule,
     MatDialogModule,
+    MatDividerModule,
     MatCardModule,
     MatIconModule,
+    MatInputModule,
+    MatTooltipModule,
     MatSidenavModule,
     MatTableModule,
     MatToolbarModule,

@@ -39,6 +39,7 @@
             <mat-cell *matCellDef="let row">
                 <mat-checkbox (click)="$event.stopPropagation()"
                             (change)="$event ? selection.toggle(row) : null"
+                            [disabled]="row.type === 'Invalid Kubernetes config'"
                             [checked]="selection.isSelected(row)">
                 </mat-checkbox>
             </mat-cell>

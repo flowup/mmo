@@ -108,6 +108,6 @@ export class ServiceComponent implements OnInit {
   masterToggle() {
     this.isAllSelected() ?
         this.selection.clear() :
-        this.service.kubernetes.forEach(row => this.selection.select(row));
+        this.service.kubernetes.filter(row => row.type !== "Invalid Kubernetes config").forEach(row => this.selection.select(row));
   }
 }

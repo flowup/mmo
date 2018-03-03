@@ -45,7 +45,7 @@ service ApiService {
 
     rpc KubernetesConfigFromForm(KubernetesServiceForm) returns (KubernetesConfigs) {
         option (google.api.http) = {
-            post: "/services/{serviceName}/kubernetes/form"
+            post: "/services/{serviceName}/kubernetes/create"
         };
     }
 }

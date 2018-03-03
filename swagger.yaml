@@ -195,7 +195,7 @@
             type: "string"
         tags: 
           - "ApiService"
-    /services/{serviceName}/kubernetes/form: 
+    /services/{serviceName}/kubernetes/create: 
       post: 
         operationId: "KubernetesConfigFromForm"
         responses: 

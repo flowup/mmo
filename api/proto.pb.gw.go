@@ -453,7 +453,7 @@ var (
 
 	pattern_ApiService_KubernetesFormFromPlugins_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 2, 3}, []string{"services", "name", "kubernetes", "form"}, ""))
 
-	pattern_ApiService_KubernetesConfigFromForm_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 2, 3}, []string{"services", "serviceName", "kubernetes", "form"}, ""))
+	pattern_ApiService_KubernetesConfigFromForm_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 1, 0, 4, 1, 5, 1, 2, 2, 2, 3}, []string{"services", "serviceName", "kubernetes", "create"}, ""))
 )
 
 var (

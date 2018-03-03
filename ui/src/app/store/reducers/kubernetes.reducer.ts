@@ -3,7 +3,9 @@ import { ApiKubernetesServiceForm } from "../../../../api";
 
 export enum KubernetesActionType {
   GetDefaults = '[Kubernetes] Get Defaults',
-  GetDefaultsSuccess = '[Kubernetes] Get Defaults Success'
+  GetDefaultsSuccess = '[Kubernetes] Get Defaults Success',
+  CreateConfig = '[Kubernetes] Create config',
+  CreateConfigSuccess = '[Kubernetes] Create config'
 }
 
 const initialState: ApiKubernetesServiceForm = {
@@ -19,6 +21,10 @@ export function kubernetesReducer(state: ApiKubernetesServiceForm = initialState
             return initialState;
         case KubernetesActionType.GetDefaultsSuccess:
             return action.payload;
+        case KubernetesActionType.CreateConfig:
+            return initialState;
+        case KubernetesActionType.CreateConfigSuccess:
+            return initialState;
         default:
             return state;
     }
