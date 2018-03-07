@@ -5,11 +5,13 @@ import { Inject, Injectable, Optional } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
 import {
+  ApiGithubDeployRequest,
   ApiKubernetesConfigs,
   ApiKubernetesServiceForm,
   ApiPlugins,
   ApiServices,
   ApiVersion,
+  ProtobufEmpty,
 } from '.';
 
 interface HttpOptions {
@@ -39,6 +41,13 @@ export class ApiClientService {
       headers: options && options.headers ? options.headers : new HttpHeaders(),
       params: options && options.params ? options.params : new HttpParams()
     };
+  }
+
+  githubDeploy(body: ApiGithubDeployRequest, options?: HttpOptions): Observable<ProtobufEmpty> {
+    const path = `/github/deploy`;
+    options = {...this.options, ...options};
+
+    return this.sendRequest<ProtobufEmpty>('POST', path, options, JSON.stringify(body));
   }
 
   getGlobalPlugins(options?: HttpOptions): Observable<ApiPlugins> {
@@ -88,9 +97,6 @@ export class ApiClientService {
   kubernetesConfigFromForm(serviceName: string, body: ApiKubernetesServiceForm, options?: HttpOptions): Observable<ApiKubernetesConfigs> {
     const path = `/services/${serviceName}/kubernetes/create`;
     options = {...this.options, ...options};
-
-    console.log(serviceName);
-    console.log(body);
 
     return this.sendRequest<ApiKubernetesConfigs>('POST', path, options, JSON.stringify(body));
   }

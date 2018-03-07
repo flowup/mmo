@@ -15,6 +15,15 @@
     - "application/json"
   tags: []
   definitions: 
+    apiGithubDeployRequest: 
+      type: "object"
+      properties: 
+        environment: 
+          type: "string"
+        message: 
+          type: "string"
+        ref: 
+          type: "string"
     apiKubernetesConfig: 
       type: "object"
       properties: 
@@ -111,7 +120,28 @@
       properties: 
         name: 
           type: "string"
+    protobufEmpty: 
+      type: "object"
+      description: "service Foo {\n      rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);\n    }\n\nThe JSON representation for `Empty` is empty JSON object `{}`."
+      title: "A generic empty message that you can re-use to avoid defining duplicated\nempty messages in your APIs. A typical example is to use it as the request\nor the response type of an API method. For instance:"
   paths: 
+    /github/deploy: 
+      post: 
+        operationId: "GithubDeploy"
+        responses: 
+          200: 
+            description: ""
+            schema: 
+              $ref: "#/definitions/protobufEmpty"
+        parameters: 
+          - 
+            name: "body"
+            in: "body"
+            required: true
+            schema: 
+              $ref: "#/definitions/apiGithubDeployRequest"
+        tags: 
+          - "ApiService"
     /plugins: 
       get: 
         operationId: "GetGlobalPlugins"

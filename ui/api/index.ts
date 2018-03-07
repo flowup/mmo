@@ -1,5 +1,6 @@
 /* tslint:disable */
 
+export { ApiGithubDeployRequest } from './models/api-github-deploy-request.model';
 export { ApiKubernetesConfig } from './models/api-kubernetes-config.model';
 export { ApiKubernetesConfigs } from './models/api-kubernetes-configs.model';
 export { ApiKubernetesEnvVar } from './models/api-kubernetes-env-var.model';
@@ -11,5 +12,6 @@ export { ApiPlugins } from './models/api-plugins.model';
 export { ApiService } from './models/api-service.model';
 export { ApiServices } from './models/api-services.model';
 export { ApiVersion } from './models/api-version.model';
+export { ProtobufEmpty } from './models/protobuf-empty.model';
 
 export { ApiClientService } from './api-client-service';

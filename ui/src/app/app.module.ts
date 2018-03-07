@@ -29,12 +29,14 @@ import { GlobalPluginsComponent } from './global-plugins/global-plugins.componen
 import { ServiceComponent } from './service/service.component';
 import { KubernetesCreateDialog } from './service/kubernetes/kubernetesCreate.dialog';
 import { KubernetesFormComponent } from './service/kubernetes/kubernetes-form/kubernetes-form.component';
-import { ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { KubernetesEffect } from './store/effects/kubernetes.effect';
 import { KubernetesEditorDialog } from './service/kubernetes/kubernetesEditor.dialog';
 import { AceEditorModule } from 'ng2-ace-editor';
-import { MatCheckboxModule, MatInputModule, MatDividerModule, MatTooltipModule } from '@angular/material';
+import { MatCheckboxModule, MatInputModule, MatDividerModule, MatTooltipModule, MatSelectModule } from '@angular/material';
 import { KubernetesDeployDialog } from './service/kubernetes/kubernetesDeploy.dialog';
+import { DeploymentComponent } from './deployment/deployment.component';
+import { DeploymentEffect } from './store/effects/deployment.effect';
 
 const reducerMap: ActionReducerMap<AppStateModel> = {
   plugins: pluginReducer,
@@ -52,7 +54,8 @@ const reducerMap: ActionReducerMap<AppStateModel> = {
     KubernetesCreateDialog,
     KubernetesDeployDialog,
     KubernetesEditorDialog,
-    KubernetesFormComponent
+    KubernetesFormComponent,
+    DeploymentComponent
   ],
   imports: [
     AceEditorModule,
@@ -69,14 +72,17 @@ const reducerMap: ActionReducerMap<AppStateModel> = {
     MatInputModule,
     MatTooltipModule,
     MatSidenavModule,
+    MatSelectModule,
     MatTableModule,
     MatToolbarModule,
+    FormsModule,
     ReactiveFormsModule,
     EffectsModule.forRoot([
       KubernetesEffect,
       PluginEffect,
       ServiceEffect,
-      ServiceDetailEffect
+      ServiceDetailEffect,
+      DeploymentEffect,
     ]),
     StoreModule.forRoot(reducerMap)
   ], 

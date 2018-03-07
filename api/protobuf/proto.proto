@@ -49,6 +49,13 @@ service ApiService {
             body: "*"
         };
     }
+
+    rpc GithubDeploy(GithubDeployRequest) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/github/deploy"
+            body: "*"
+        };
+    }
 }
 
 message Version {
@@ -107,4 +114,10 @@ message KubernetesPort {
 message KubernetesEnvVar {
     string name = 1;
     string value = 2;
+}
+
+message GithubDeployRequest {
+    string environment = 1;
+    string message = 2;
+    string ref = 3;
 }

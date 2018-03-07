@@ -1,0 +1,34 @@
+<mat-card>
+  <mat-card-title>Github deploy</mat-card-title>
+  <mat-card-content>
+    Deploy application using Github Deployment API. Make sure you have exported your Github personal access token to variable GITHUB_TOKEN
+    <div class="form-content">
+      <mat-form-field>
+          <input matInput placeholder="Ref" [(ngModel)]="ref">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="Subject" [(ngModel)]="message">
+        </mat-form-field>
+        <mat-form-field>
+          <mat-select placeholder="Target environment" [(value)]="environment">
+            <mat-option *ngFor="let environment of environments" [value]="environment">
+              {{ environment }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+    </div>
+  </mat-card-content>
+  <mat-card-actions>
+    <button mat-button color="primary" (click)="deployGithub()">DEPLOY</button>
+  </mat-card-actions>
+</mat-card>
+
+<mat-card>
+  <mat-card-title>Kubernetes deploy</mat-card-title>
+  <mat-card-content>
+    Deploy application to Kubernetes cluster 
+  </mat-card-content>
+  <mat-card-actions>
+    <button mat-button color="primary">DEPLOY</button>
+  </mat-card-actions>
+</mat-card>

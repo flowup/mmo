@@ -9,6 +9,7 @@ import (
 	"github.com/flowup/mmo/config"
 	"github.com/flowup/mmo/docker"
 	google_protobuf "github.com/golang/protobuf/ptypes/empty"
+	"github.com/google/go-github/github"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
@@ -17,12 +18,13 @@ import (
 
 // Api represents an implementation of the service interface
 type APIService struct {
-	Config *config.Config
+	Config       *config.Config
+	GithubClient *github.Client
 }
 
 // NewApi creates a new service object
-func NewAPIService(config *config.Config) *APIService {
-	return &APIService{Config: config}
+func NewAPIService(config *config.Config, githubClient *github.Client) *APIService {
+	return &APIService{Config: config, GithubClient: githubClient}
 }
 
 func (s *APIService) GetVersion(ctx context.Context, in *google_protobuf.Empty) (*Version, error) {
@@ -164,6 +166,23 @@ func (s *APIService) KubernetesFormFromPlugins(ctx context.Context, in *Service)
 func (s *APIService) KubernetesConfigFromForm(ctx context.Context, in *KubernetesServiceForm) (*KubernetesConfigs, error) {
 	logrus.Debugln("Generating kubernetes configs... ")
 	return &KubernetesConfigs{}, nil
+}
+
+func (s *APIService) GithubDeploy(ctx context.Context, in *GithubDeployRequest) (*google_protobuf.Empty, error) {
+	request := &github.DeploymentRequest{
+		Environment: github.String(in.Environment),
+		Ref:         github.String(in.Ref),
+		Description: github.String(in.Message),
+	}
+
+	_, _, err := s.GithubClient.Repositories.CreateDeployment(
+		context.Background(),
+		s.Config.Prefix.GetOwner(),
+		s.Config.Prefix.GetRepository(),
+		request,
+	)
+
+	return &google_protobuf.Empty{}, err
 }
 
 //func (s *APIService) GetPlugins(ctx context.Context, in *Service) (*Plugins, error) {}

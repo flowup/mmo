@@ -1,4 +1,4 @@
-package main
+package server
 
 import (
 	"context"
@@ -10,8 +10,10 @@ import (
 	"github.com/flowup/mmo/api"
 	"github.com/flowup/mmo/config"
 	"github.com/golang/protobuf/proto"
+	"github.com/google/go-github/github"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	log "github.com/sirupsen/logrus"
+	"golang.org/x/oauth2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 )
@@ -27,7 +29,7 @@ func init() {
 	log.SetLevel(log.DebugLevel)
 }
 
-func main() {
+func Serve() {
 
 	lis, err := net.Listen("tcp", grpcPort)
 	if err != nil {
@@ -39,11 +41,18 @@ func main() {
 		log.Fatalf("Failed to load mmo config")
 	}
 
+	ts := oauth2.StaticTokenSource(
+		&oauth2.Token{AccessToken: os.Getenv("GITHUB_TOKEN")},
+	)
+	tc := oauth2.NewClient(context.Background(), ts)
+
+	githubClient := github.NewClient(tc)
+
 	// create the grpc server
 	s := grpc.NewServer()
 
 	// register the service
-	api.RegisterApiServiceServer(s, api.NewAPIService(mmoConfig))
+	api.RegisterApiServiceServer(s, api.NewAPIService(mmoConfig, githubClient))
 
 	// Register reflection service on gRPC server.
 	reflection.Register(s)
