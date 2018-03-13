@@ -26,3 +26,16 @@ export class KubernetesEffect {
             ))
         )
 }
+
+@Injectable()
+export class KubernetesClustersEffect {
+    constructor(private actions$: Actions, private apiClient: ApiClientService) { }
+
+    @Effect() getKubernetesClusters$: Observable<AppAction> = this.actions$
+        .ofType(KubernetesActionType.LoadClusters)
+        .pipe(
+            switchMap(() => this.apiClient.getKubernetesClusters().pipe(
+                map((response) => ({type: KubernetesActionType.LoadClustersSuccess, payload: response}))
+            ))
+        )
+}

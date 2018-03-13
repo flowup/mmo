@@ -15,6 +15,11 @@
     - "application/json"
   tags: []
   definitions: 
+    apiConsoleOutput: 
+      type: "object"
+      properties: 
+        output: 
+          type: "string"
     apiGithubDeployRequest: 
       type: "object"
       properties: 
@@ -24,6 +29,13 @@
           type: "string"
         ref: 
           type: "string"
+    apiKubernetesClusters: 
+      type: "object"
+      properties: 
+        clusters: 
+          type: "array"
+          items: 
+            type: "string"
     apiKubernetesConfig: 
       type: "object"
       properties: 
@@ -42,6 +54,15 @@
           type: "array"
           items: 
             $ref: "#/definitions/apiKubernetesConfig"
+    apiKubernetesDeployRequest: 
+      type: "object"
+      properties: 
+        cluster: 
+          type: "string"
+        namespace: 
+          type: "string"
+        environment: 
+          type: "string"
     apiKubernetesEnvVar: 
       type: "object"
       properties: 
@@ -140,6 +161,67 @@
             required: true
             schema: 
               $ref: "#/definitions/apiGithubDeployRequest"
+        tags: 
+          - "ApiService"
+    /kuberentes/save: 
+      post: 
+        operationId: "SaveKuberentesConfig"
+        responses: 
+          200: 
+            description: ""
+            schema: 
+              $ref: "#/definitions/protobufEmpty"
+        parameters: 
+          - 
+            name: "body"
+            in: "body"
+            required: true
+            schema: 
+              $ref: "#/definitions/apiKubernetesConfig"
+        tags: 
+          - "ApiService"
+    /kubernetes/clusters: 
+      get: 
+        operationId: "GetKubernetesClusters"
+        responses: 
+          200: 
+            description: ""
+            schema: 
+              $ref: "#/definitions/apiKubernetesClusters"
+        tags: 
+          - "ApiService"
+    /kubernetes/deploy/confirm: 
+      post: 
+        operationId: "ConfirmKubernetesDeploy"
+        responses: 
+          200: 
+            description: ""
+            schema: 
+              $ref: "#/definitions/apiConsoleOutput"
+        parameters: 
+          - 
+            name: "body"
+            in: "body"
+            required: true
+            schema: 
+              $ref: "#/definitions/apiKubernetesDeployRequest"
+        tags: 
+          - "ApiService"
+    /kubernetes/deploy/new: 
+      post: 
+        operationId: "KubernetesDeploy"
+        responses: 
+          200: 
+            description: ""
+            schema: 
+              $ref: "#/definitions/apiKubernetesConfigs"
+        parameters: 
+          - 
+            name: "body"
+            in: "body"
+            required: true
+            schema: 
+              $ref: "#/definitions/apiKubernetesDeployRequest"
         tags: 
           - "ApiService"
     /plugins: 

@@ -18,7 +18,7 @@ import { PluginEffect } from './store/effects/plugin.effect';
 import { ServiceEffect } from './store/effects/service.effect';
 import { ServiceDetailEffect } from './store/effects/serviceDetail.effect';
 import { StoreModule, ActionReducerMap } from '@ngrx/store';
-import { kubernetesReducer } from './store/reducers/kubernetes.reducer';
+import { kubernetesReducer, kubernetesClustersReducer } from './store/reducers/kubernetes.reducer';
 import { pluginReducer } from './store/reducers/plugin.reducer';
 import { serviceReducer } from './store/reducers/service.reducer';
 import { serviceDetailReducer } from './store/reducers/serviceDetail.reducer';
@@ -30,19 +30,21 @@ import { ServiceComponent } from './service/service.component';
 import { KubernetesCreateDialog } from './service/kubernetes/kubernetesCreate.dialog';
 import { KubernetesFormComponent } from './service/kubernetes/kubernetes-form/kubernetes-form.component';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { KubernetesEffect } from './store/effects/kubernetes.effect';
+import { KubernetesEffect, KubernetesClustersEffect } from './store/effects/kubernetes.effect';
 import { KubernetesEditorDialog } from './service/kubernetes/kubernetesEditor.dialog';
 import { AceEditorModule } from 'ng2-ace-editor';
 import { MatCheckboxModule, MatInputModule, MatDividerModule, MatTooltipModule, MatSelectModule } from '@angular/material';
 import { KubernetesDeployDialog } from './service/kubernetes/kubernetesDeploy.dialog';
 import { DeploymentComponent } from './deployment/deployment.component';
 import { DeploymentEffect } from './store/effects/deployment.effect';
+import { ConfirmDeployDialog } from './deployment/deployment.dialog';
 
 const reducerMap: ActionReducerMap<AppStateModel> = {
   plugins: pluginReducer,
   services: serviceReducer,
   serviceDetails: serviceDetailReducer,
   kubernetesForm: kubernetesReducer,
+  kubeClusters: kubernetesClustersReducer
 };
 
 @NgModule({
@@ -54,6 +56,7 @@ const reducerMap: ActionReducerMap<AppStateModel> = {
     KubernetesCreateDialog,
     KubernetesDeployDialog,
     KubernetesEditorDialog,
+    ConfirmDeployDialog,
     KubernetesFormComponent,
     DeploymentComponent
   ],
@@ -79,6 +82,7 @@ const reducerMap: ActionReducerMap<AppStateModel> = {
     ReactiveFormsModule,
     EffectsModule.forRoot([
       KubernetesEffect,
+      KubernetesClustersEffect,
       PluginEffect,
       ServiceEffect,
       ServiceDetailEffect,
@@ -97,7 +101,8 @@ const reducerMap: ActionReducerMap<AppStateModel> = {
   entryComponents: [
     KubernetesCreateDialog,
     KubernetesEditorDialog,
-    KubernetesDeployDialog
+    KubernetesDeployDialog,
+    ConfirmDeployDialog,
   ]
 })
 export class AppModule { }

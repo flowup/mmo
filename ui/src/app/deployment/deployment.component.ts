@@ -1,8 +1,14 @@
 import { Component, OnInit } from '@angular/core';
-import { AppStateModel } from '../store/models/app-state.model';
+import { AppStateModel, AppAction } from '../store/models/app-state.model';
 import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs/Observable';
 import { DeploymentActionType } from '../store/effects/deployment.effect';
-import { ApiGithubDeployRequest } from '../../../api';
+import { ApiGithubDeployRequest, ApiKubernetesClusters, ApiKubernetesDeployRequest } from '../../../api';
+import { KubernetesActionType } from '../store/reducers/kubernetes.reducer';
+import { Actions } from '@ngrx/effects';
+import { Subscription } from 'rxjs/Subscription';
+import { MatDialog } from '@angular/material';
+import { ConfirmDeployDialog } from './deployment.dialog';
 
 @Component({
   selector: 'mmo-deployment',
@@ -17,9 +23,40 @@ export class DeploymentComponent implements OnInit {
   message: string = "";
   ref: string = "master";
 
-  constructor(private store: Store<AppStateModel>) { }
+  clusters$: Observable<ApiKubernetesClusters>;
+  cluster: string = "";
+  source: string = "staging";
+  namespace: string = "default";
+
+  success: Subscription;
+
+  constructor(private store: Store<AppStateModel>, 
+    private actions$: Actions,
+    public dialog: MatDialog) { }
 
   ngOnInit() {
+    this.store.dispatch({type: KubernetesActionType.LoadClusters});
+    this.clusters$ = this.store.select((state) => (state.kubeClusters))
+    this.success = this.actions$.ofType(DeploymentActionType.DeployKubeSuccess).subscribe((action: AppAction) => {
+      let request: ApiKubernetesDeployRequest = {
+        environment: this.source,
+        cluster: this.cluster,
+        namespace: this.namespace
+      }
+
+      let dialogRef = this.dialog.open(ConfirmDeployDialog, {
+        width: '750px',
+        data: {
+          request: request,
+          configs: action.payload
+        }
+      });
+  
+      dialogRef.afterClosed().subscribe(() => {
+        console.log('The dialog was closed');
+      });
+      console.log(action.payload);
+    })
   }
 
   deployGithub() {
@@ -36,4 +73,20 @@ export class DeploymentComponent implements OnInit {
     });
   }
 
+  deployKubernetes() {
+    let request: ApiKubernetesDeployRequest = {
+      environment: this.source,
+      cluster: this.cluster,
+      namespace: this.namespace
+    }
+
+    this.store.dispatch({
+      type: DeploymentActionType.DeployKube, 
+      payload: request
+    });
+  }
+
+  ngOnDestroy() {
+    this.success.unsubscribe();
+  }
 }

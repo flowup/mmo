@@ -5,8 +5,12 @@ import { Inject, Injectable, Optional } from '@angular/core';
 import { Observable } from 'rxjs/Observable';
 
 import {
+  ApiConsoleOutput,
   ApiGithubDeployRequest,
+  ApiKubernetesClusters,
+  ApiKubernetesConfig,
   ApiKubernetesConfigs,
+  ApiKubernetesDeployRequest,
   ApiKubernetesServiceForm,
   ApiPlugins,
   ApiServices,
@@ -48,6 +52,34 @@ export class ApiClientService {
     options = {...this.options, ...options};
 
     return this.sendRequest<ProtobufEmpty>('POST', path, options, JSON.stringify(body));
+  }
+
+  saveKuberentesConfig(body: ApiKubernetesConfig, options?: HttpOptions): Observable<ProtobufEmpty> {
+    const path = `/kuberentes/save`;
+    options = {...this.options, ...options};
+
+    return this.sendRequest<ProtobufEmpty>('POST', path, options, JSON.stringify(body));
+  }
+
+  getKubernetesClusters(options?: HttpOptions): Observable<ApiKubernetesClusters> {
+    const path = `/kubernetes/clusters`;
+    options = {...this.options, ...options};
+
+    return this.sendRequest<ApiKubernetesClusters>('GET', path, options);
+  }
+
+  confirmKubernetesDeploy(body: ApiKubernetesDeployRequest, options?: HttpOptions): Observable<ApiConsoleOutput> {
+    const path = `/kubernetes/deploy/confirm`;
+    options = {...this.options, ...options};
+
+    return this.sendRequest<ApiConsoleOutput>('POST', path, options, JSON.stringify(body));
+  }
+
+  kubernetesDeploy(body: ApiKubernetesDeployRequest, options?: HttpOptions): Observable<ApiKubernetesConfigs> {
+    const path = `/kubernetes/deploy/new`;
+    options = {...this.options, ...options};
+
+    return this.sendRequest<ApiKubernetesConfigs>('POST', path, options, JSON.stringify(body));
   }
 
   getGlobalPlugins(options?: HttpOptions): Observable<ApiPlugins> {

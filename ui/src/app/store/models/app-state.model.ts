@@ -1,11 +1,12 @@
 import { ApiPlugin } from '../../../../api/models/api-plugin.model';
 import { Action } from '@ngrx/store';
-import { ApiService, ApiKubernetesConfig, ApiKubernetesServiceForm } from '../../../../api';
+import { ApiService, ApiKubernetesConfig, ApiKubernetesServiceForm, ApiKubernetesClusters } from '../../../../api';
 
 export interface AppStateModel {
     plugins: ApiPlugin[];
     services: ApiService[];
     serviceDetails: StoreState<AppServiceDetail>;
+    kubeClusters: ApiKubernetesClusters;
 
     kubernetesForm: ApiKubernetesServiceForm
 }

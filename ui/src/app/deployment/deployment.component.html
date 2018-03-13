@@ -26,9 +26,24 @@
 <mat-card>
   <mat-card-title>Kubernetes deploy</mat-card-title>
   <mat-card-content>
-    Deploy application to Kubernetes cluster 
+    Deploy application to Kubernetes cluster
+    <div class="form-content">
+        <mat-form-field>
+          <input matInput placeholder="Kubernetes namespace" [(ngModel)]="namespace">
+        </mat-form-field>
+        <mat-form-field>
+          <input matInput placeholder="Source environment" [(ngModel)]="source">
+        </mat-form-field>
+        <mat-form-field>
+          <mat-select placeholder="Target cluster" [(value)]="cluster">
+            <mat-option *ngFor="let cluster of (clusters$ | async).clusters" [value]="cluster">
+              {{ cluster }}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+    </div>
   </mat-card-content>
   <mat-card-actions>
-    <button mat-button color="primary">DEPLOY</button>
+    <button mat-button color="primary" (click)="deployKubernetes()">DEPLOY</button>
   </mat-card-actions>
 </mat-card>

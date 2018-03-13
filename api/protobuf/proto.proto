@@ -37,6 +37,13 @@ service ApiService {
         };
     }
 
+    rpc SaveKuberentesConfig(KubernetesConfig) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/kuberentes/save"
+            body: "*"
+        };
+    }
+
     rpc KubernetesFormFromPlugins(Service) returns (KubernetesServiceForm) {
         option (google.api.http) = {
             get: "/services/{name}/kubernetes/form"
@@ -46,6 +53,26 @@ service ApiService {
     rpc KubernetesConfigFromForm(KubernetesServiceForm) returns (KubernetesConfigs) {
         option (google.api.http) = {
             post: "/services/{serviceName}/kubernetes/create"
+            body: "*"
+        };
+    }
+
+    rpc GetKubernetesClusters(google.protobuf.Empty) returns (KubernetesClusters) {
+        option (google.api.http) = {
+            get: "/kubernetes/clusters"
+        };
+    }
+
+    rpc KubernetesDeploy(KubernetesDeployRequest) returns (KubernetesConfigs) {
+        option (google.api.http) = {
+            post: "/kubernetes/deploy/new"
+            body: "*"
+        };
+    }
+
+    rpc ConfirmKubernetesDeploy(KubernetesDeployRequest) returns (ConsoleOutput) {
+        option (google.api.http) = {
+            post: "/kubernetes/deploy/confirm"
             body: "*"
         };
     }
@@ -120,4 +147,18 @@ message GithubDeployRequest {
     string environment = 1;
     string message = 2;
     string ref = 3;
+}
+
+message KubernetesClusters {
+    repeated string clusters = 1;
+}
+
+message KubernetesDeployRequest {
+    string cluster = 1;
+    string namespace = 2;
+    string environment = 3;
+}
+
+message ConsoleOutput {
+    string output = 1;
 }

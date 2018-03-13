@@ -1,11 +1,13 @@
 import { AppAction } from "../models/app-state.model";
-import { ApiKubernetesServiceForm } from "../../../../api";
+import { ApiKubernetesServiceForm, ApiKubernetesClusters } from "../../../../api";
 
 export enum KubernetesActionType {
   GetDefaults = '[Kubernetes] Get Defaults',
   GetDefaultsSuccess = '[Kubernetes] Get Defaults Success',
   CreateConfig = '[Kubernetes] Create config',
-  CreateConfigSuccess = '[Kubernetes] Create config'
+  CreateConfigSuccess = '[Kubernetes] Create config',
+  LoadClusters = '[Kubernetes] Load clusters',
+  LoadClustersSuccess = '[Kubernetes] Load clusters success'
 }
 
 const initialState: ApiKubernetesServiceForm = {
@@ -25,6 +27,17 @@ export function kubernetesReducer(state: ApiKubernetesServiceForm = initialState
             return initialState;
         case KubernetesActionType.CreateConfigSuccess:
             return initialState;
+        default:
+            return state;
+    }
+}
+
+export function kubernetesClustersReducer(state: ApiKubernetesClusters = { clusters: [] }, action: AppAction): ApiKubernetesClusters {
+    switch (action.type) {
+        case KubernetesActionType.LoadClusters:
+            return { clusters: []};
+        case KubernetesActionType.LoadClustersSuccess:
+            return action.payload;
         default:
             return state;
     }

@@ -3,6 +3,7 @@ package api
 import (
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -84,7 +85,7 @@ func (s *APIService) GetKubernetesConfigs(ctx context.Context, in *Service) (*Ku
 	result := make([]*KubernetesConfig, 0)
 
 	err := filepath.Walk("./infrastructure", func(path string, info os.FileInfo, err error) error {
-		logrus.Debugln("Walking file", info.Name(), "in path", path)
+		// logrus.Debugln("Walking file", info.Name(), "in path", path)
 		if info.IsDir() {
 			return nil
 		}
@@ -124,6 +125,15 @@ func (s *APIService) GetKubernetesConfigs(ctx context.Context, in *Service) (*Ku
 	})
 
 	return &KubernetesConfigs{Configs: result}, err
+}
+
+func (s *APIService) SaveKuberentesConfig(ctx context.Context, in *KubernetesConfig) (*google_protobuf.Empty, error) {
+	info, err := os.Stat(in.Path)
+	if err != nil {
+		return nil, err
+	}
+	err = ioutil.WriteFile(in.Path, []byte(in.Data), info.Mode())
+	return &google_protobuf.Empty{}, err
 }
 
 func (s *APIService) KubernetesFormFromPlugins(ctx context.Context, in *Service) (*KubernetesServiceForm, error) {
@@ -183,6 +193,77 @@ func (s *APIService) GithubDeploy(ctx context.Context, in *GithubDeployRequest) 
 	)
 
 	return &google_protobuf.Empty{}, err
+}
+
+func (s *APIService) GetKubernetesClusters(ctx context.Context, in *google_protobuf.Empty) (*KubernetesClusters, error) {
+	out, err := exec.Command("kubectl", "config", "get-clusters").CombinedOutput()
+	if err != nil {
+		return nil, err
+	}
+
+	clusters := strings.Split(string(out), "\n")
+
+	result := &KubernetesClusters{
+		Clusters: clusters[1 : len(clusters)-1],
+	}
+
+	return result, nil
+}
+
+func (s *APIService) KubernetesDeploy(ctx context.Context, in *KubernetesDeployRequest) (*KubernetesConfigs, error) {
+	configs := KubernetesConfigs{
+		Configs: []*KubernetesConfig{},
+	}
+
+	dirs := []string{"deployments", "services", in.Environment}
+
+	for _, dir := range dirs {
+		err := filepath.Walk("infrastructure/"+dir, func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				logrus.Warnln("error", err)
+				return nil
+			}
+
+			if info.IsDir() {
+				return nil
+			}
+
+			k := &KubernetesConfig{}
+			k.Name = info.Name()
+			k.Path = path
+
+			logrus.Debugln("Appending", k)
+			configs.Configs = append(configs.Configs, k)
+
+			return nil
+		})
+
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return &configs, nil
+}
+
+func (s *APIService) ConfirmKubernetesDeploy(ctx context.Context, in *KubernetesDeployRequest) (*ConsoleOutput, error) {
+	out, err := s.KubernetesDeploy(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+
+	log := ""
+
+	for _, config := range out.Configs {
+		out, err := exec.Command("kubectl", "apply", "-f", config.Path).CombinedOutput()
+		if err != nil {
+			logrus.Warnln("Error deploying", err)
+		}
+
+		log += string(out)
+	}
+
+	return &ConsoleOutput{Output: log}, nil
 }
 
 //func (s *APIService) GetPlugins(ctx context.Context, in *Service) (*Plugins, error) {}
