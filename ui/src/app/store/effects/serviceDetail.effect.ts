@@ -38,8 +38,27 @@ export class ServiceDetailEffect {
         .ofType(KubernetesActionType.CreateConfigSuccess)
         .pipe(
             switchMap((action: AppAction) => {
-                console.log(action.payload); 
                 return Observable.of({ type: ServiceDetailActionType.GetServiceDetail, payload: action.payload})
+            })
+        )
+
+    @Effect() saveKubernetesConfig$: Observable<AppAction> = this.actions$
+        .ofType(ServiceDetailActionType.SaveKubernetesConfig)
+        .pipe(
+            switchMap((action: AppAction) => {
+                    return this.apiClient.saveKuberentesConfig(action.payload).pipe(
+                        map(() => ({ type: ServiceDetailActionType.SaveKubernetesConfigSuccess }))
+                )
+            })
+        )
+
+    @Effect() removeKubernetesConfig$: Observable<AppAction> = this.actions$
+        .ofType(ServiceDetailActionType.RemoveKubernetesConfig)
+        .pipe(
+            switchMap((action: AppAction) => {
+                    return this.apiClient.removeKubernetesConfig(action.payload).pipe(
+                        map(() => ({ type: ServiceDetailActionType.RemoveKubernetesConfigSuccess }))
+                )
             })
         )
 }

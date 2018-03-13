@@ -85,6 +85,10 @@ export class ServiceComponent implements OnInit {
     });
   }
 
+  deleteKubernetes(config: ApiKubernetesConfig) {
+    this.store.dispatch({type: ServiceDetailActionType.RemoveKubernetesConfig, payload: config});
+  }
+
   deploySelected() {
 
     let dialogRef = this.dialog.open(KubernetesDeployDialog, {

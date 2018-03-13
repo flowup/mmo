@@ -136,6 +136,11 @@ func (s *APIService) SaveKuberentesConfig(ctx context.Context, in *KubernetesCon
 	return &google_protobuf.Empty{}, err
 }
 
+func (s *APIService) RemoveKubernetesConfig(ctx context.Context, in *KubernetesConfig) (*google_protobuf.Empty, error) {
+	os.Remove(in.Path)
+	return &google_protobuf.Empty{}, nil
+}
+
 func (s *APIService) KubernetesFormFromPlugins(ctx context.Context, in *Service) (*KubernetesServiceForm, error) {
 
 	mmoService, ok := s.Config.Services[in.Name]

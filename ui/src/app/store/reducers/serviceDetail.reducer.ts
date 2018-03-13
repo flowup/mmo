@@ -2,7 +2,11 @@ import { AppAction, AppServiceDetail, StoreState } from "../models/app-state.mod
 
 export enum ServiceDetailActionType {
   GetServiceDetail = '[ServiceDetail] Get Service detail',
-  GetServicePluginsSuccess = '[ServiceDetail] Get Service plugins Success'
+  GetServicePluginsSuccess = '[ServiceDetail] Get Service plugins Success',
+  SaveKubernetesConfig = '[KubeConfig] Save Kubernetes config',
+  SaveKubernetesConfigSuccess = '[KubeConfig] Save Kubernetes config success',
+  RemoveKubernetesConfig = '[KubeConfig] Remove Kubernetes config',
+  RemoveKubernetesConfigSuccess = '[KubeConfig] Remove Kubernetes config success',
 }
 
 const initialState: StoreState<AppServiceDetail> = {

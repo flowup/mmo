@@ -163,23 +163,6 @@
               $ref: "#/definitions/apiGithubDeployRequest"
         tags: 
           - "ApiService"
-    /kuberentes/save: 
-      post: 
-        operationId: "SaveKuberentesConfig"
-        responses: 
-          200: 
-            description: ""
-            schema: 
-              $ref: "#/definitions/protobufEmpty"
-        parameters: 
-          - 
-            name: "body"
-            in: "body"
-            required: true
-            schema: 
-              $ref: "#/definitions/apiKubernetesConfig"
-        tags: 
-          - "ApiService"
     /kubernetes/clusters: 
       get: 
         operationId: "GetKubernetesClusters"
@@ -222,6 +205,40 @@
             required: true
             schema: 
               $ref: "#/definitions/apiKubernetesDeployRequest"
+        tags: 
+          - "ApiService"
+    /kubernetes/remove: 
+      post: 
+        operationId: "RemoveKubernetesConfig"
+        responses: 
+          200: 
+            description: ""
+            schema: 
+              $ref: "#/definitions/protobufEmpty"
+        parameters: 
+          - 
+            name: "body"
+            in: "body"
+            required: true
+            schema: 
+              $ref: "#/definitions/apiKubernetesConfig"
+        tags: 
+          - "ApiService"
+    /kubernetes/save: 
+      post: 
+        operationId: "SaveKuberentesConfig"
+        responses: 
+          200: 
+            description: ""
+            schema: 
+              $ref: "#/definitions/protobufEmpty"
+        parameters: 
+          - 
+            name: "body"
+            in: "body"
+            required: true
+            schema: 
+              $ref: "#/definitions/apiKubernetesConfig"
         tags: 
           - "ApiService"
     /plugins: 

@@ -39,7 +39,14 @@ service ApiService {
 
     rpc SaveKuberentesConfig(KubernetesConfig) returns (google.protobuf.Empty) {
         option (google.api.http) = {
-            post: "/kuberentes/save"
+            post: "/kubernetes/save"
+            body: "*"
+        };
+    }
+
+    rpc RemoveKubernetesConfig(KubernetesConfig) returns (google.protobuf.Empty) {
+        option (google.api.http) = {
+            post: "/kubernetes/remove"
             body: "*"
         };
     }

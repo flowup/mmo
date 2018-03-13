@@ -54,13 +54,6 @@ export class ApiClientService {
     return this.sendRequest<ProtobufEmpty>('POST', path, options, JSON.stringify(body));
   }
 
-  saveKuberentesConfig(body: ApiKubernetesConfig, options?: HttpOptions): Observable<ProtobufEmpty> {
-    const path = `/kuberentes/save`;
-    options = {...this.options, ...options};
-
-    return this.sendRequest<ProtobufEmpty>('POST', path, options, JSON.stringify(body));
-  }
-
   getKubernetesClusters(options?: HttpOptions): Observable<ApiKubernetesClusters> {
     const path = `/kubernetes/clusters`;
     options = {...this.options, ...options};
@@ -80,6 +73,20 @@ export class ApiClientService {
     options = {...this.options, ...options};
 
     return this.sendRequest<ApiKubernetesConfigs>('POST', path, options, JSON.stringify(body));
+  }
+
+  removeKubernetesConfig(body: ApiKubernetesConfig, options?: HttpOptions): Observable<ProtobufEmpty> {
+    const path = `/kubernetes/remove`;
+    options = {...this.options, ...options};
+
+    return this.sendRequest<ProtobufEmpty>('POST', path, options, JSON.stringify(body));
+  }
+
+  saveKuberentesConfig(body: ApiKubernetesConfig, options?: HttpOptions): Observable<ProtobufEmpty> {
+    const path = `/kubernetes/save`;
+    options = {...this.options, ...options};
+
+    return this.sendRequest<ProtobufEmpty>('POST', path, options, JSON.stringify(body));
   }
 
   getGlobalPlugins(options?: HttpOptions): Observable<ApiPlugins> {
