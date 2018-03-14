@@ -1,81 +1,128 @@
 <form [formGroup]="kubernetesForm" (ngSubmit)="submit()">
-  
+
   <h3 class="mat-subheading-2">Metadata</h3>
 
   <mat-form-field>
-    <input matInput 
-        type="text" 
-        id="serviceName" 
-        placeholder="Service name"
-        formControlName="serviceName" >
+    <input matInput
+           type="text"
+           id="serviceName"
+           placeholder="Service name"
+           formControlName="serviceName">
   </mat-form-field>
 
   <mat-divider></mat-divider>
 
-  <div matTooltip="Services are used to make your service accessible in the cluster. Name of the port is DNS name under which will be the service accessible" matTooltipPosition="above">
-      <h3 class="mat-subheading-2">Service ports</h3>
+  <div
+    matTooltip="Services are used to make your service accessible in the cluster. Name of the port is DNS name under which will be the service accessible"
+    matTooltipPosition="above">
+    <h3 class="mat-subheading-2">Service ports</h3>
   </div>
 
   <!-- ports -->
   <fieldset formArrayName="ports">
     <div class="form-group row"
-        *ngFor="let item of kubernetesForm.get('ports').controls; let i=index"
-        [formGroup]="item">
-    <mat-form-field>
-        <input matInput 
-            type="text" 
-            placeholder="Port name"
-            [attr.id]="'name'+i" 
-            formControlName="name" >
-    </mat-form-field>
-    <mat-form-field>
-        <input matInput 
-            type="text" 
-            placeholder="Port number"
-            [attr.id]="'port'+i" 
-            formControlName="port">
-    </mat-form-field>
-    <button mat-icon-button type="button" (click)="kubernetesForm.get('ports').removeAt(i)">
+         *ngFor="let item of kubernetesForm.get('ports').controls; let i=index"
+         [formGroup]="item">
+      <mat-form-field>
+        <input matInput
+               type="text"
+               placeholder="Port name"
+               [attr.id]="'name'+i"
+               formControlName="name">
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput
+               type="text"
+               placeholder="Port number"
+               [attr.id]="'port'+i"
+               formControlName="port">
+      </mat-form-field>
+      <button mat-icon-button type="button" (click)="kubernetesForm.get('ports').removeAt(i)">
         <mat-icon aria-label="Delete port">delete</mat-icon>
-    </button>
+      </button>
     </div>
     <button mat-button type="button" (click)="kubernetesForm.get('ports').push(buildPort('', ''))">Add port</button>
   </fieldset>
 
   <mat-divider></mat-divider>
 
-  <div matTooltip="Environment variables added here will be exported to container. These can be used to store configurations" matTooltipPosition="above">
-      <h3 class="mat-subheading-2">Environment variables</h3>
+  <div
+    matTooltip="Environment variables added here will be exported to container. These can be used to store configurations"
+    matTooltipPosition="above">
+    <h3 class="mat-subheading-2">Environment variables</h3>
   </div>
   <!-- variables -->
   <fieldset formArrayName="variables">
-      <div class="form-group row"
-          *ngFor="let item of kubernetesForm.get('variables').controls; let i=index"
-          [formGroup]="item">
+    <div class="form-group row"
+         *ngFor="let item of kubernetesForm.get('variables').controls; let i=index"
+         [formGroup]="item">
       <mat-form-field>
-          <input matInput 
-              type="text" 
-              placeholder="Variable name"
-              [attr.id]="'name'+i" 
-              formControlName="name" >
+        <input matInput
+               type="text"
+               placeholder="Variable name"
+               [attr.id]="'name'+i"
+               formControlName="name">
       </mat-form-field>
       <mat-form-field>
-          <input matInput 
-              type="text" 
-              placeholder="Variable value"
-              [attr.id]="'value'+i" 
-              formControlName="value" >
+        <input matInput
+               type="text"
+               placeholder="Variable value"
+               [attr.id]="'value'+i"
+               formControlName="value">
       </mat-form-field>
       <button mat-icon-button type="button" (click)="kubernetesForm.get('variables').removeAt(i)">
-          <mat-icon aria-label="Delete port">delete</mat-icon>
+        <mat-icon aria-label="Delete port">delete</mat-icon>
       </button>
-      </div>
-      <button mat-button type="button" (click)="kubernetesForm.get('variables').push(buildVariable('', ''))">Add variable</button>
-    </fieldset>
+    </div>
+    <button mat-button type="button" (click)="kubernetesForm.get('variables').push(buildVariable('', ''))">Add
+      variable
+    </button>
+  </fieldset>
 
-    <mat-divider></mat-divider>
-    
-    <h3 class="mat-subheading-2">Service volumes</h3>
-    
-    <button mat-button color="primary" type="submit">Submit</button>
+  <mat-divider></mat-divider>
+
+  <h3 class="mat-subheading-2">Service volumes</h3>
+
+  <fieldset formArrayName="volumes">
+    <div class="form-group row"
+         *ngFor="let item of kubernetesForm.get('volumes').controls; let i=index"
+         [formGroup]="item">
+      <mat-form-field>
+        <input matInput
+               type="text"
+               placeholder="Volume name"
+               [attr.id]="'name'+i"
+               formControlName="name">
+      </mat-form-field>
+      <mat-form-field *ngIf="item.controls['pvcSizeGB']">
+        <input matInput
+               type="number"
+               placeholder="Volume size (GiB)"
+               [attr.id]="'pvcSizeGB'+i"
+               formControlName="pvcSizeGB">
+      </mat-form-field>
+      <mat-form-field *ngIf="item.controls['gceDisk']">
+        <input matInput
+               type="text"
+               placeholder="GCE disk name"
+               [attr.id]="'gceDisk'+i"
+               formControlName="gceDisk">
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput
+               type="text"
+               placeholder="Mount path"
+               [attr.id]="'mountPath'+i"
+               formControlName="mountPath">
+      </mat-form-field>
+      <button mat-icon-button type="button" (click)="kubernetesForm.get('volumes').removeAt(i)">
+        <mat-icon aria-label="Delete port">delete</mat-icon>
+      </button>
+    </div>
+    <button type="button" mat-button [matMenuTriggerFor]="menu">Add volume</button>
+    <mat-menu #menu="matMenu">
+      <button type="button" mat-menu-item (click)="kubernetesForm.get('volumes').push(buildPersistentVolume())">Persistent volume</button>
+      <button type="button" mat-menu-item (click)="kubernetesForm.get('volumes').push(buildGceVolume())">GCE Disk</button>
+    </mat-menu>
+  </fieldset>
 </form>

@@ -57,7 +57,7 @@ service ApiService {
         };
     }
 
-    rpc KubernetesConfigFromForm(KubernetesServiceForm) returns (KubernetesConfigs) {
+    rpc KubernetesConfigFromForm(KubernetesServiceForm) returns (KubernetesServiceForm) {
         option (google.api.http) = {
             post: "/services/{serviceName}/kubernetes/create"
             body: "*"
@@ -127,6 +127,7 @@ message KubernetesConfig {
 
 message KubernetesServiceForm {
     string serviceName = 1;
+    string projectName = 5;
     repeated KubernetesPort ports = 2;
     repeated KubernetesVolume volumes = 3;
     repeated KubernetesEnvVar variables = 4;

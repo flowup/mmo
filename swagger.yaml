@@ -82,6 +82,8 @@
       properties: 
         serviceName: 
           type: "string"
+        projectName: 
+          type: "string"
         ports: 
           type: "array"
           items: 
@@ -331,7 +333,7 @@
           200: 
             description: ""
             schema: 
-              $ref: "#/definitions/apiKubernetesConfigs"
+              $ref: "#/definitions/apiKubernetesServiceForm"
         parameters: 
           - 
             name: "serviceName"

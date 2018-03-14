@@ -33,7 +33,7 @@ import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { KubernetesEffect, KubernetesClustersEffect } from './store/effects/kubernetes.effect';
 import { KubernetesEditorDialog } from './service/kubernetes/kubernetesEditor.dialog';
 import { AceEditorModule } from 'ng2-ace-editor';
-import { MatCheckboxModule, MatInputModule, MatDividerModule, MatTooltipModule, MatSelectModule } from '@angular/material';
+import { MatCheckboxModule, MatInputModule, MatDividerModule, MatTooltipModule, MatSelectModule, MatMenuModule } from '@angular/material';
 import { KubernetesDeployDialog } from './service/kubernetes/kubernetesDeploy.dialog';
 import { DeploymentComponent } from './deployment/deployment.component';
 import { DeploymentEffect } from './store/effects/deployment.effect';
@@ -73,6 +73,7 @@ const reducerMap: ActionReducerMap<AppStateModel> = {
     MatCardModule,
     MatIconModule,
     MatInputModule,
+    MatMenuModule,
     MatTooltipModule,
     MatSidenavModule,
     MatSelectModule,
@@ -89,7 +90,7 @@ const reducerMap: ActionReducerMap<AppStateModel> = {
       DeploymentEffect,
     ]),
     StoreModule.forRoot(reducerMap)
-  ], 
+  ],
   providers: [
     ApiClientService,
     {

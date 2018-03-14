@@ -123,6 +123,15 @@ func Generate(options map[string]interface{}, tmpl string, out string) error {
 				skipFiles[filename+"/"] = true
 				return nil
 			}
+
+			dir, err := os.Stat(pathTemplated)
+			if err != nil {
+				return err
+			}
+
+			if dir.IsDir() {
+				return nil
+			}
 			return os.Mkdir(pathTemplated, 0755)
 		}
 

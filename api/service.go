@@ -1,6 +1,7 @@
 package api
 
 import (
+	"go/build"
 	"io/ioutil"
 	"os"
 	"os/exec"
@@ -9,12 +10,17 @@ import (
 
 	"github.com/flowup/mmo/config"
 	"github.com/flowup/mmo/docker"
+	"github.com/flowup/mmo/generator"
 	google_protobuf "github.com/golang/protobuf/ptypes/empty"
 	"github.com/google/go-github/github"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/net/context"
 	"gopkg.in/yaml.v2"
+)
+
+var (
+	kubernetesTemplate = build.Default.GOPATH + "/src/github.com/flowup/mmo/templates/kubernetes"
 )
 
 // Api represents an implementation of the service interface
@@ -105,7 +111,7 @@ func (s *APIService) GetKubernetesConfigs(ctx context.Context, in *Service) (*Ku
 		}
 
 		kType := struct {
-			Kind string `yaml:"Kind"`
+			Kind string `yaml:"kind"`
 		}{}
 
 		yaml.Unmarshal(data, &kType)
@@ -178,9 +184,32 @@ func (s *APIService) KubernetesFormFromPlugins(ctx context.Context, in *Service)
 	// return &KubernetesServiceForm{}, nil
 }
 
-func (s *APIService) KubernetesConfigFromForm(ctx context.Context, in *KubernetesServiceForm) (*KubernetesConfigs, error) {
+func (s *APIService) KubernetesConfigFromForm(ctx context.Context, in *KubernetesServiceForm) (*KubernetesServiceForm, error) {
 	logrus.Debugln("Generating kubernetes configs... ")
-	return &KubernetesConfigs{}, nil
+	logrus.Debugln(in.ServiceName)
+	logrus.Debugln(in.Ports)
+	logrus.Debugln(in.Variables)
+	logrus.Debugln(in.Volumes)
+
+	input := make(map[string]interface{})
+	input["ServiceName"] = in.ServiceName
+	input["ProjectName"] = s.Config.Name
+
+	if len(in.Ports) > 0 {
+		input["Ports"] = in.Ports
+	}
+	if len(in.Variables) > 0 {
+		input["Variables"] = in.Variables
+	}
+	if len(in.Volumes) > 0 {
+		input["Volumes"] = in.Volumes
+	}
+
+	err := generator.Generate(input, kubernetesTemplate, ".")
+	if err != nil {
+		logrus.Warnln(err)
+	}
+	return in, err
 }
 
 func (s *APIService) GithubDeploy(ctx context.Context, in *GithubDeployRequest) (*google_protobuf.Empty, error) {

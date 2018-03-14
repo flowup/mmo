@@ -5,7 +5,7 @@ export enum KubernetesActionType {
   GetDefaults = '[Kubernetes] Get Defaults',
   GetDefaultsSuccess = '[Kubernetes] Get Defaults Success',
   CreateConfig = '[Kubernetes] Create config',
-  CreateConfigSuccess = '[Kubernetes] Create config',
+  CreateConfigSuccess = '[Kubernetes] Create config Success',
   LoadClusters = '[Kubernetes] Load clusters',
   LoadClustersSuccess = '[Kubernetes] Load clusters success'
 }
@@ -14,7 +14,8 @@ const initialState: ApiKubernetesServiceForm = {
     serviceName: "",
     ports: [],
     variables: [],
-    volumes: []
+    volumes: [],
+    projectName: ""
 }
 
 export function kubernetesReducer(state: ApiKubernetesServiceForm = initialState, action: AppAction): ApiKubernetesServiceForm {
