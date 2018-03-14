@@ -64,9 +64,9 @@ func (mmo *Mmo) SetContext(services []string) error {
 		Services: services,
 	}
 
-	err := config.SaveContext(serviceContext)
+	mmo.Context = serviceContext
 
-	return err
+	return config.SaveContext(serviceContext)
 }
 
 // ResetContext resets user's context of the MMO
