@@ -286,7 +286,17 @@ func (s *APIService) ConfirmKubernetesDeploy(ctx context.Context, in *Kubernetes
 		return nil, err
 	}
 
-	log := ""
+	log := "Switching to selected to cluster...\n"
+
+	currentContext, err := exec.Command("kubectl", "config", "current-context").CombinedOutput()
+	if err != nil {
+		logrus.Warnln(err)
+	}
+	console, err := exec.Command("kubectl", "config", "use-context", in.Cluster).CombinedOutput()
+	if err != nil {
+		logrus.Warnln(err)
+	}
+	log += string(console) + "\n"
 
 	for _, config := range out.Configs {
 		out, err := exec.Command("kubectl", "apply", "-f", config.Path).CombinedOutput()
@@ -296,6 +306,13 @@ func (s *APIService) ConfirmKubernetesDeploy(ctx context.Context, in *Kubernetes
 
 		log += string(out)
 	}
+
+	log += "\nSwitching back to previously selected cluster...\n"
+	console, err = exec.Command("kubectl", "config", "use-context", strings.Split(string(currentContext), "\n")[0]).CombinedOutput()
+	if err != nil {
+		logrus.Warnln(err)
+	}
+	log += string(console)
 
 	return &ConsoleOutput{Output: log}, nil
 }
