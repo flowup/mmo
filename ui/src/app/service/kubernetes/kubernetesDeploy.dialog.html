@@ -1,0 +1,13 @@
+<h1 mat-dialog-title>Deploy</h1>
+<mat-dialog-content class="mat-body-1">
+  <ace-editor
+  [(text)]="deployCommand"
+  #highlight
+  mode="sh"
+  readOnly="true"
+  style="min-height: 400px; width:100%; overflow: auto;"
+  ></ace-editor>
+</mat-dialog-content>
+<mat-dialog-actions>
+  <button mat-button color="primary" (click)="onNoClick()">Cancel</button>
+</mat-dialog-actions>

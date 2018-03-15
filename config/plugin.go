@@ -1,10 +1,11 @@
 package config
 
 import (
+	"os"
+
 	"github.com/flowup/mmo/docker"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
-	"os"
 )
 
 // Plugins is structure that represents plugin system of the MMO
@@ -37,7 +38,7 @@ func (p *Plugins) RunGen(contextServices []string, plugins []string) error {
 		opts.AddArguments(contextServices...)
 		opts.AutoRemove = true
 		opts.MountHostVolume(pwd, "/source")
-		opts.AddEnvVariable("GO_PREFIX", p.Config.Prefix)
+		opts.AddEnvVariable("GO_PREFIX", string(p.Config.Prefix))
 
 		if len(contextServices) == 1 {
 			opts.WorkingDir = "/source/" + contextServices[0]

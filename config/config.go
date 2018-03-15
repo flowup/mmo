@@ -1,10 +1,12 @@
 package config
 
 import (
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
 	"sort"
+	"strings"
+
+	"gopkg.in/yaml.v2"
 )
 
 const (
@@ -12,11 +14,13 @@ const (
 	FilenameConfig = "mmo.yaml"
 )
 
+type GoPrefix string
+
 // Config represents projects configuration
 type Config struct {
 	Name     string             `yaml:"name"`
 	Plugins  []string           `yaml:"plugins"`
-	Prefix   string             `yaml:prefix`
+	Prefix   GoPrefix           `yaml:prefix`
 	Services map[string]Service `yaml:"services"`
 }
 
@@ -86,4 +90,22 @@ func SaveConfig(cfg *Config) error {
 	_, err = f.Write(b)
 
 	return err
+}
+
+func (p *GoPrefix) GetOwner() string {
+	parts := strings.Split(string(*p), "/")
+	if len(parts) != 3 {
+		return ""
+	}
+
+	return parts[1]
+}
+
+func (p *GoPrefix) GetRepository() string {
+	parts := strings.Split(string(*p), "/")
+	if len(parts) != 3 {
+		return ""
+	}
+
+	return parts[2]
 }

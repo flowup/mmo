@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/evalphobia/logrus_sentry"
+	"github.com/flowup/mmo/api/server"
 	"github.com/flowup/mmo/config"
 	"github.com/flowup/mmo/generator"
 	"github.com/flowup/mmo/utils"
@@ -276,8 +277,14 @@ func main() {
 
 				return nil
 			},
-		},
-		{
+		}, {
+			Name:  "ui",
+			Usage: "Run MMO UI",
+			Action: func(c *cli.Context) error {
+				server.Serve()
+				return nil
+			},
+		}, {
 			Name:  "add",
 			Usage: "scaffolds resources across the mmo such as services, models, etc.",
 			Subcommands: []cli.Command{

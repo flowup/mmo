@@ -1,0 +1,38 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: {{ .ServiceName }}
+  namespace: {{ .ProjectName }}
+  labels:
+    app: {{ .ServiceName }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .ServiceName }}
+  template:
+    metadata:
+      labels:
+        app: {{ .ServiceName }}
+        type: api-service
+    spec:
+      containers:
+      - name: {{ .ServiceName }}
+        image: {{ .ProjectName }}-{{ .ServiceName }}:latest
+        command: ['./{{ .ServiceName }}'] {{if .Variables }}
+        env: {{range $index, $element := .Variables}}
+        - name: {{ $element.Name }}
+          value: {{ $element.Value }} {{end}}{{end}}{{if .Ports }}
+        ports: {{range $index, $element := .Ports}}
+        - name: {{ $element.Name }}
+          containerPort: {{ $element.Port }}
+          protocol: TCP {{end}}{{end}}{{if .Volumes }}
+        volumeMounts: {{range $index, $element := .Volumes}}
+        - name: {{ $element.Name }}
+          mountPath: {{ $element.MountPath }}{{end}}{{end}}{{if .Volumes }}
+      volumes: {{range $index, $element := .Volumes}}
+      - name: {{ $element.Name }}{{if $element.GceDisk}}
+        gcePersistentDisk:
+          pdName: {{ $element.GceDisk}}
+          fsType: ext4{{end}}{{end}}{{end}}
+      

@@ -1,0 +1,11 @@
+name: mmo
+plugins:
+- flowup/mmo-gen-swagger:1.0.1
+- flowup/mmo-gen-angular-client:1.2.1
+prefix: github.com/flowup/mmo
+services:
+  api:
+    description: "API of the MMO"
+    plugins:
+    - flowup/mmo-gen-go-grpc:1.0.2
+    - flowup/mmo-gen-grpc-gateway:1.0.1
