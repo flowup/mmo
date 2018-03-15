@@ -1,4 +1,4 @@
-<form [formGroup]="kubernetesForm" (ngSubmit)="submit()">
+<form [formGroup]="kubernetesForm">
 
   <h3 class="mat-subheading-2">Metadata</h3>
 
@@ -21,7 +21,7 @@
   <!-- ports -->
   <fieldset formArrayName="ports">
     <div class="form-group row"
-         *ngFor="let item of kubernetesForm.get('ports').controls; let i=index"
+         *ngFor="let item of formPorts.controls; let i=index"
          [formGroup]="item">
       <mat-form-field>
         <input matInput
@@ -41,7 +41,7 @@
         <mat-icon aria-label="Delete port">delete</mat-icon>
       </button>
     </div>
-    <button mat-button type="button" (click)="kubernetesForm.get('ports').push(buildPort('', ''))">Add port</button>
+    <button mat-button type="button" (click)="formPorts.push(buildPort('', ''))">Add port</button>
   </fieldset>
 
   <mat-divider></mat-divider>
@@ -54,7 +54,7 @@
   <!-- variables -->
   <fieldset formArrayName="variables">
     <div class="form-group row"
-         *ngFor="let item of kubernetesForm.get('variables').controls; let i=index"
+         *ngFor="let item of formVariables.controls; let i=index"
          [formGroup]="item">
       <mat-form-field>
         <input matInput
@@ -74,7 +74,7 @@
         <mat-icon aria-label="Delete port">delete</mat-icon>
       </button>
     </div>
-    <button mat-button type="button" (click)="kubernetesForm.get('variables').push(buildVariable('', ''))">Add
+    <button mat-button type="button" (click)="formVariables.push(buildVariable('', ''))">Add
       variable
     </button>
   </fieldset>
@@ -85,7 +85,7 @@
 
   <fieldset formArrayName="volumes">
     <div class="form-group row"
-         *ngFor="let item of kubernetesForm.get('volumes').controls; let i=index"
+         *ngFor="let item of formVolumes.controls; let i=index"
          [formGroup]="item">
       <mat-form-field>
         <input matInput
@@ -121,8 +121,8 @@
     </div>
     <button type="button" mat-button [matMenuTriggerFor]="menu">Add volume</button>
     <mat-menu #menu="matMenu">
-      <button type="button" mat-menu-item (click)="kubernetesForm.get('volumes').push(buildPersistentVolume())">Persistent volume</button>
-      <button type="button" mat-menu-item (click)="kubernetesForm.get('volumes').push(buildGceVolume())">GCE Disk</button>
+      <button type="button" mat-menu-item (click)="formVolumes.push(buildPersistentVolume())">Persistent volume</button>
+      <button type="button" mat-menu-item (click)="formVolumes.push(buildGceVolume())">GCE Disk</button>
     </mat-menu>
   </fieldset>
 </form>

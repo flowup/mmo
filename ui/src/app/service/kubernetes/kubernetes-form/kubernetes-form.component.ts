@@ -71,8 +71,12 @@ export class KubernetesFormComponent implements OnInit {
   buildPersistentVolume() {
     return new FormGroup({
       'name': new FormControl('', Validators.required),
-      'pvcSizeGB': new FormControl('', Validators.required | Validators.min(1)),
+      'pvcSizeGB': new FormControl('', Validators.required),
       'mountPath': new FormControl('', Validators.required)
     })
   }
+
+  get formPorts(): FormArray { return this.kubernetesForm.get('ports') as FormArray; }
+  get formVariables(): FormArray { return this.kubernetesForm.get('variables') as FormArray; }
+  get formVolumes(): FormArray { return this.kubernetesForm.get('volumes') as FormArray; }
 }

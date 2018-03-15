@@ -9,6 +9,7 @@ import (
 
 	"github.com/flowup/mmo/api"
 	"github.com/flowup/mmo/config"
+	"github.com/flowup/mmo/utils"
 	"github.com/golang/protobuf/proto"
 	"github.com/google/go-github/github"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -21,6 +22,7 @@ import (
 var (
 	grpcPort = ":50051"
 	httpPort = ":50080"
+	feURL    = "https://mmo-ui.firebaseapp.com/"
 )
 
 func init() {
@@ -85,6 +87,8 @@ func Serve() {
 		log.Infoln("Starting gateway server on", httpPort)
 		log.Fatalf("gw: failed to server: %v", http.ListenAndServe(httpPort, mux))
 	}()
+
+	utils.OpenWebBrowser(feURL)
 
 	wg.Wait()
 }
