@@ -5,7 +5,8 @@ import (
 	"net"
 	"sync"
 	"google.golang.org/grpc"
-	"github.com/spf13/viper"
+    "github.com/spf13/viper"
+    "{{ .Package }}/{{ .Name }}"
 	"google.golang.org/grpc/reflection"	{{if .WebRPC}}
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
     "net/http"{{end}}
@@ -54,14 +55,11 @@ func main(){
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	// create additional resources for the service
-	access := {{.Name}}.NewAccess()
-
     // create the grpc server
 	s := grpc.NewServer()
 
 	// register the service
-	{{.Name}}.Register{{.Name | Title}}ServiceServer(s, {{.Name}}.NewService(access))
+	{{.Name}}.Register{{.Name | Title}}ServiceServer(s, {{.Name}}.NewService())
 
 
 	// Register reflection service on gRPC server.

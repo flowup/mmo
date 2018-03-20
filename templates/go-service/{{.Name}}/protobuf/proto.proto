@@ -1,6 +1,7 @@
 syntax = "proto3";
 
 package {{.Name}};
+option go_package = "{{ .Package }}/{{ .Name }}";
 
 import "google/protobuf/empty.proto";
 {{ if .Gateway }}import "google/api/annotations.proto";{{end}}

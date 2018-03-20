@@ -125,13 +125,10 @@ func Generate(options map[string]interface{}, tmpl string, out string) error {
 			}
 
 			dir, err := os.Stat(pathTemplated)
-			if err != nil {
-				return err
-			}
-
-			if dir.IsDir() {
+			if err == nil && dir.IsDir() {
 				return nil
 			}
+
 			return os.Mkdir(pathTemplated, 0755)
 		}
 

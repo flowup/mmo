@@ -340,6 +340,7 @@ func main() {
 						err = generator.GenerateService(generator.Service{
 							Name:    arg,
 							Project: m.Config.Name,
+							Package: string(m.Config.Prefix),
 						},
 							c.StringSlice("x"),
 							c.String("t"),
