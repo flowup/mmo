@@ -22,7 +22,7 @@ import (
 var (
 	grpcPort = ":50051"
 	httpPort = ":50080"
-	feURL    = "https://mmo-ui.firebaseapp.com/"
+	feURL    = "http://localhost:50080/static/"
 )
 
 func init() {
@@ -77,7 +77,14 @@ func Serve() {
 		ctx, cancel := context.WithCancel(ctx)
 		defer cancel()
 
+		// fs := http.FileServer(http.Dir(build.Default.GOPATH + "/src/github.com/flowup/mmo/api/static"))
+		fs := http.FileServer(http.Dir("api/static"))
+		m := http.NewServeMux()
+		m.Handle("/static/", http.StripPrefix("/static/", fs))
+
 		mux := runtime.NewServeMux(runtime.WithForwardResponseOption(corsFilter))
+		m.Handle("/", mux)
+
 		opts := []grpc.DialOption{grpc.WithInsecure()}
 		err := api.RegisterApiServiceHandlerFromEndpoint(ctx, mux, grpcPort, opts)
 		if err != nil {
@@ -85,7 +92,7 @@ func Serve() {
 		}
 
 		log.Infoln("Starting gateway server on", httpPort)
-		log.Fatalf("gw: failed to server: %v", http.ListenAndServe(httpPort, mux))
+		log.Fatalf("gw: failed to server: %v", http.ListenAndServe(httpPort, m))
 	}()
 
 	utils.OpenWebBrowser(feURL)
