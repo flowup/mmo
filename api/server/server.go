@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"go/build"
 	"net"
 	"net/http"
 	"os"
@@ -77,8 +78,7 @@ func Serve() {
 		ctx, cancel := context.WithCancel(ctx)
 		defer cancel()
 
-		// fs := http.FileServer(http.Dir(build.Default.GOPATH + "/src/github.com/flowup/mmo/api/static"))
-		fs := http.FileServer(http.Dir("api/static"))
+		fs := http.FileServer(http.Dir(build.Default.GOPATH + "/src/github.com/flowup/mmo/api/static"))
 		m := http.NewServeMux()
 		m.Handle("/static/", http.StripPrefix("/static/", fs))
 
