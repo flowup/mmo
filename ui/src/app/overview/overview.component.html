@@ -1,0 +1,23 @@
+<mat-card>
+    <mat-card-title>Project</mat-card-title>
+</mat-card>
+<mat-card>
+    <mat-card-title>Services</mat-card-title>
+    <mat-card-content>
+        <mat-table #table [dataSource]="servicesList$ | async">
+            <ng-container matColumnDef="name">
+                <mat-header-cell *matHeaderCellDef>Name </mat-header-cell>
+                <mat-cell *matCellDef="let service"><a [routerLink]="['/overview', service.name]">{{service.name}}</a></mat-cell>
+            </ng-container>
+  
+            <ng-container matColumnDef="description">
+                <mat-header-cell *matHeaderCellDef> Description </mat-header-cell>
+                <mat-cell *matCellDef="let service"> {{service.description}} </mat-cell>
+            </ng-container>
+  
+            <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+            <mat-row class="table-row" *matRowDef="let row; columns: displayedColumns;" ></mat-row>
+        </mat-table>
+    </mat-card-content>
+  </mat-card>
+    

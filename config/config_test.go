@@ -1,8 +1,8 @@
 package config
 
 import (
-	"testing"
 	"github.com/stretchr/testify/suite"
+	"testing"
 )
 
 type ConfigSuite struct {

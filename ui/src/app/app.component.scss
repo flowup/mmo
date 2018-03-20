@@ -1,0 +1,31 @@
+.sidenav-toggle {
+    margin-right: 16px;
+}
+
+.navigation {
+    padding: 16px 0px;
+    width: 200px;
+}
+
+.content {
+    padding: 16px;
+}
+
+.container {
+    position: absolute;
+    top: 64px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
+.nav-button {
+    width: 100%;
+    &.active::before {
+        content: '> ';
+    }
+}
+
+ul {
+    list-style-type: none;
+}

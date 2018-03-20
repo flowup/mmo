@@ -1,10 +1,12 @@
 package config
 
 import (
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
 	"sort"
+	"strings"
+
+	"gopkg.in/yaml.v2"
 )
 
 const (
@@ -12,15 +14,14 @@ const (
 	FilenameConfig = "mmo.yaml"
 )
 
+type GoPrefix string
+
 // Config represents projects configuration
 type Config struct {
-	Name       string             `yaml:"name"`
-	Lang       string             `yaml:"lang"`
-	DepManager string             `yaml:"dependencyManager"`
-	GoPackage  string             `yaml:"goPackage"`
-	Plugins    []string           `yaml:"plugins"`
-	Generators []string           `yaml:"generators"`
-	Services   map[string]Service `yaml:"services"`
+	Name     string             `yaml:"name"`
+	Plugins  []string           `yaml:"plugins"`
+	Prefix   GoPrefix           `yaml:prefix`
+	Services map[string]Service `yaml:"services"`
 }
 
 // ServiceNames returns an array of all services registered within the config
@@ -35,6 +36,7 @@ func (c *Config) ServiceNames() []string {
 	return names
 }
 
+// AddPlugin is method for adding global plugin
 func (c *Config) AddPlugin(name string) {
 	for _, plugin := range c.Plugins {
 		if plugin == name {
@@ -47,12 +49,9 @@ func (c *Config) AddPlugin(name string) {
 
 // Service represents service configuration from Config
 type Service struct {
-	Name         string       `yaml:"-"`
-	Description  string       `yaml:"description"`
-	WebRPC       bool         `yaml:"webRPC"`
-	Dependencies []Dependency `yaml:"dependencies"`
-	Sentry       bool         `yaml:"sentry"`
-	Gateway      bool         `yaml:"gateway"`
+	Name        string   `yaml:"-"`
+	Description string   `yaml:"description"`
+	Plugins     []string `yaml:"plugins"`
 }
 
 // Dependency represents service dependency configuration from Config
@@ -91,4 +90,22 @@ func SaveConfig(cfg *Config) error {
 	_, err = f.Write(b)
 
 	return err
+}
+
+func (p *GoPrefix) GetOwner() string {
+	parts := strings.Split(string(*p), "/")
+	if len(parts) != 3 {
+		return ""
+	}
+
+	return parts[1]
+}
+
+func (p *GoPrefix) GetRepository() string {
+	parts := strings.Split(string(*p), "/")
+	if len(parts) != 3 {
+		return ""
+	}
+
+	return parts[2]
 }

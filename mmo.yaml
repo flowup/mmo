@@ -1,24 +1,11 @@
-name: example-project-name
-lang: go
-dependencyManager: glide
-goPackage: github.com/flowup/goginn
+name: mmo
+plugins:
+- flowup/mmo-gen-swagger:1.0.1
+- flowup/mmo-gen-angular-client:1.2.1
+prefix: github.com/flowup/mmo
 services:
-  auth:
-    description: handles authentication and authorization of users
-    webRPC: true
-  product:
-    description: handles product creation and reading
-    webRPC: false
-    dependencies:
-    - name: auth
-      type: grpc
-      run:
-        name: auth
-        location: local
-    - name: auth2
-      type: grpc
-      run:
-        name: auth
-        location: octo
-    - name: db
-      type: postgres
+  api:
+    description: "API of the MMO"
+    plugins:
+    - flowup/mmo-gen-go-grpc:1.0.2
+    - flowup/mmo-gen-grpc-gateway:1.0.1

@@ -5,7 +5,6 @@
 *.dll
 *.so
 *.dylib
-mmo
 
 # Test binary, build with `go test -c`
 *.test
@@ -17,3 +16,5 @@ mmo
 .glide/
 vendor/
 .idea/
+*.code-workspace
+.vscode/

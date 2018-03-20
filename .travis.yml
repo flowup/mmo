@@ -1,16 +1,16 @@
 language: go
 
 go:
-  - 1.8.x
+  - 1.9.x
   - master
 
 install:
   - go get github.com/mattn/goveralls
-  - go get github.com/Masterminds/glide
+  - go get -u github.com/golang/dep/cmd/dep
   - go get -u github.com/golang/lint/golint
-  - glide i
+  - dep ensure
 
 script:
   - go build github.com/flowup/mmo
-  - golint $(glide nv)
-  - $HOME/gopath/bin/goveralls -service=travis-ci
+  - golint $(go list -e github.com/flowup/mmo/... | grep -v templates)
+  # - $HOME/gopath/bin/goveralls -service=travis-ci

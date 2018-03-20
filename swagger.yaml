@@ -1,0 +1,361 @@
+---
+  swagger: "2.0"
+  info: 
+    version: "0.0.1"
+    title: "Swagger"
+    description: "All services\n"
+  host: "host"
+  basePath: "/"
+  schemes: 
+    - "http"
+    - "https"
+  consumes: 
+    - "application/json"
+  produces: 
+    - "application/json"
+  tags: []
+  definitions: 
+    apiConsoleOutput: 
+      type: "object"
+      properties: 
+        output: 
+          type: "string"
+    apiGithubDeployRequest: 
+      type: "object"
+      properties: 
+        environment: 
+          type: "string"
+        message: 
+          type: "string"
+        ref: 
+          type: "string"
+    apiKubernetesClusters: 
+      type: "object"
+      properties: 
+        clusters: 
+          type: "array"
+          items: 
+            type: "string"
+    apiKubernetesConfig: 
+      type: "object"
+      properties: 
+        name: 
+          type: "string"
+        type: 
+          type: "string"
+        path: 
+          type: "string"
+        data: 
+          type: "string"
+    apiKubernetesConfigs: 
+      type: "object"
+      properties: 
+        configs: 
+          type: "array"
+          items: 
+            $ref: "#/definitions/apiKubernetesConfig"
+    apiKubernetesDeployRequest: 
+      type: "object"
+      properties: 
+        cluster: 
+          type: "string"
+        namespace: 
+          type: "string"
+        environment: 
+          type: "string"
+    apiKubernetesEnvVar: 
+      type: "object"
+      properties: 
+        name: 
+          type: "string"
+        value: 
+          type: "string"
+    apiKubernetesPort: 
+      type: "object"
+      properties: 
+        name: 
+          type: "string"
+        port: 
+          type: "string"
+    apiKubernetesServiceForm: 
+      type: "object"
+      properties: 
+        serviceName: 
+          type: "string"
+        projectName: 
+          type: "string"
+        ports: 
+          type: "array"
+          items: 
+            $ref: "#/definitions/apiKubernetesPort"
+        volumes: 
+          type: "array"
+          items: 
+            $ref: "#/definitions/apiKubernetesVolume"
+        variables: 
+          type: "array"
+          items: 
+            $ref: "#/definitions/apiKubernetesEnvVar"
+    apiKubernetesVolume: 
+      type: "object"
+      properties: 
+        name: 
+          type: "string"
+        mountPath: 
+          type: "string"
+        pvcName: 
+          type: "string"
+        pvcSizeGB: 
+          type: "integer"
+          format: "int32"
+        gceDisk: 
+          type: "string"
+    apiPlugin: 
+      type: "object"
+      properties: 
+        name: 
+          type: "string"
+        version: 
+          type: "string"
+    apiPlugins: 
+      type: "object"
+      properties: 
+        plugins: 
+          type: "array"
+          items: 
+            $ref: "#/definitions/apiPlugin"
+    apiService: 
+      type: "object"
+      properties: 
+        name: 
+          type: "string"
+        description: 
+          type: "string"
+    apiServices: 
+      type: "object"
+      properties: 
+        services: 
+          type: "array"
+          items: 
+            $ref: "#/definitions/apiService"
+    apiVersion: 
+      type: "object"
+      properties: 
+        name: 
+          type: "string"
+    protobufEmpty: 
+      type: "object"
+      description: "service Foo {\n      rpc Bar(google.protobuf.Empty) returns (google.protobuf.Empty);\n    }\n\nThe JSON representation for `Empty` is empty JSON object `{}`."
+      title: "A generic empty message that you can re-use to avoid defining duplicated\nempty messages in your APIs. A typical example is to use it as the request\nor the response type of an API method. For instance:"
+  paths: 
+    /github/deploy: 
+      post: 
+        operationId: "GithubDeploy"
+        responses: 
+          200: 
+            description: ""
+            schema: 
+              $ref: "#/definitions/protobufEmpty"
+        parameters: 
+          - 
+            name: "body"
+            in: "body"
+            required: true
+            schema: 
+              $ref: "#/definitions/apiGithubDeployRequest"
+        tags: 
+          - "ApiService"
+    /kubernetes/clusters: 
+      get: 
+        operationId: "GetKubernetesClusters"
+        responses: 
+          200: 
+            description: ""
+            schema: 
+              $ref: "#/definitions/apiKubernetesClusters"
+        tags: 
+          - "ApiService"
+    /kubernetes/deploy/confirm: 
+      post: 
+        operationId: "ConfirmKubernetesDeploy"
+        responses: 
+          200: 
+            description: ""
+            schema: 
+              $ref: "#/definitions/apiConsoleOutput"
+        parameters: 
+          - 
+            name: "body"
+            in: "body"
+            required: true
+            schema: 
+              $ref: "#/definitions/apiKubernetesDeployRequest"
+        tags: 
+          - "ApiService"
+    /kubernetes/deploy/new: 
+      post: 
+        operationId: "KubernetesDeploy"
+        responses: 
+          200: 
+            description: ""
+            schema: 
+              $ref: "#/definitions/apiKubernetesConfigs"
+        parameters: 
+          - 
+            name: "body"
+            in: "body"
+            required: true
+            schema: 
+              $ref: "#/definitions/apiKubernetesDeployRequest"
+        tags: 
+          - "ApiService"
+    /kubernetes/remove: 
+      post: 
+        operationId: "RemoveKubernetesConfig"
+        responses: 
+          200: 
+            description: ""
+            schema: 
+              $ref: "#/definitions/protobufEmpty"
+        parameters: 
+          - 
+            name: "body"
+            in: "body"
+            required: true
+            schema: 
+              $ref: "#/definitions/apiKubernetesConfig"
+        tags: 
+          - "ApiService"
+    /kubernetes/save: 
+      post: 
+        operationId: "SaveKuberentesConfig"
+        responses: 
+          200: 
+            description: ""
+            schema: 
+              $ref: "#/definitions/protobufEmpty"
+        parameters: 
+          - 
+            name: "body"
+            in: "body"
+            required: true
+            schema: 
+              $ref: "#/definitions/apiKubernetesConfig"
+        tags: 
+          - "ApiService"
+    /plugins: 
+      get: 
+        operationId: "GetGlobalPlugins"
+        responses: 
+          200: 
+            description: ""
+            schema: 
+              $ref: "#/definitions/apiPlugins"
+        tags: 
+          - "ApiService"
+    /services: 
+      get: 
+        operationId: "GetServices"
+        responses: 
+          200: 
+            description: ""
+            schema: 
+              $ref: "#/definitions/apiServices"
+        tags: 
+          - "ApiService"
+    /services/{name}/kubernetes: 
+      get: 
+        operationId: "GetKubernetesConfigs"
+        responses: 
+          200: 
+            description: ""
+            schema: 
+              $ref: "#/definitions/apiKubernetesConfigs"
+        parameters: 
+          - 
+            name: "name"
+            in: "path"
+            required: true
+            type: "string"
+          - 
+            name: "description"
+            in: "query"
+            required: false
+            type: "string"
+        tags: 
+          - "ApiService"
+    /services/{name}/kubernetes/form: 
+      get: 
+        operationId: "KubernetesFormFromPlugins"
+        responses: 
+          200: 
+            description: ""
+            schema: 
+              $ref: "#/definitions/apiKubernetesServiceForm"
+        parameters: 
+          - 
+            name: "name"
+            in: "path"
+            required: true
+            type: "string"
+          - 
+            name: "description"
+            in: "query"
+            required: false
+            type: "string"
+        tags: 
+          - "ApiService"
+    /services/{name}/plugins: 
+      get: 
+        operationId: "GetPlugins"
+        responses: 
+          200: 
+            description: ""
+            schema: 
+              $ref: "#/definitions/apiPlugins"
+        parameters: 
+          - 
+            name: "name"
+            in: "path"
+            required: true
+            type: "string"
+          - 
+            name: "description"
+            in: "query"
+            required: false
+            type: "string"
+        tags: 
+          - "ApiService"
+    /services/{serviceName}/kubernetes/create: 
+      post: 
+        operationId: "KubernetesConfigFromForm"
+        responses: 
+          200: 
+            description: ""
+            schema: 
+              $ref: "#/definitions/apiKubernetesServiceForm"
+        parameters: 
+          - 
+            name: "serviceName"
+            in: "path"
+            required: true
+            type: "string"
+          - 
+            name: "body"
+            in: "body"
+            required: true
+            schema: 
+              $ref: "#/definitions/apiKubernetesServiceForm"
+        tags: 
+          - "ApiService"
+    /version: 
+      get: 
+        operationId: "GetVersion"
+        responses: 
+          200: 
+            description: ""
+            schema: 
+              $ref: "#/definitions/apiVersion"
+        tags: 
+          - "ApiService"
+
