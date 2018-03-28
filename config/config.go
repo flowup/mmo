@@ -20,7 +20,7 @@ type GoPrefix string
 type Config struct {
 	Name     string             `yaml:"name"`
 	Plugins  []string           `yaml:"plugins"`
-	Prefix   GoPrefix           `yaml:prefix`
+	Prefix   GoPrefix           `yaml:"prefix"`
 	Services map[string]Service `yaml:"services"`
 }
 
