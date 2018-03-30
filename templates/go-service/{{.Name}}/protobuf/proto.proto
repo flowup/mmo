@@ -4,10 +4,12 @@ package {{.Name}};
 option go_package = "{{ .Package }}/{{ .Name }}";
 
 import "google/protobuf/empty.proto";
+import "core/protobuf/proto.proto";
 {{ if .Gateway }}import "google/api/annotations.proto";{{end}}
 
 service {{.Name | Title}}Service {
     rpc GetVersion (google.protobuf.Empty) returns (Version) {}
+    rpc Check(core.HealthCheckRequest) returns (core.HealthCheckResponse);
 }
 
 message Version {

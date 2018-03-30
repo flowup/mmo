@@ -77,6 +77,11 @@ func main() {
 					Name:  "option, x",
 					Usage: "additional options passed to template engine (-x name=value)",
 				},
+				cli.StringFlag{
+					Name:  "prefix, p",
+					Usage: "Go prefix of the project",
+					Value: "",
+				},
 			},
 			Action: func(c *cli.Context) error {
 				debug(c, "Initialization process was started")
@@ -87,9 +92,14 @@ func main() {
 					return errors.New("Missing mmo name argument")
 				}
 
+				if c.String("p") == "" {
+					return errors.New("Flag -p is required")
+				}
+
 				m := &Mmo{
 					Config: &config.Config{
-						Name: arg,
+						Name:   arg,
+						Prefix: config.GoPrefix(c.String("p")),
 					},
 				}
 
@@ -112,7 +122,7 @@ func main() {
 				}
 
 				err := generator.GenerateProject(
-					generator.Project{Name: arg},
+					m.Config,
 					c.StringSlice("x"),
 					c.String("t"),
 					".",

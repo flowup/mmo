@@ -29,10 +29,40 @@ spec:
           protocol: TCP {{end}}{{end}}{{if .Volumes }}
         volumeMounts: {{range $index, $element := .Volumes}}
         - name: {{ $element.Name }}
-          mountPath: {{ $element.MountPath }}{{end}}{{end}}{{if .Volumes }}
+          mountPath: {{ $element.MountPath }}{{end}}{{end}}
+      - name: health
+        image: flowup/grpchc:1.0.0
+        ports:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+        args: ["-service", "{{.ServiceName | Title}}Service", "-host", "127.0.0.1:50051"]
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 3
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 3{{if .Volumes }}
       volumes: {{range $index, $element := .Volumes}}
       - name: {{ $element.Name }}{{if $element.GceDisk}}
         gcePersistentDisk:
           pdName: {{ $element.GceDisk}}
           fsType: ext4{{end}}{{end}}{{end}}
-      
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: {{ .ServiceName }}
+spec:
+  selector:
+    app: {{ .ServiceName }}
+  ports:{{range $index, $element := .Ports}}
+    - name: {{ $element.Name }}
+      port: {{ $element.Port }}
+      protocol: TCP {{end}}

@@ -92,6 +92,10 @@ func (s *APIService) GetKubernetesConfigs(ctx context.Context, in *Service) (*Ku
 
 	err := filepath.Walk("./infrastructure", func(path string, info os.FileInfo, err error) error {
 		// logrus.Debugln("Walking file", info.Name(), "in path", path)
+		if err != nil {
+			return nil
+		}
+
 		if info.IsDir() {
 			return nil
 		}
@@ -101,7 +105,7 @@ func (s *APIService) GetKubernetesConfigs(ctx context.Context, in *Service) (*Ku
 			return nil
 		}
 
-		if !strings.HasPrefix(info.Name(), in.Name+"-") {
+		if !strings.HasPrefix(info.Name(), in.Name) {
 			return nil
 		}
 
@@ -249,7 +253,7 @@ func (s *APIService) KubernetesDeploy(ctx context.Context, in *KubernetesDeployR
 		Configs: []*KubernetesConfig{},
 	}
 
-	dirs := []string{"deployments", "services", in.Environment}
+	dirs := []string{"shared", in.Environment}
 
 	for _, dir := range dirs {
 		err := filepath.Walk("infrastructure/"+dir, func(path string, info os.FileInfo, err error) error {
@@ -299,7 +303,7 @@ func (s *APIService) ConfirmKubernetesDeploy(ctx context.Context, in *Kubernetes
 	log += string(console) + "\n"
 
 	for _, config := range out.Configs {
-		out, err := exec.Command("kubectl", "apply", "-f", config.Path).CombinedOutput()
+		out, err := exec.Command("kubectl", "apply", "-n", in.Namespace, "-f", config.Path).CombinedOutput()
 		if err != nil {
 			logrus.Warnln("Error deploying", err)
 		}
