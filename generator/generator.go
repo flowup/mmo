@@ -13,6 +13,7 @@ import (
 	"text/template"
 
 	"cloud.google.com/go/storage"
+	"github.com/flowup/mmo/config"
 	"github.com/flowup/mmo/utils"
 	"google.golang.org/api/option"
 )
@@ -28,19 +29,15 @@ type Service struct {
 	Project string
 }
 
-// Project represents data needed for project initialization
-type Project struct {
-	Name string
-}
-
 // GenerateProject is function to initialize project from template
-func GenerateProject(project Project, opts []string, tmpl string, out string) error {
+func GenerateProject(config *config.Config, opts []string, tmpl string, out string) error {
 	options, err := ParseOptions(opts)
 	if err != nil {
 		return err
 	}
 
-	options["Name"] = project.Name
+	options["Name"] = config.Name
+	options["Package"] = config.Prefix
 
 	return Generate(options, tmpl, out)
 }

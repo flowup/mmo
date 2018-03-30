@@ -105,7 +105,7 @@ func (s *APIService) GetKubernetesConfigs(ctx context.Context, in *Service) (*Ku
 			return nil
 		}
 
-		if !strings.HasPrefix(info.Name(), in.Name+"-") {
+		if !strings.HasPrefix(info.Name(), in.Name) {
 			return nil
 		}
 

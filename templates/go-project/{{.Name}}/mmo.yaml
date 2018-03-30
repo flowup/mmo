@@ -1,3 +1,8 @@
 name: {{.Name}}
+prefix: {{.Package}}
 plugins: []
-services: {}
+services:
+  core:
+    description: Used for shared models
+    plugins:
+    - flowup/mmo-gen-go-grpc:1.0.2
