@@ -92,6 +92,10 @@ func (s *APIService) GetKubernetesConfigs(ctx context.Context, in *Service) (*Ku
 
 	err := filepath.Walk("./infrastructure", func(path string, info os.FileInfo, err error) error {
 		// logrus.Debugln("Walking file", info.Name(), "in path", path)
+		if err != nil {
+			return nil
+		}
+
 		if info.IsDir() {
 			return nil
 		}
