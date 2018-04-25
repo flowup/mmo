@@ -1,7 +1,6 @@
 package server
 
 import (
-	"context"
 	"go/build"
 	"net"
 	"net/http"
@@ -18,6 +17,7 @@ import (
 	"golang.org/x/oauth2"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
+	"golang.org/x/net/context"
 )
 
 var (
