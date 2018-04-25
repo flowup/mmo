@@ -429,9 +429,5 @@ func getPrefix() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	prefix := strings.Split(path, "/go/src/")
-	if len(prefix) < 0 {
-		return "", errors.New("Cannot create project outside $GOPATH")
-	}
-	return prefix[1], err
+	return strings.TrimPrefix(path, os.Getenv("GOPATH")+"/src/"), nil
 }
