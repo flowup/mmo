@@ -85,21 +85,25 @@ func main() {
 			},
 			Action: func(c *cli.Context) error {
 				debug(c, "Initialization process was started")
-
+				var err error
 				arg := c.Args().First()
 
 				if arg == "" {
 					return errors.New("Missing mmo name argument")
 				}
 
-				if c.String("p") == "" {
-					return errors.New("Flag -p is required")
+				prefix := c.String("p")
+				if prefix == "" {
+					prefix, err = getPrefix()
+					if err != nil {
+						return err
+					}
 				}
 
 				m := &Mmo{
 					Config: &config.Config{
 						Name:   arg,
-						Prefix: config.GoPrefix(c.String("p")),
+						Prefix: config.GoPrefix(prefix),
 					},
 				}
 
@@ -121,7 +125,7 @@ func main() {
 					}
 				}
 
-				err := generator.GenerateProject(
+				err = generator.GenerateProject(
 					m.Config,
 					c.StringSlice("x"),
 					c.String("t"),
@@ -418,4 +422,16 @@ func debug(c *cli.Context, message string) {
 		"flags":   c.GlobalFlagNames(),
 		"command": c.Command.Name,
 	}).Debugln(message)
+}
+
+func getPrefix() (string, error) {
+	path, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+	prefix := strings.Split(path, "/go/src/")
+	if len(prefix) < 0 {
+		return "", errors.New("Cannot create project outside $GOPATH")
+	}
+	return prefix[1], err
 }
