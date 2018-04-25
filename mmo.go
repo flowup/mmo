@@ -365,7 +365,7 @@ func main() {
 							return err
 						}
 
-						log.Infof("Service %s was created\n", arg)
+						log.Infof("Service %s was created", arg)
 
 						return nil
 					},
@@ -393,7 +393,7 @@ func main() {
 							return err
 						}
 
-						log.Infof("Plugin %s was created\n", arg)
+						log.Infof("Plugin %s was created", arg)
 
 						return nil
 					},
