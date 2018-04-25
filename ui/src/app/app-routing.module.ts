@@ -36,7 +36,7 @@ export const navItems: NavigationItem[] = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(navItems)],
+  imports: [RouterModule.forRoot(navItems, { useHash: true })],
   exports: [RouterModule]
 })
 export class AppRoutingModule { }
