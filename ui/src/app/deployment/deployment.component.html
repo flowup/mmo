@@ -32,7 +32,11 @@
           <input matInput placeholder="Kubernetes namespace" [(ngModel)]="namespace">
         </mat-form-field>
         <mat-form-field>
-          <input matInput placeholder="Source environment" [(ngModel)]="source">
+          <mat-select placeholder="Source environment" [(value)]="source">
+            <mat-option *ngFor="let environment of (clusters$ | async).environments" [value]="environment">
+              {{ environment }}
+            </mat-option>
+          </mat-select>
         </mat-form-field>
         <mat-form-field>
           <mat-select placeholder="Target cluster" [(value)]="cluster">

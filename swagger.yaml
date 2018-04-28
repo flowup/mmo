@@ -36,6 +36,10 @@
           type: "array"
           items: 
             type: "string"
+        environments: 
+          type: "array"
+          items: 
+            type: "string"
     apiKubernetesConfig: 
       type: "object"
       properties: 

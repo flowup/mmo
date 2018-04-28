@@ -160,6 +160,7 @@ message GithubDeployRequest {
 
 message KubernetesClusters {
     repeated string clusters = 1;
+    repeated string environments = 2;
 }
 
 message KubernetesDeployRequest {

@@ -34,10 +34,10 @@ export function kubernetesReducer(state: ApiKubernetesServiceForm = initialState
     }
 }
 
-export function kubernetesClustersReducer(state: ApiKubernetesClusters = { clusters: [] }, action: AppAction): ApiKubernetesClusters {
+export function kubernetesClustersReducer(state: ApiKubernetesClusters = { clusters: [], environments: [] }, action: AppAction): ApiKubernetesClusters {
     switch (action.type) {
         case KubernetesActionType.LoadClusters:
-            return { clusters: []};
+            return { clusters: [], environments: []};
         case KubernetesActionType.LoadClustersSuccess:
             return action.payload;
         default:

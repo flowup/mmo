@@ -243,7 +243,19 @@ func (s *APIService) GetKubernetesClusters(ctx context.Context, in *google_proto
 	clusters := strings.Split(string(out), "\n")
 
 	result := &KubernetesClusters{
-		Clusters: clusters[1 : len(clusters)-1],
+		Clusters:     clusters[1 : len(clusters)-1],
+		Environments: []string{},
+	}
+
+	files, err := ioutil.ReadDir("./infrastructure")
+	if err != nil {
+		return nil, err
+	}
+
+	for _, f := range files {
+		if f.IsDir() {
+			result.Environments = append(result.Environments, filepath.Base(f.Name()))
+		}
 	}
 
 	return result, nil
