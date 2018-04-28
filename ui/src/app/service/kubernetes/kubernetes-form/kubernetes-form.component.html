@@ -52,6 +52,9 @@
     <h3 class="mat-subheading-2">Environment variables</h3>
   </div>
   <!-- variables -->
+  <div class="variablecf">
+    <mat-checkbox class="variablecf" formControlName="configEnvConfigmap">Keep values in Configmap</mat-checkbox>
+  </div>  
   <fieldset formArrayName="variables">
     <div class="form-group row"
          *ngFor="let item of formVariables.controls; let i=index"

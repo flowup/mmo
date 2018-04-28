@@ -131,6 +131,7 @@ message KubernetesServiceForm {
     repeated KubernetesPort ports = 2;
     repeated KubernetesVolume volumes = 3;
     repeated KubernetesEnvVar variables = 4;
+    bool configEnvConfigmap = 6;
 }
 
 message KubernetesVolume {

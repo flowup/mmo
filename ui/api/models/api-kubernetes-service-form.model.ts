@@ -6,6 +6,7 @@ import {
 } from './..';
 
 export interface ApiKubernetesServiceForm {
+  configEnvConfigmap: boolean;
   ports: ApiKubernetesPort[];
   projectName: string;
   serviceName: string;

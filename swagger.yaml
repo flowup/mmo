@@ -96,6 +96,9 @@
           type: "array"
           items: 
             $ref: "#/definitions/apiKubernetesEnvVar"
+        configEnvConfigmap: 
+          type: "boolean"
+          format: "boolean"
     apiKubernetesVolume: 
       type: "object"
       properties: 

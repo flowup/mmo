@@ -15,7 +15,8 @@ const initialState: ApiKubernetesServiceForm = {
     ports: [],
     variables: [],
     volumes: [],
-    projectName: ""
+    projectName: "",
+    configEnvConfigmap: false
 }
 
 export function kubernetesReducer(state: ApiKubernetesServiceForm = initialState, action: AppAction): ApiKubernetesServiceForm {

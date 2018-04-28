@@ -198,6 +198,7 @@ func (s *APIService) KubernetesConfigFromForm(ctx context.Context, in *Kubernete
 	input := make(map[string]interface{})
 	input["ServiceName"] = in.ServiceName
 	input["ProjectName"] = s.Config.Name
+	input["EnvMap"] = in.ConfigEnvConfigmap
 
 	if len(in.Ports) > 0 {
 		input["Ports"] = in.Ports

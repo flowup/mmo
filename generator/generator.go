@@ -113,6 +113,9 @@ func Generate(options map[string]interface{}, tmpl string, out string) error {
 		fileBytes := &bytes.Buffer{}
 
 		template.Must(template.New("").Parse(filename)).Execute(pathBytes, options)
+		if pathBytes.String() == filepath.Dir(filename)+"/" {
+			return nil
+		}
 
 		pathTemplated := filepath.Join(out, pathBytes.String())
 		if info.IsDir() {

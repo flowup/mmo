@@ -2,7 +2,6 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   name: {{ .ServiceName }}
-  namespace: {{ .ProjectName }}
   labels:
     app: {{ .ServiceName }}
 spec:
@@ -19,10 +18,13 @@ spec:
       containers:
       - name: {{ .ServiceName }}
         image: {{ .ProjectName }}-{{ .ServiceName }}:latest
-        command: ['./{{ .ServiceName }}'] {{if .Variables }}
+        command: ['./{{ .ServiceName }}'] {{if and (.Variables) (not (.EnvMap)) }}
         env: {{range $index, $element := .Variables}}
         - name: {{ $element.Name }}
-          value: {{ $element.Value }} {{end}}{{end}}{{if .Ports }}
+          value: {{ $element.Value }} {{end}}{{end}}{{if and (.Variables) (.EnvMap) }}
+        envFrom:
+        - configMapRef:
+            name: {{ .ServiceName }}-config{{end}}{{if .Ports }}
         ports: {{range $index, $element := .Ports}}
         - name: {{ $element.Name }}
           containerPort: {{ $element.Port }}

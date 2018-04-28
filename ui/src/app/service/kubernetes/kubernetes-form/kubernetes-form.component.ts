@@ -32,6 +32,7 @@ export class KubernetesFormComponent implements OnInit {
         'serviceName': new FormControl(form.serviceName, Validators.required),
         'ports': new FormArray(form.ports.map(port => this.buildPort(port.name, port.port))),
         'variables': new FormArray(form.variables.map(variable => this.buildVariable(variable.name, variable.value))),
+        'configEnvConfigmap': new FormControl(false),
         'volumes': new FormArray([])
       });
     });

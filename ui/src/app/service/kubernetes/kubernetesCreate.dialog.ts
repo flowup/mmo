@@ -33,6 +33,7 @@ export class KubernetesCreateDialog implements OnInit {
   }
 
   generate(): void {
+    console.log(this.kubernetesForm.getFilledForm());
     this.store.dispatch({
       type: KubernetesActionType.CreateConfig, payload: {
         id: this.serviceID,
