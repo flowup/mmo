@@ -279,6 +279,11 @@ func (s *APIService) KubernetesDeploy(ctx context.Context, in *KubernetesDeployR
 				return nil
 			}
 
+			if !(strings.HasSuffix(info.Name(), ".yaml") ||
+				strings.HasSuffix(info.Name(), ".yml")) {
+				return nil
+			}
+
 			k := &KubernetesConfig{}
 			k.Name = info.Name()
 			k.Path = path
