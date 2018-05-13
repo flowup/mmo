@@ -22,7 +22,7 @@ func (s *Service) GetVersion(ctx context.Context, in *google_protobuf.Empty) (*V
 }
 
 func (s *Service) Check(ctx context.Context, in *core.HealthCheckRequest) (*core.HealthCheckResponse, error) {
-    return &HealthCheckResponse{
-        Status: core.ServingStatus_SERVING,
+    return &core.HealthCheckResponse{
+        Status: core.HealthCheckResponse_SERVING,
     }, nil
 }

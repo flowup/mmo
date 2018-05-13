@@ -8,8 +8,12 @@ import "core/protobuf/proto.proto";
 {{ if .Gateway }}import "google/api/annotations.proto";{{end}}
 
 service {{.Name | Title}}Service {
-    rpc GetVersion (google.protobuf.Empty) returns (Version) {}
-    rpc Check(core.HealthCheckRequest) returns (core.HealthCheckResponse);
+    rpc GetVersion (google.protobuf.Empty) returns (Version) { {{ if .Gateway }}
+        option (google.api.http) = {
+            get: "/{{.Name}}/version"
+        };
+    {{end}}};
+    rpc Check(core.HealthCheckRequest) returns (core.HealthCheckResponse) {};
 }
 
 message Version {
