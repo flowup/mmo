@@ -1,10 +1,9 @@
 package docker
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
-
-	"github.com/sirupsen/logrus"
 )
 
 // Client represents Docker client
@@ -20,7 +19,7 @@ func CreateClient() (*Client, error) {
 
 // Run is method to run Docker image according to passed options
 func (c *Client) Run(options *RunOptions, output bool) error {
-	logrus.Debugln(options.ToArgs())
+	fmt.Println(options.ToArgs())
 	cmd := exec.Command("docker", options.ToArgs()...)
 	if output {
 		cmd.Stdout = os.Stdout
