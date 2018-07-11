@@ -1,9 +1,5 @@
 package docker
 
-import (
-	"os/user"
-)
-
 // RunOptions is structure that represents Docker run options
 type RunOptions struct {
 	Image         string
@@ -14,17 +10,13 @@ type RunOptions struct {
 	AutoRemove    bool
 	Environment   map[string]string
 	WorkingDir    string
-	User          *user.User
 }
 
 // CreateRunOptions creates minimal options that runs image with command and can be extended later
 func CreateRunOptions(image string, command string) *RunOptions {
-	u, _ := user.Current()
-
 	return &RunOptions{
 		Image:         image,
 		Command:       command,
-		User:          u,
 		Volumes:       make([]string, 0),
 		PortPublishes: make([]string, 0),
 		Args:          make([]string, 0),
@@ -78,10 +70,6 @@ func (o *RunOptions) ToArgs() []string {
 	if o.WorkingDir != "" {
 		args = append(args, "-w")
 		args = append(args, o.WorkingDir)
-	}
-
-	if o.Image != "" && o.User != nil {
-		args = append(args, "--user", o.User.Uid+":"+o.User.Gid)
 	}
 
 	if o.Image != "" {
