@@ -248,7 +248,6 @@ func main() {
 				debug(c, "start generating MMO resources")
 
 				m, err := GetMmo()
-
 				if err != nil {
 					return utils.ErrNoProject
 				}
@@ -263,16 +262,7 @@ func main() {
 					services = m.Context.GetServices()
 				}
 
-				for _, service := range services {
-					log.Debugln("Running service " + service)
-					err = m.Plugins.RunGen([]string{service}, m.Config.Services[service].Plugins)
-					if err != nil {
-						log.Error(err)
-					}
-				}
-
-				err = m.Plugins.RunGen(m.Config.ServiceNames(), m.Config.Plugins)
-				if err != nil {
+				if err := config.RunGen(m.Config, m.Plugins, services); err != nil {
 					return err
 				}
 
@@ -350,6 +340,7 @@ func main() {
 						m.Config.Services[arg] = config.Service{
 							Name:        arg,
 							Description: c.String("d"),
+							Plugins:     []string{"flowup/mmo-gen-go-grpc:1.0.2"},
 						}
 
 						err = generator.GenerateService(generator.Service{
@@ -372,6 +363,13 @@ func main() {
 
 						log.Infof("Service %s was created", arg)
 
+						debug(c, "start generating MMO resources")
+
+						if err := config.RunGen(m.Config, m.Plugins, m.Config.ServiceNames()); err != nil {
+							return err
+						}
+
+						log.Infoln("Generation was completed")
 						return nil
 					},
 				},

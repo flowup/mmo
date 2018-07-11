@@ -2,10 +2,9 @@ package config
 
 import (
 	"os"
-
+	log "github.com/sirupsen/logrus"
 	"github.com/flowup/mmo/docker"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 // Plugins is structure that represents plugin system of the MMO
@@ -24,11 +23,11 @@ func NewPlugins(config *Config) (Plugins, error) {
 	return Plugins{Client: cli, Config: config}, nil
 }
 
-// RunGen is method to run all plugins that have specified hook
-func (p *Plugins) RunGen(contextServices []string, plugins []string) error {
+// gen is method to run all plugins that have specified hook
+func (p *Plugins) gen(contextServices []string, plugins []string) error {
 
 	for _, plugin := range plugins {
-		logrus.Infof("Running plugin %s", plugin)
+		log.Infof("Running plugin %s", plugin)
 		pwd, err := os.Getwd()
 		if err != nil {
 			return err
@@ -48,6 +47,25 @@ func (p *Plugins) RunGen(contextServices []string, plugins []string) error {
 		if err != nil {
 			return errors.Wrap(err, "Error running plugin "+plugin)
 		}
+	}
+
+	return nil
+}
+
+// RunGen is method to run all gived services with plugins that have specified hook
+func RunGen(config *Config, plugins *Plugins, services []string) error {
+	var err error
+	for _, service := range services {
+		log.Debugln("Running service " + service)
+		err = plugins.gen([]string{service}, config.Services[service].Plugins)
+		if err != nil {
+			log.Error(err)
+		}
+	}
+
+	err = plugins.gen(config.ServiceNames(), config.Plugins)
+	if err != nil {
+		return err
 	}
 
 	return nil
