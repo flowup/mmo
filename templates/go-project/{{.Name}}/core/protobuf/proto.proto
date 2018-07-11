@@ -3,8 +3,6 @@ syntax = "proto3";
 package core;
 option go_package = "{{ .Package }}/core";
 
-message HealthCheckRequest {
-}
 
 message HealthCheckResponse {
   enum ServingStatus {
@@ -13,4 +11,8 @@ message HealthCheckResponse {
     NOT_SERVING = 2;
   }
   ServingStatus status = 1;
+}
+
+message Version {
+  string name = 1;
 }
