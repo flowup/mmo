@@ -24,7 +24,7 @@ go install
 
 > Default initialization template can be seen within `mmo init --help`
 
-To create a new project called `myproject`, run:
+To create a new project called `myproject`, optional parameter `-p` to change path to project, run:
 ```bash
 $ mmo init myproject
 ```

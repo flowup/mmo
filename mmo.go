@@ -86,9 +86,9 @@ func main() {
 			Action: func(c *cli.Context) error {
 				debug(c, "Initialization process was started")
 				var err error
-				arg := c.Args().First()
+				projectName := c.Args().First()
 
-				if arg == "" {
+				if projectName == "" {
 					return errors.New("Missing mmo name argument")
 				}
 
@@ -98,11 +98,12 @@ func main() {
 					if err != nil {
 						return err
 					}
+					prefix += "/" + projectName
 				}
 
 				m := &Mmo{
 					Config: &config.Config{
-						Name:   arg,
+						Name:   projectName,
 						Prefix: config.GoPrefix(prefix),
 					},
 				}
@@ -136,7 +137,7 @@ func main() {
 					return err
 				}
 
-				log.Infof("Project %s was created", arg)
+				log.Infof("Project %s was created", projectName)
 
 				return nil
 			},
