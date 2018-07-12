@@ -14,7 +14,7 @@ type Client struct {
 // CreateClient is constructor for initializing Client
 func CreateClient() (*Client, error) {
 	c := Client{}
-	err := c.Run(CreateRunOptions("", "info"), false)
+	err := c.Run(CreateRunOptions("", "info"), true)
 	return &c, err
 }
 
