@@ -1,0 +1,30 @@
+module github.com/flowup/mmo
+
+require (
+	cloud.google.com/go v0.17.0
+	github.com/certifi/gocertifi v0.0.0-20170727155124-3fd9e1adb12b
+	github.com/davecgh/go-spew v1.1.0
+	github.com/evalphobia/logrus_sentry v0.4.2
+	github.com/getsentry/raven-go v0.0.0-20170918144728-1452f6376ddb
+	github.com/golang/protobuf v0.0.0-20171113180720-1e59b77b52bf
+	github.com/google/go-github v15.0.0+incompatible
+	github.com/google/go-querystring v0.0.0-20170111101155-53e6ce116135
+	github.com/googleapis/gax-go v2.0.0+incompatible
+	github.com/grpc-ecosystem/grpc-gateway v1.3.1
+	github.com/pkg/errors v0.8.0
+	github.com/pmezard/go-difflib v1.0.0
+	github.com/sergi/go-diff v0.0.0-20170409071739-feef008d51ad
+	github.com/sirupsen/logrus v1.0.3
+	github.com/stretchr/testify v1.1.4
+	github.com/urfave/cli v1.20.0
+	golang.org/x/crypto v0.0.0-20170930174604-9419663f5a44
+	golang.org/x/net v0.0.0-20171004034648-a04bdaca5b32
+	golang.org/x/oauth2 v0.0.0-20180104230036-30785a2c434e
+	golang.org/x/sys v0.0.0-20170927054621-314a259e304f
+	golang.org/x/text v0.0.0-20171006144033-825fc78a2fd6
+	google.golang.org/api v0.0.0-20180114000307-8124d1ac69f1
+	google.golang.org/appengine v1.0.0
+	google.golang.org/genproto v0.0.0-20171212231943-a8101f21cf98
+	google.golang.org/grpc v1.9.1
+	gopkg.in/yaml.v2 v2.0.0-20170812160011-eb3733d160e7
+)
