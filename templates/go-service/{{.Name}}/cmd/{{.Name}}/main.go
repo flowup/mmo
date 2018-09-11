@@ -11,10 +11,10 @@ import (
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
     "net/http"{{end}}
     log "github.com/sirupsen/logrus"{{if .Sentry}}
-    "github.com/evalphobia/logrus_sentry"{{end}}{{if .Gateway}}
+    "github.com/evalphobia/logrus_sentry"{{end}}
     "net/http"
     "context"
-    "github.com/grpc-ecosystem/grpc-gateway/runtime"{{end}}
+    "github.com/grpc-ecosystem/grpc-gateway/runtime"
 )
 
 func init() {
@@ -22,8 +22,8 @@ func init() {
 
     log.SetOutput(os.Stdout)
 
-    log.SetLevel(log.DebugLevel){{if .Sentry}}
-
+    log.SetLevel(log.DebugLevel)
+    {{if .Sentry}}
     // Init Logrus with Sentry
     sentryDsn, ok := os.LookupEnv("SENTRY_DSN")
     if ok {
@@ -47,8 +47,8 @@ func main(){
 
     viper.SetDefault("db.conn", "host=db-svc user=goo dbname=goo sslmode=disable password=goo")
 	viper.SetDefault("server.binds.grpc", ":50051"){{if .WebRPC}}
-	viper.SetDefault("server.binds.webrpc", ":50060"){{end}}{{if .Gateway}}
-	viper.SetDefault("server.binds.gw", ":80"){{end}}
+	viper.SetDefault("server.binds.webrpc", ":50060"){{end}}
+	viper.SetDefault("server.binds.gw", ":80")
 
 	lis, err := net.Listen("tcp", viper.GetString("server.binds.grpc"))
 	if err != nil {
@@ -98,7 +98,7 @@ func main(){
 		}
 
 		wg.Done()
-	}()	{{end}}	{{if .Gateway}}
+	}()	{{end}}
 
 	go func() {
         ctx := context.Background()
@@ -114,7 +114,7 @@ func main(){
 
         log.Infoln("Starting gateway server on", viper.GetString("server.binds.gw"))
         log.Fatalf("gw: failed to server: %v", http.ListenAndServe(viper.GetString("server.binds.gw"), mux))
-    }(){{end}}
+    }()
 
 	wg.Wait()
 }
