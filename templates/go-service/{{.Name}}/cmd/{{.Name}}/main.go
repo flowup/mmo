@@ -12,7 +12,9 @@ import (
     "net/http"{{end}}
     log "github.com/sirupsen/logrus"{{if .Sentry}}
     "github.com/evalphobia/logrus_sentry"{{end}}{{if .Profiler}}
-	"cloud.google.com/go/profiler"{{end}}
+	"cloud.google.com/go/profiler"{{end}}{{ if .Tracing }}
+	"go.opencensus.io/trace"
+	"contrib.go.opencensus.io/exporter/stackdriver" {{end}}
 	"net/http"
     "context"
     "github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -54,8 +56,13 @@ func main(){
 	viper.SetDefault("server.binds.webrpc", ":50060"){{end}}
 	viper.SetDefault("server.binds.gw", ":80"){{if .Profiler}}
 	viper.SetDefault("profiler", false)
-	viper.BindEnv("profiler", "PROFILER")
-	{{end}}
+	viper.BindEnv("profiler", "PROFILER"){{end}}{{if .Tracing}}
+	viper.SetDefault("tracing", false)
+	viper.BindEnv("tracing", "tracing"){{end}}
+	viper.SetDefault("gcp.projectId", "default")
+	viper.BindEnv("gcp.projectId", "GCP_PROJECTID")
+
+
 
 
 	lis, err := net.Listen("tcp", viper.GetString("server.binds.grpc"))
@@ -65,6 +72,7 @@ func main(){
 
     // create the grpc server
 	s := grpc.NewServer()
+	opts := []grpc.DialOption{grpc.WithInsecure()}
 
 	// register the service
 	{{.Name}}.Register{{.Name | Title}}ServiceServer(s, {{.Name}}.NewService())
@@ -72,7 +80,27 @@ func main(){
 
 	// Register reflection service on gRPC server.
 	reflection.Register(s)
-
+	{{ if .Tracing }}
+	if viper.GetBool("tracing") {
+		exporter, err := stackdriver.NewExporter(stackdriver.Options{
+			ProjectID: viper.GetString("gcp.projectId"),
+			OnError: func(err error) {
+				log.Warnln(errors.Wrap(err, "failed to export trace"))
+			},
+			/*TraceClientOptions: []option.ClientOption{
+				option.WithCredentialsFile("service-account.json"),
+			},*/
+		})
+		if err != nil {
+			log.Warn(err)
+		} else {
+			trace.RegisterExporter(exporter)
+			trace.ApplyConfig(trace.Config{DefaultSampler: trace.AlwaysSample()})
+			opts = append(opts, grpc.WithStatsHandler(&ocgrpc.ClientHandler{}))
+			log.Infoln("Tracing to GCP Stackdriver Trace enabled")
+		}
+	}
+	}{{end}}
     // if any service fails, whole app should fail
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
@@ -122,7 +150,6 @@ func main(){
         defer cancel()
 
         mux := runtime.NewServeMux()
-        opts := []grpc.DialOption{grpc.WithInsecure()}
         err := {{ .Name }}.Register{{ .Name | Title }}ServiceHandlerFromEndpoint(ctx, mux, viper.GetString("server.binds.grpc"), opts)
         if err != nil {
             log.Fatalf("gw: failed to register: %v", err)
