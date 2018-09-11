@@ -11,8 +11,9 @@ import (
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
     "net/http"{{end}}
     log "github.com/sirupsen/logrus"{{if .Sentry}}
-    "github.com/evalphobia/logrus_sentry"{{end}}
-    "net/http"
+    "github.com/evalphobia/logrus_sentry"{{end}}{{if .Profiler}}
+	"cloud.google.com/go/profiler"{{end}}
+	"net/http"
     "context"
     "github.com/grpc-ecosystem/grpc-gateway/runtime"
 )
@@ -26,21 +27,24 @@ func init() {
     {{if .Sentry}}
     // Init Logrus with Sentry
     sentryDsn, ok := os.LookupEnv("SENTRY_DSN")
-    if ok {
-        hook, err := logrus_sentry.NewSentryHook(sentryDsn, []log.Level{
-            log.PanicLevel,
-            log.FatalLevel,
-            log.ErrorLevel,
-        })
+    if !ok {
+    	log.Warnln("No SENTRY_DSN was found, sentry reporting won't work")
+    	return
+    }
+	hook, err := logrus_sentry.NewSentryHook(sentryDsn, []log.Level{
+		log.PanicLevel,
+		log.FatalLevel,
+		log.ErrorLevel,
+	})
 
-        if err == nil {
-            hook.Timeout = 20 * time.Second
-            hook.StacktraceConfiguration.Enable = true
-            log.AddHook(hook)
-        }
-    } else {
-        log.Warnln("No SENTRY_DSN was found, sentry reporting won't work")
-    }{{end}}
+	if err == nil {
+		hook.Timeout = 20 * time.Second
+		hook.StacktraceConfiguration.Enable = true
+		log.AddHook(hook)
+	} else  {
+		log.Warnf("Failed to create sentry hook: %s", err.Error())
+	}
+    {{end}}
 }
 
 func main(){
@@ -48,7 +52,11 @@ func main(){
     viper.SetDefault("db.conn", "host=db-svc user=goo dbname=goo sslmode=disable password=goo")
 	viper.SetDefault("server.binds.grpc", ":50051"){{if .WebRPC}}
 	viper.SetDefault("server.binds.webrpc", ":50060"){{end}}
-	viper.SetDefault("server.binds.gw", ":80")
+	viper.SetDefault("server.binds.gw", ":80"){{if .Profiler}}
+	viper.SetDefault("profiler", false)
+	viper.BindEnv("profiler", "PROFILER")
+	{{end}}
+
 
 	lis, err := net.Listen("tcp", viper.GetString("server.binds.grpc"))
 	if err != nil {
@@ -99,6 +107,14 @@ func main(){
 
 		wg.Done()
 	}()	{{end}}
+	{{if .Profiler }}
+	if viper.GetBool("profiler") {
+		if err := profiler.Start(profiler.Config{Service: "{{ .Name }}"}); err != nil {
+			log.Warn(err)
+		} else {
+			log.Infoln("GCloud profiler enabled")
+		}
+	}{{end}}
 
 	go func() {
         ctx := context.Background()
