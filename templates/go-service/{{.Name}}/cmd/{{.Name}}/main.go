@@ -11,44 +11,36 @@ import (
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
     "net/http"{{end}}
     log "github.com/sirupsen/logrus"{{if .Sentry}}
-    "github.com/evalphobia/logrus_sentry"{{end}}{{if .Gateway}}
-    "net/http"
+    "github.com/evalphobia/logrus_sentry"{{end}}{{if .Profiler}}
+	"cloud.google.com/go/profiler"{{end}}{{ if .Tracing }}
+	"go.opencensus.io/trace"
+	"contrib.go.opencensus.io/exporter/stackdriver" {{end}}
+	"net/http"
     "context"
-    "github.com/grpc-ecosystem/grpc-gateway/runtime"{{end}}
+    "github.com/grpc-ecosystem/grpc-gateway/runtime"
 )
 
 func init() {
     log.SetFormatter(&log.JSONFormatter{})
-
     log.SetOutput(os.Stdout)
-
-    log.SetLevel(log.DebugLevel){{if .Sentry}}
-
-    // Init Logrus with Sentry
-    sentryDsn, ok := os.LookupEnv("SENTRY_DSN")
-    if ok {
-        hook, err := logrus_sentry.NewSentryHook(sentryDsn, []log.Level{
-            log.PanicLevel,
-            log.FatalLevel,
-            log.ErrorLevel,
-        })
-
-        if err == nil {
-            hook.Timeout = 20 * time.Second
-            hook.StacktraceConfiguration.Enable = true
-            log.AddHook(hook)
-        }
-    } else {
-        log.Warnln("No SENTRY_DSN was found, sentry reporting won't work")
-    }{{end}}
+    log.SetLevel(log.DebugLevel)
 }
 
 func main(){
 
     viper.SetDefault("db.conn", "host=db-svc user=goo dbname=goo sslmode=disable password=goo")
 	viper.SetDefault("server.binds.grpc", ":50051"){{if .WebRPC}}
-	viper.SetDefault("server.binds.webrpc", ":50060"){{end}}{{if .Gateway}}
-	viper.SetDefault("server.binds.gw", ":80"){{end}}
+	viper.SetDefault("server.binds.webrpc", ":50060"){{end}}
+	viper.SetDefault("server.binds.gw", ":80"){{if .Profiler}}
+	viper.SetDefault("profiler", false)
+	viper.BindEnv("profiler", "PROFILER"){{end}}{{if .Tracing}}
+	viper.SetDefault("tracing", false)
+	viper.BindEnv("tracing", "tracing"){{end}}
+	viper.SetDefault("gcp.projectId", "default")
+	viper.BindEnv("gcp.projectId", "GCP_PROJECTID")
+
+
+
 
 	lis, err := net.Listen("tcp", viper.GetString("server.binds.grpc"))
 	if err != nil {
@@ -57,6 +49,7 @@ func main(){
 
     // create the grpc server
 	s := grpc.NewServer()
+	opts := []grpc.DialOption{grpc.WithInsecure()}
 
 	// register the service
 	{{.Name}}.Register{{.Name | Title}}ServiceServer(s, {{.Name}}.NewService())
@@ -64,7 +57,27 @@ func main(){
 
 	// Register reflection service on gRPC server.
 	reflection.Register(s)
-
+	{{ if .Tracing }}
+	if viper.GetBool("tracing") {
+		exporter, err := stackdriver.NewExporter(stackdriver.Options{
+			ProjectID: viper.GetString("gcp.projectId"),
+			OnError: func(err error) {
+				log.Warnln(errors.Wrap(err, "failed to export trace"))
+			},
+			/*TraceClientOptions: []option.ClientOption{
+				option.WithCredentialsFile("service-account.json"),
+			},*/
+		})
+		if err != nil {
+			log.Warn(err)
+		} else {
+			trace.RegisterExporter(exporter)
+			trace.ApplyConfig(trace.Config{DefaultSampler: trace.AlwaysSample()})
+			opts = append(opts, grpc.WithStatsHandler(&ocgrpc.ClientHandler{}))
+			log.Infoln("Tracing to GCP Stackdriver Trace enabled")
+		}
+	}
+	}{{end}}
     // if any service fails, whole app should fail
 	wg := &sync.WaitGroup{}
 	wg.Add(1)
@@ -98,7 +111,15 @@ func main(){
 		}
 
 		wg.Done()
-	}()	{{end}}	{{if .Gateway}}
+	}()	{{end}}
+	{{if .Profiler }}
+	if viper.GetBool("profiler") {
+		if err := profiler.Start(profiler.Config{Service: "{{ .Name }}"}); err != nil {
+			log.Warn(err)
+		} else {
+			log.Infoln("GCloud profiler enabled")
+		}
+	}{{end}}
 
 	go func() {
         ctx := context.Background()
@@ -106,7 +127,6 @@ func main(){
         defer cancel()
 
         mux := runtime.NewServeMux()
-        opts := []grpc.DialOption{grpc.WithInsecure()}
         err := {{ .Name }}.Register{{ .Name | Title }}ServiceHandlerFromEndpoint(ctx, mux, viper.GetString("server.binds.grpc"), opts)
         if err != nil {
             log.Fatalf("gw: failed to register: %v", err)
@@ -114,7 +134,7 @@ func main(){
 
         log.Infoln("Starting gateway server on", viper.GetString("server.binds.gw"))
         log.Fatalf("gw: failed to server: %v", http.ListenAndServe(viper.GetString("server.binds.gw"), mux))
-    }(){{end}}
+    }()
 
 	wg.Wait()
 }
