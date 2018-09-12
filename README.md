@@ -4,15 +4,10 @@ Monorepo Microservice Orchestration is a CLI tool that helps to easily create, b
 
 ## Installation
 
-MMO supports installation from source, as there is no support for vendor locked `go get` at the moment.
-
-> Go > 1.9
+> Go >= 1.11
 
 ```
-go get -u github.com/flowup/mmo # clone the repository to your tree (this may fail to install, just continue)
-cd $GOPATH/src/github.com/flowup/mmo
-dep ensure
-go install
+go get -u github.com/flowup/mmo
 ```
 
 ## Language support
