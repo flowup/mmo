@@ -22,31 +22,8 @@ import (
 
 func init() {
     log.SetFormatter(&log.JSONFormatter{})
-
     log.SetOutput(os.Stdout)
-
     log.SetLevel(log.DebugLevel)
-    {{if .Sentry}}
-    // Init Logrus with Sentry
-    sentryDsn, ok := os.LookupEnv("SENTRY_DSN")
-    if !ok {
-    	log.Warnln("No SENTRY_DSN was found, sentry reporting won't work")
-    	return
-    }
-	hook, err := logrus_sentry.NewSentryHook(sentryDsn, []log.Level{
-		log.PanicLevel,
-		log.FatalLevel,
-		log.ErrorLevel,
-	})
-
-	if err == nil {
-		hook.Timeout = 20 * time.Second
-		hook.StacktraceConfiguration.Enable = true
-		log.AddHook(hook)
-	} else  {
-		log.Warnf("Failed to create sentry hook: %s", err.Error())
-	}
-    {{end}}
 }
 
 func main(){
