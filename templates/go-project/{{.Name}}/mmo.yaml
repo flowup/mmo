@@ -5,4 +5,5 @@ services:
   core:
     description: Used for shared models
     plugins:
-    - flowup/mmo-gen-go-grpc:1.0.2
+    - flowup/mmo-gen-go-grpc:1.4.0
+    - flowup/mmo-gen-grpc-gateway:1.4.0
