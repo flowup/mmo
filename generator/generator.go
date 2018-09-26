@@ -112,7 +112,16 @@ func Generate(options map[string]interface{}, tmpl string, out string) error {
 		pathBytes := &bytes.Buffer{}
 		fileBytes := &bytes.Buffer{}
 
-		template.Must(template.New("").Parse(filename)).Execute(pathBytes, options)
+		// template the directory
+		tpl, err := template.New("").Parse(filename)
+		if err != nil {
+			return err
+		}
+
+		err = tpl.Execute(pathBytes, options)
+		if err != nil {
+			return err
+		}
 
 		pathTemplated := filepath.Join(out, pathBytes.String())
 		if info.IsDir() {
@@ -129,16 +138,23 @@ func Generate(options map[string]interface{}, tmpl string, out string) error {
 			return os.Mkdir(pathTemplated, 0755)
 		}
 
+		// template the contents of the file
 		fileTemplate, err := ioutil.ReadFile(path)
 		if err != nil {
 			return err
 		}
 
-		template.Must(
-			template.New("").
-				Funcs(utils.DefaultFuncMap).
-				Parse(string(fileTemplate)),
-		).Execute(fileBytes, options)
+		contentTpl, err := template.New("").
+			Funcs(utils.DefaultFuncMap).
+			Parse(string(fileTemplate))
+		if err != nil {
+			return err
+		}
+
+		err = contentTpl.Execute(fileBytes, options)
+		if err != nil {
+			return err
+		}
 
 		err = ioutil.WriteFile(pathTemplated, fileBytes.Bytes(), 0755)
 
