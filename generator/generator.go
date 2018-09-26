@@ -9,6 +9,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"text/template"
 
@@ -94,6 +95,8 @@ func Generate(options map[string]interface{}, tmpl string, out string) error {
 
 	skipFiles := make(map[string]bool)
 	skipFiles["__help.txt"] = true
+	skipFiles["_helpers.tpl"] = true
+	skipFiles["chart/templates/*.yaml"] = true
 
 	err = filepath.Walk(tmpl, func(path string, info os.FileInfo, err error) error {
 
@@ -104,7 +107,9 @@ func Generate(options map[string]interface{}, tmpl string, out string) error {
 		filename := path[len(tmpl):]
 
 		for key := range skipFiles {
-			if strings.HasPrefix(filename, key) {
+			rxp, _ := regexp.Compile(key)
+
+			if rxp.MatchString(filename) {
 				return nil
 			}
 		}
