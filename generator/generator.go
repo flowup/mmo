@@ -3,8 +3,8 @@ package generator
 import (
 	"bytes"
 	"context"
-	"errors"
 	"flag"
+	"github.com/pkg/errors"
 	"io/ioutil"
 	"log"
 	"os"
@@ -115,12 +115,12 @@ func Generate(options map[string]interface{}, tmpl string, out string) error {
 		// template the directory
 		tpl, err := template.New("").Parse(filename)
 		if err != nil {
-			return err
+			return WrapFileError(err, path)
 		}
 
 		err = tpl.Execute(pathBytes, options)
 		if err != nil {
-			return err
+			return WrapFileError(err, path)
 		}
 
 		pathTemplated := filepath.Join(out, pathBytes.String())
@@ -141,24 +141,27 @@ func Generate(options map[string]interface{}, tmpl string, out string) error {
 		// template the contents of the file
 		fileTemplate, err := ioutil.ReadFile(path)
 		if err != nil {
-			return err
+			return WrapFileError(err, path)
 		}
 
 		contentTpl, err := template.New("").
 			Funcs(utils.DefaultFuncMap).
 			Parse(string(fileTemplate))
 		if err != nil {
-			return err
+			return WrapFileError(err, path)
 		}
 
 		err = contentTpl.Execute(fileBytes, options)
 		if err != nil {
-			return err
+			return WrapFileError(err, path)
 		}
 
 		err = ioutil.WriteFile(pathTemplated, fileBytes.Bytes(), 0755)
+		if err != nil {
+			return WrapFileError(err, path)
+		}
 
-		return err
+		return nil
 	})
 	if err != nil {
 		return err
@@ -186,4 +189,8 @@ func ParseOptions(opts []string) (map[string]interface{}, error) {
 	}
 
 	return out, nil
+}
+
+func WrapFileError(err error, file string) error {
+	return errors.Wrap(err, "An error occurred during templating: "+file)
 }
