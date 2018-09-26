@@ -1,9 +1,11 @@
-package {{.Name}}
+package {{ .Name }}
 
 import (
-    "golang.org/x/net/context"
+    "context"
     google_protobuf "github.com/golang/protobuf/ptypes/empty"
     "{{ .Package }}/core"
+
+    "{{ .Package }}/{{ .Name }}"
 )
 
 // {{.Name | Title}} represents an implementation of the service interface
@@ -16,7 +18,7 @@ func NewService() *Service {
 }
 
 func (s *Service) GetVersion(ctx context.Context, in *google_protobuf.Empty) (*Version, error) {
-    return &Version{
+    return &{{ .Name }}.Version{
         Name: "1.0.0",
     }, nil
 }
