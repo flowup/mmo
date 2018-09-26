@@ -1,7 +1,7 @@
-package {{.Name}}
+package {{name}}
 
 import (
-    "golang.org/x/net/context"
+    "context"
     google_protobuf "github.com/golang/protobuf/ptypes/empty"
     "{{ .Package }}/core"
 )
