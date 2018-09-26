@@ -5,9 +5,7 @@ import (
 	"go/build"
 	"os"
 	"strings"
-	"time"
 
-	"github.com/evalphobia/logrus_sentry"
 	"github.com/flowup/mmo/api/server"
 	"github.com/flowup/mmo/config"
 	"github.com/flowup/mmo/generator"
@@ -17,31 +15,12 @@ import (
 	"github.com/urfave/cli"
 )
 
-const (
-	// Log global settings of logger
-	dsn = "https://5554d201ce064e8790792540de39c608:fb93a01a320a486ab40b4fbb5feaf7ac@sentry.io/190135"
-)
-
 func init() {
 	// Logging format is Text
 	log.SetFormatter(&log.TextFormatter{})
 	log.SetOutput(os.Stdout)
 	// this should be override-able by some debug flag
 	log.SetLevel(log.InfoLevel)
-
-	levels := []log.Level{
-		log.PanicLevel,
-		log.FatalLevel,
-		log.ErrorLevel,
-	}
-
-	hook, err := logrus_sentry.NewSentryHook(dsn, levels)
-	hook.Timeout = 20 * time.Second
-	hook.StacktraceConfiguration.Enable = true
-
-	if err == nil {
-		log.AddHook(hook)
-	}
 }
 
 func main() {
