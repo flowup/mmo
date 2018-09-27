@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"context"
 	"flag"
-	"fmt"
 	"github.com/pkg/errors"
 	"io/ioutil"
 	"log"
