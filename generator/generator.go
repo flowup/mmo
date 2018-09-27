@@ -3,12 +3,13 @@ package generator
 import (
 	"bytes"
 	"context"
-	"errors"
 	"flag"
+	"github.com/pkg/errors"
 	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"text/template"
 
@@ -92,8 +93,16 @@ func Generate(options map[string]interface{}, tmpl string, out string) error {
 		out += "/"
 	}
 
-	skipFiles := make(map[string]bool)
-	skipFiles["__help.txt"] = true
+	// skipped files by the templating engine
+	skipFiles := []string{
+		"__help.txt",
+	}
+
+	// files that should be written as is
+	skipTemplating := []string{
+		"_helpers.tpl",
+		"chart/templates/.*yaml",
+	}
 
 	err = filepath.Walk(tmpl, func(path string, info os.FileInfo, err error) error {
 
@@ -103,21 +112,27 @@ func Generate(options map[string]interface{}, tmpl string, out string) error {
 
 		filename := path[len(tmpl):]
 
-		for key := range skipFiles {
-			if strings.HasPrefix(filename, key) {
-				return nil
-			}
+		if matchInStringSlice(path, skipFiles) {
+			return nil
 		}
 
 		pathBytes := &bytes.Buffer{}
 		fileBytes := &bytes.Buffer{}
 
-		template.Must(template.New("").Parse(filename)).Execute(pathBytes, options)
+		// template the directory
+		tpl, err := template.New("").Parse(filename)
+		if err != nil {
+			return WrapFileError(err, path)
+		}
+
+		err = tpl.Execute(pathBytes, options)
+		if err != nil {
+			return WrapFileError(err, path)
+		}
 
 		pathTemplated := filepath.Join(out, pathBytes.String())
 		if info.IsDir() {
 			if pathBytes.Len() == 0 {
-				skipFiles[filename+"/"] = true
 				return nil
 			}
 
@@ -129,20 +144,36 @@ func Generate(options map[string]interface{}, tmpl string, out string) error {
 			return os.Mkdir(pathTemplated, 0755)
 		}
 
+		// read the template from the file
 		fileTemplate, err := ioutil.ReadFile(path)
 		if err != nil {
-			return err
+			return WrapFileError(err, path)
 		}
 
-		template.Must(
-			template.New("").
+		if matchInStringSlice(path, skipTemplating) {
+			// skipping the templating only writes original contents
+			fileBytes.Write(fileTemplate)
+		} else {
+			contentTpl, err := template.New("").
 				Funcs(utils.DefaultFuncMap).
-				Parse(string(fileTemplate)),
-		).Execute(fileBytes, options)
+				Parse(string(fileTemplate))
+			if err != nil {
+				return WrapFileError(err, path)
+			}
 
+			err = contentTpl.Execute(fileBytes, options)
+			if err != nil {
+				return WrapFileError(err, path)
+			}
+		}
+
+		// write the contents of the template (either not templated or templated)
 		err = ioutil.WriteFile(pathTemplated, fileBytes.Bytes(), 0755)
+		if err != nil {
+			return WrapFileError(err, path)
+		}
 
-		return err
+		return nil
 	})
 	if err != nil {
 		return err
@@ -170,4 +201,23 @@ func ParseOptions(opts []string) (map[string]interface{}, error) {
 	}
 
 	return out, nil
+}
+
+func WrapFileError(err error, file string) error {
+	return errors.Wrap(err, "An error occurred during templating: "+file)
+}
+
+func matchInStringSlice(key string, opts []string) bool {
+	for _, rxp := range opts {
+		rxp, err := regexp.Compile(rxp)
+		if err != nil {
+			panic(err)
+		}
+
+		if rxp.MatchString(key) {
+			return true
+		}
+	}
+
+	return false
 }
