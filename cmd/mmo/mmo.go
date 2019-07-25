@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/evalphobia/logrus_sentry"
-	"github.com/flowup/mmo/api/server"
 	"github.com/flowup/mmo/config"
 	"github.com/flowup/mmo/generator"
 	"github.com/flowup/mmo/utils"
@@ -289,13 +288,6 @@ func main() {
 
 				log.Infoln(utils.GetTemplateHelp(c.Args().First()))
 
-				return nil
-			},
-		}, {
-			Name:  "ui",
-			Usage: "Run MMO UI",
-			Action: func(c *cli.Context) error {
-				server.Serve()
 				return nil
 			},
 		}, {
