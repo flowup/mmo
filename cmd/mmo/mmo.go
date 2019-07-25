@@ -5,9 +5,7 @@ import (
 	"go/build"
 	"os"
 	"strings"
-	"time"
 
-	"github.com/evalphobia/logrus_sentry"
 	"github.com/flowup/mmo/config"
 	"github.com/flowup/mmo/generator"
 	"github.com/flowup/mmo/utils"
@@ -28,19 +26,11 @@ func init() {
 	// this should be override-able by some debug flag
 	log.SetLevel(log.InfoLevel)
 
-	levels := []log.Level{
-		log.PanicLevel,
-		log.FatalLevel,
-		log.ErrorLevel,
-	}
-
-	hook, err := logrus_sentry.NewSentryHook(dsn, levels)
-	hook.Timeout = 20 * time.Second
-	hook.StacktraceConfiguration.Enable = true
-
-	if err == nil {
-		log.AddHook(hook)
-	}
+	//levels := []log.Level{
+	//	log.PanicLevel,
+	//	log.FatalLevel,
+	//	log.ErrorLevel,
+	//}
 }
 
 func main() {

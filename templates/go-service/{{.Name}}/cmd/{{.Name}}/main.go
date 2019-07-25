@@ -10,8 +10,7 @@ import (
 	"google.golang.org/grpc/reflection"	{{if .WebRPC}}
 	"github.com/improbable-eng/grpc-web/go/grpcweb"
     "net/http"{{end}}
-    log "github.com/sirupsen/logrus"{{if .Sentry}}
-    "github.com/evalphobia/logrus_sentry"{{end}}{{if .Profiler}}
+    log "github.com/sirupsen/logrus"{{if .Profiler}}
 	"cloud.google.com/go/profiler"{{end}}{{ if .Tracing }}
 	"go.opencensus.io/trace"
 	"contrib.go.opencensus.io/exporter/stackdriver" {{end}}

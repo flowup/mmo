@@ -1,4 +1,0 @@
-Options:
-
--x Sentry=true -- use sentry
--x WebRPC=true -- use webRPC
